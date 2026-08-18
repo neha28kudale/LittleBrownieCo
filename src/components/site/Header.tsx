@@ -28,19 +28,16 @@ export function Header() {
       <div className="container-x h-16 md:h-20">
         <div className="grid h-full grid-cols-[minmax(0,1fr)_auto] items-center gap-2 sm:gap-3 lg:grid-cols-[minmax(0,1.4fr)_auto_auto] lg:gap-6">
           <Link to="/" className="flex min-w-0 items-center gap-2 md:gap-3" onClick={closeMobile}>
-            <img
-              src={IMG.logo}
-              alt="Little Brownie Co."
-              className="h-9 w-9 shrink-0 rounded-full border border-border/80 object-cover shadow-soft md:h-11 md:w-11"
-            />
-            <div className="min-w-0">
-              <div className="whitespace-nowrap font-serif text-[1rem] leading-none text-primary sm:text-[1.2rem] lg:text-[1.55rem]">
-                Little Brownie Co.
-              </div>
-              <div className="truncate pt-1 text-[8px] uppercase tracking-[0.14em] text-muted-foreground sm:text-[10px] sm:tracking-[0.22em]">
-                Bengaluru · Handcrafted Since 2022
-              </div>
-            </div>
+            <img src={IMG.logo} alt="Little Brownie Co."
+  className="h-12 w-12 shrink-0 rounded-full border border-border/80 object-cover shadow-soft md:h-16 md:w-16" />
+<div className="min-w-0">
+  <div className="whitespace-nowrap font-serif text-[1.3rem] leading-none text-primary sm:text-[1.6rem] lg:text-[2rem]">
+    Little Brownie Co.
+  </div>
+  <div className="truncate pt-1 text-[9px] uppercase tracking-[0.14em] text-muted-foreground sm:text-[11px] sm:tracking-[0.22em]">
+    Handcrafted since 2025
+  </div>
+</div>
           </Link>
 
           <nav className="hidden items-center justify-center gap-5 xl:gap-8 lg:flex">
