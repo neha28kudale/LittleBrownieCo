@@ -44,10 +44,11 @@ function CartPage() {
 
   return (
     <section className="container-x py-10 md:py-20">
-      <span className="text-[11px] uppercase tracking-[0.28em] text-toffee">Your Cart</span>
+      <span className="text-[11px] uppercase tracking-[0.28em] text-toffee">Cart</span>
       <h1 className="mt-3 font-serif text-4xl text-primary sm:text-5xl md:text-6xl">
-        Almost baked.
+        Your cart
       </h1>
+      <p className="mt-3 text-muted-foreground">Ready when you are.</p>
 
       <div className="mt-8 grid gap-8 lg:grid-cols-3 lg:gap-12">
         <div className="min-w-0 space-y-4 lg:col-span-2">
@@ -118,7 +119,7 @@ function CartPage() {
               </div>
               <div className="flex justify-between">
                 <dt className="text-muted-foreground">Delivery charges</dt>
-                <dd className="text-muted-foreground">At dispatch</dd>
+                <dd className="text-muted-foreground">Calculated at dispatch</dd>
               </div>
               <div className="flex justify-between border-t border-border pt-3 font-serif text-lg text-primary">
                 <dt>Pay now</dt>
