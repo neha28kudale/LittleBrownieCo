@@ -24,6 +24,8 @@ import galleryPhoto6 from "@/assets/real/gallery-6.jpg";
 import galleryPhoto7 from "@/assets/real/gallery-7.jpg";
 import galleryPhoto8 from "@/assets/real/gallery-8.jpg";
 import heroPhoto from "@/assets/real/hero.jpg";
+import headerBannerPhoto from "@/assets/drive/header-banner.png";
+import biteSizedHandPhoto from "@/assets/drive/bite-sized-hand.jpg";
 
 // Real gifting photography supplied earlier — plain local imports too
 import hamperBagHeart from "@/assets/gifting/hamper-bag-heart.png";
@@ -36,6 +38,8 @@ import hamperPostcardFlowers from "@/assets/gifting/hamper-postcard-flowers.png"
 export const IMG = {
   logo,
   heroPortrait: heroPhoto,
+  headerBanner: headerBannerPhoto,
+  biteSizedHand: biteSizedHandPhoto,
   tub: tubPhoto,
   tubSquare: tubPhoto,
   loaf: loafPhoto,
@@ -127,42 +131,26 @@ const FALLBACK_PRODUCTS: Product[] = [
     category: "Bites",
     image: IMG.tub,
     square: IMG.tubSquare,
-    gallery: [IMG.tub],
+    gallery: [IMG.tub, IMG.assortedTub, IMG.biteSizedHand],
     variants: [
       { id: "6-dark", label: "6 pcs · Dark Chocolate", price: 215 },
       { id: "6-walnut", label: "6 pcs · Walnut", price: 265 },
       { id: "6-nutella", label: "6 pcs · Nutella", price: 245 },
+      { id: "6-assorted", label: "6 pcs · Assorted (2 each)", price: 295 },
       { id: "12-dark", label: "12 pcs · Dark Chocolate", price: 385 },
       { id: "12-walnut", label: "12 pcs · Walnut", price: 465 },
       { id: "12-nutella", label: "12 pcs · Nutella", price: 425 },
+      { id: "12-assorted", label: "12 pcs · Assorted (4 each)", price: 475 },
       { id: "24-dark", label: "24 pcs · Dark Chocolate", price: 665 },
       { id: "24-walnut", label: "24 pcs · Walnut", price: 775 },
       { id: "24-nutella", label: "24 pcs · Nutella", price: 745 },
+      { id: "24-assorted", label: "24 pcs · Assorted (8 each)", price: 835 },
     ],
-    flavours: ["Dark Chocolate", "Walnut", "Nutella"],
+    flavours: ["Dark Chocolate", "Walnut", "Nutella", "Assorted"],
     ingredients: ["Belgian dark chocolate", "Butter", "Eggs", "Cane sugar", "All-purpose flour"],
     description:
-      "It is filled with mini brownie bites that are soft, fudgy, and melt-in-your-mouth delicious. Designed for easy munching, this tub is ideal for casual snacking, sharing with friends, or enjoying a quick treat whenever a craving hits. Just the right size to satisfy your sweet tooth — one bite at a time!",
+      "Soft, fudgy mini brownie bites, ideal for casual snacking, sharing with friends, or enjoying a quick treat whenever a craving hits. Choose a single flavour, or go Assorted for all three (Dark Chocolate, Walnut, Nutella) in one tub — 2 pcs of each in the 6 pcs tub, 4 pcs of each in the 12 pcs tub, and 8 pcs of each in the 24 pcs tub.",
     bestSeller: true,
-  },
-  {
-    id: "p2",
-    slug: "mini-brownie-tub-assorted",
-    name: "Mini Brownie Tub · Assorted",
-    tagline: "All three flavours in one tub.",
-    category: "Bites",
-    image: IMG.assortedTub,
-    square: IMG.assortedTubSquare,
-    gallery: [IMG.assortedTub],
-    variants: [
-      { id: "6", label: "6 pcs · Assorted", price: 295 },
-      { id: "12", label: "12 pcs · Assorted", price: 475 },
-      { id: "24", label: "24 pcs · Assorted", price: 835 },
-    ],
-    flavours: ["Dark Chocolate", "Walnut", "Nutella"],
-    ingredients: ["Belgian dark chocolate", "Butter", "Eggs", "Walnuts", "Nutella", "Flour"],
-    description:
-      "The assorted mini brownie tub consists of all 3 flavours (Dark Chocolate, Walnut, Nutella) — 2 pcs of each in the 6 pcs tub, 4 pcs of each in the 12 pcs tub, and 8 pcs of each in the 24 pcs tub.",
     signature: true,
   },
   {
