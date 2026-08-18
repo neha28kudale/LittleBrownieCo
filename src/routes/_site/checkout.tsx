@@ -163,7 +163,7 @@ function Checkout() {
       <h1 className="mt-3 font-serif text-4xl text-primary sm:text-5xl">Checkout</h1>
 
       <div className="mt-8 grid gap-8 lg:grid-cols-3 lg:gap-12">
-        <div className="space-y-8 lg:col-span-2">
+        <div className="min-w-0 space-y-8 lg:col-span-2">
           <div className="rounded-lg border border-border bg-card p-5 sm:p-6">
             <h2 className="font-serif text-2xl text-primary">Delivery details</h2>
             <p className="mt-1 text-xs text-muted-foreground">
@@ -314,7 +314,7 @@ function Checkout() {
           </div>
         </div>
 
-        <aside className="h-fit rounded-lg border border-border bg-card p-5 shadow-soft lg:sticky lg:top-28 lg:p-6">
+        <aside className="h-fit min-w-0 rounded-lg border border-border bg-card p-5 shadow-soft lg:sticky lg:top-28 lg:p-6">
           <h2 className="font-serif text-2xl text-primary">Order Summary</h2>
           <ul className="mt-4 space-y-2 text-sm">
             {detailed.map((d) => (
@@ -332,9 +332,9 @@ function Checkout() {
               <dt className="text-muted-foreground">Subtotal</dt>
               <dd>₹{subtotal}</dd>
             </div>
-            <div className="flex justify-between">
+            <div className="flex justify-between gap-2">
               <dt className="text-muted-foreground">Delivery charges ({distance ? `${distance} km` : "TBD"})</dt>
-              <dd>₹{deliveryFee}</dd>
+              <dd className="shrink-0">₹{deliveryFee}</dd>
             </div>
             <div className="flex justify-between border-t border-border pt-3 font-serif text-lg text-primary">
               <dt>Pay now</dt>
