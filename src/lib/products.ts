@@ -24,8 +24,8 @@ import galleryPhoto6 from "@/assets/real/gallery-6.jpg";
 import galleryPhoto7 from "@/assets/real/gallery-7.jpg";
 import galleryPhoto8 from "@/assets/real/gallery-8.jpg";
 import heroPhoto from "@/assets/real/hero.jpg";
-import headerBannerPhoto from "@/assets/drive/header-banner.png";
-import biteSizedHandPhoto from "@/assets/drive/bite-sized-hand.jpg";
+import headerBannerPhoto from "@/assets/header-banner.png";
+import biteSizedHandPhoto from "@/assets/bite-sized-hand.jpg";
 
 // Real gifting photography supplied earlier — plain local imports too
 import hamperBagHeart from "@/assets/gifting/hamper-bag-heart.png";
