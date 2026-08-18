@@ -50,7 +50,7 @@ function CartPage() {
       </h1>
 
       <div className="mt-8 grid gap-8 lg:grid-cols-3 lg:gap-12">
-        <div className="space-y-4 lg:col-span-2">
+        <div className="min-w-0 space-y-4 lg:col-span-2">
           {detailed.map((d) => (
             <div
               key={d.key}
@@ -108,7 +108,7 @@ function CartPage() {
           </button>
         </div>
 
-        <aside className="h-fit space-y-6 lg:sticky lg:top-28">
+        <aside className="h-fit min-w-0 space-y-6 lg:sticky lg:top-28">
           <div className="rounded-lg border border-border bg-card p-5 shadow-soft lg:p-6">
             <h2 className="font-serif text-2xl text-primary">Order Summary</h2>
             <dl className="mt-5 space-y-3 text-sm">
