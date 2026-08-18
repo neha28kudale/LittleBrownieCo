@@ -2,8 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Clock, Instagram, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import {
   ADDRESS,
+  DELIVERY_HOURS,
   EMAIL,
-  HOURS,
+  ORDER_HOURS,
   PHONE_DISPLAY,
   WHATSAPP_NUMBER,
   whatsappLink,
@@ -87,9 +88,15 @@ function Contact() {
           <MapPin className="h-6 w-6 text-accent" />
           <h2 className="mt-4 font-serif text-2xl text-primary">Location</h2>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{ADDRESS}</p>
-          <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
-            <Clock className="h-4 w-4 text-accent" />
-            Open daily · {HOURS}
+          <div className="mt-4 space-y-1.5 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4 text-accent" />
+              Taking orders · {ORDER_HOURS}
+            </div>
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4 text-accent" />
+              Deliveries · {DELIVERY_HOURS}
+            </div>
           </div>
         </div>
       </section>
