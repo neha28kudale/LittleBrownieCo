@@ -10,9 +10,7 @@ import {
   maxDeliveryDate,
   formatDisplayDate,
   toISODate,
-  getDeliverySlabs,
-  feeForDistance,
-  DeliverySlab,
+  isDateSelectable,
 } from "@/lib/delivery";
 import { DELIVERY_AGREEMENT_TEXT } from "@/lib/site-content";
 import { supabase } from "@/lib/supabase";
@@ -37,35 +35,24 @@ function Checkout() {
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
   const [address, setAddress] = useState("");
-  const [distance, setDistance] = useState<number | "">("");
   const [date, setDate] = useState("");
   const [slot, setSlot] = useState<string>("");
   const [notes, setNotes] = useState("");
   const [deliveryAgreed, setDeliveryAgreed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [deliverySlabs, setDeliverySlabs] = useState<DeliverySlab[]>([]);
 
   useEffect(() => {
     setDate(toISODate(earliestDeliveryDate()));
   }, []);
 
-  useEffect(() => {
-    const loadSlabs = async () => {
-      const slabs = await getDeliverySlabs();
-      setDeliverySlabs(slabs);
-    };
-    loadSlabs();
-  }, []);
-
   const minDate = toISODate(earliestDeliveryDate());
   const maxDate = toISODate(maxDeliveryDate());
 
-  // Calculate delivery fee based on distance
-  const deliveryFee =
-    typeof distance === "number" && distance >= 0 ? feeForDistance(deliverySlabs, distance) : 0;
-  const totalAmount = subtotal + deliveryFee;
+  // Delivery charges are no longer collected at checkout — they're
+  // calculated by the team at dispatch time (based on distance/courier
+  // availability) and communicated to the customer separately.
+  const totalAmount = subtotal;
 
   if (detailed.length === 0) {
     return (
@@ -81,17 +68,32 @@ function Checkout() {
     );
   }
 
+  // A simple, permissive check for an active Indian WhatsApp number: 10
+  // digits, optionally prefixed with a country code.
+  const isValidWhatsAppNumber = (value: string) => {
+    const digits = value.replace(/[\s-]/g, "");
+    return /^(\+?91)?[6-9]\d{9}$/.test(digits);
+  };
+
   const submit = async () => {
-    if (!name.trim() || !phone.trim() || !address.trim()) {
-      toast.error("Please fill in your name, phone and delivery address.");
+    if (!name.trim()) {
+      toast.error("Please enter your name.");
       return;
     }
-    if (typeof distance !== "number" || distance < 0) {
-      toast.error("Please enter a valid delivery distance in kilometers.");
+    if (!phone.trim() || !isValidWhatsAppNumber(phone)) {
+      toast.error("Please enter a valid, active WhatsApp phone number.");
       return;
     }
-    if (!date || !slot) {
-      toast.error("Please choose a delivery date and time slot.");
+    if (!address.trim()) {
+      toast.error("Please enter your delivery address.");
+      return;
+    }
+    if (!date || !isDateSelectable(date)) {
+      toast.error("Please choose a valid delivery date. Same-day delivery isn't available.");
+      return;
+    }
+    if (!slot) {
+      toast.error("Please choose a delivery time slot.");
       return;
     }
     if (!deliveryAgreed) {
@@ -104,9 +106,8 @@ function Checkout() {
     const result = await createOrder({
       customerName: name,
       phone,
-      email: email || undefined,
       address,
-      deliveryFee,
+      deliveryFee: 0,
       deliveryDate: date,
       deliverySlot: slot,
       notes: notes || undefined,
@@ -172,61 +173,41 @@ function Checkout() {
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
               <label className="block sm:col-span-1">
                 <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-                  Full name
+                  Full name <span className="text-destructive">*</span>
                 </span>
                 <input
                   value={name}
                   onChange={(e) => setName(e.target.value)}
+                  required
                   className="mt-2 w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm text-primary outline-none focus:border-accent"
                 />
               </label>
               <label className="block sm:col-span-1">
                 <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-                  Phone
+                  WhatsApp phone number <span className="text-destructive">*</span>
                 </span>
                 <input
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   type="tel"
+                  inputMode="tel"
+                  placeholder="e.g., 98765 43210"
+                  required
                   className="mt-2 w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm text-primary outline-none focus:border-accent"
                 />
-              </label>
-              <label className="block sm:col-span-2">
-                <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-                  Email (optional, for receipt)
+                <span className="mt-1 block text-[11px] text-muted-foreground">
+                  We'll send delivery updates here — make sure it's active on WhatsApp.
                 </span>
-                <input
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  type="email"
-                  className="mt-2 w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm text-primary outline-none focus:border-accent"
-                />
               </label>
               <label className="block sm:col-span-2">
                 <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-                  Delivery address
+                  Delivery address <span className="text-destructive">*</span>
                 </span>
                 <textarea
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
                   rows={3}
-                  className="mt-2 w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm text-primary outline-none focus:border-accent"
-                />
-              </label>
-              <label className="block sm:col-span-1">
-                <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-                  Distance from restaurant (km)
-                </span>
-                <input
-                  value={distance}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    setDistance(val === "" ? "" : parseFloat(val));
-                  }}
-                  type="number"
-                  step="0.5"
-                  min="0"
-                  placeholder="e.g., 3.5"
+                  required
                   className="mt-2 w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm text-primary outline-none focus:border-accent"
                 />
               </label>
