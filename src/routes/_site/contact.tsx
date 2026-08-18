@@ -71,7 +71,7 @@ function Contact() {
         </div>
 
         <a
-          href="https://instagram.com/littlebrownieco"
+          href="https://www.instagram.com/littlebrownieco.blr?igsh=MXZjejM3YTNwOXczaA==&igsi=MXZjejM3YTNwOXczaA=="
           target="_blank"
           rel="noreferrer"
           className="group rounded-lg border border-border bg-card p-8 transition hover:border-accent/50 hover:shadow-soft"
