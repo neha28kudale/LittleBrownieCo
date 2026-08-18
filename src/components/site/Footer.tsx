@@ -48,11 +48,6 @@ export function Footer() {
                 Updates
               </Link>
             </li>
-            <li>
-              <Link to="/favorites" className="text-primary/80 hover:text-accent">
-                My Favorites
-              </Link>
-            </li>
           </ul>
         </div>
 
