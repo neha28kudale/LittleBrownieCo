@@ -70,12 +70,12 @@ function ProductPage() {
               />
             </div>
             {product.gallery.length > 1 && (
-              <div className="mt-3 flex gap-3">
+              <div className="mt-3 flex gap-3 overflow-x-auto pb-1">
                 {product.gallery.map((g, i) => (
                   <button
                     key={i}
                     onClick={() => setActive(i)}
-                    className={`h-16 w-16 overflow-hidden rounded-sm border-2 sm:h-20 sm:w-20 ${active === i ? "border-accent" : "border-transparent"}`}
+                    className={`h-16 w-16 shrink-0 overflow-hidden rounded-sm border-2 sm:h-20 sm:w-20 ${active === i ? "border-accent" : "border-transparent"}`}
                     aria-label={`View image ${i + 1}`}
                   >
                     <img src={g} alt="" className="h-full w-full object-cover" />
