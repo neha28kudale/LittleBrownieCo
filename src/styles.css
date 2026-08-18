@@ -1,0 +1,175 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Little Brownie Co. — warm handcrafted bakery design system */
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-cream: var(--cream);
+  --color-cocoa: var(--cocoa);
+  --color-cocoa-dark: var(--cocoa-dark);
+  --color-caramel: var(--caramel);
+  --color-caramel-dark: var(--caramel-dark);
+  --color-toffee: var(--toffee);
+  --color-parchment: var(--parchment);
+  --color-surface: var(--surface);
+  --color-surface-soft: var(--surface-soft);
+  --font-serif: "Cormorant Garamond", ui-serif, Georgia, serif;
+  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+}
+
+:root {
+  --radius: 0.5rem;
+  /* Brand palette — matched to the Little Brownie Co. logo (dusty beige disc,
+     camel/tan blob, deep brown wordmark) */
+  --cream: oklch(0.92 0.025 65);           /* dusty beige, logo background */
+  --parchment: oklch(0.965 0.014 68);      /* lighter beige card surface */
+  --cocoa: oklch(0.28 0.05 40);            /* deep brown, wordmark ink */
+  --cocoa-dark: oklch(0.21 0.045 38);      /* darker brown — hover/active press */
+  --caramel: oklch(0.68 0.09 58);          /* camel/tan, logo blob */
+  --caramel-dark: oklch(0.58 0.095 55);    /* darker camel — hover/active press */
+  --toffee: oklch(0.56 0.08 52);           /* mid brown accent */
+
+  --background: var(--cream);
+  --foreground: var(--cocoa);
+  --card: var(--parchment);
+  --card-foreground: var(--cocoa);
+  --popover: var(--parchment);
+  --popover-foreground: var(--cocoa);
+  --primary: var(--cocoa);
+  --primary-foreground: var(--parchment);
+  --secondary: oklch(0.85 0.03 62);
+  --secondary-foreground: var(--cocoa);
+  --surface: oklch(0.955 0.016 66);
+  --surface-soft: oklch(0.89 0.022 63);
+  --muted: oklch(0.88 0.022 62);
+  --muted-foreground: oklch(0.42 0.04 45);
+  --accent: var(--caramel);
+  --accent-foreground: var(--cocoa);
+  --destructive: oklch(0.55 0.18 30);
+  --destructive-foreground: oklch(0.98 0.012 82);
+  --border: oklch(0.8 0.028 60);
+  --input: oklch(0.83 0.025 62);
+  --ring: var(--caramel);
+  --chart-1: var(--caramel);
+  --chart-2: var(--toffee);
+  --chart-3: var(--cocoa);
+  --chart-4: oklch(0.75 0.09 65);
+  --chart-5: oklch(0.5 0.09 45);
+  --sidebar: oklch(0.96 0.02 80);
+  --sidebar-foreground: var(--cocoa);
+  --sidebar-primary: var(--cocoa);
+  --sidebar-primary-foreground: var(--parchment);
+  --sidebar-accent: oklch(0.9 0.03 75);
+  --sidebar-accent-foreground: var(--cocoa);
+  --sidebar-border: oklch(0.82 0.03 70);
+  --sidebar-ring: var(--caramel);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-background);
+    background-image: radial-gradient(color-mix(in oklab, var(--border) 28%, transparent) 0.7px, transparent 0.7px);
+    background-size: 8px 8px;
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01", "ss02";
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  img {
+    display: block;
+    max-width: 100%;
+  }
+
+  button,
+  a {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  h1, h2, h3, h4, h5, .font-serif {
+    font-family: var(--font-serif);
+    font-optical-sizing: auto;
+    letter-spacing: 0;
+  }
+
+  @media (max-width: 767px) {
+    body {
+      background-size: 10px 10px;
+    }
+
+    h1 { font-size: clamp(2.5rem, 11vw, 4.5rem); }
+    h2 { font-size: clamp(2.1rem, 8vw, 3.2rem); }
+    h3 { font-size: clamp(1.5rem, 6vw, 2rem); }
+  }
+}
+
+@utility container-x {
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: 1rem;
+  max-width: 80rem;
+  @media (min-width: 768px) { padding-inline: 2rem; }
+}
+
+@utility shadow-soft {
+  box-shadow: 0 14px 34px -20px color-mix(in oklab, var(--cocoa) 35%, transparent);
+}
+
+@utility shadow-display {
+  box-shadow: 0 30px 60px -28px color-mix(in oklab, var(--cocoa) 38%, transparent);
+}
