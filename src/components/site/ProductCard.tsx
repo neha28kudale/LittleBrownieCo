@@ -1,9 +1,8 @@
 import { Link } from "@tanstack/react-router";
-import { Plus, Heart } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useState } from "react";
 import { fromPrice, type Product } from "@/lib/products";
 import { useCart } from "@/lib/cart";
-import { useFavorites } from "@/lib/favorites";
 import { toast } from "sonner";
 
 export function ProductCard({
@@ -14,10 +13,8 @@ export function ProductCard({
   onAddToCart?: (product: Product, variant: Product["variants"][number], qty: number) => void;
 }) {
   const { add } = useCart();
-  const { isFavorited, addFavorite, removeFavorite } = useFavorites();
   const [variantId, setVariantId] = useState(product.variants[0]!.id);
   const variant = product.variants.find((v) => v.id === variantId)!;
-  const liked = isFavorited(product.id);
 
   const handleAddToCart = () => {
     if (onAddToCart) {
@@ -25,17 +22,6 @@ export function ProductCard({
     } else {
       add(product.id, variant.id);
       toast.success(`${product.name} (${variant.label}) added`);
-    }
-  };
-
-  const handleToggleFavorite = (e: React.MouseEvent) => {
-    e.preventDefault();
-    if (liked) {
-      removeFavorite(product.id);
-      toast.success("Removed from favorites");
-    } else {
-      addFavorite(product.id);
-      toast.success("Added to favorites!");
     }
   };
 
@@ -55,13 +41,6 @@ export function ProductCard({
         <span className="absolute left-3 top-3 rounded-full border border-border/60 bg-background/92 px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-primary backdrop-blur sm:left-4 sm:top-4 sm:px-3">
           {product.category}
         </span>
-        <button
-          onClick={handleToggleFavorite}
-          className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full border border-border/60 bg-background/92 backdrop-blur transition-all hover:bg-primary hover:text-primary-foreground sm:right-4 sm:top-4"
-          aria-label={liked ? "Remove from favorites" : "Add to favorites"}
-        >
-          <Heart className={`h-4 w-4 ${liked ? "fill-current text-accent" : ""}`} />
-        </button>
       </Link>
       <div className="mt-3 flex items-start justify-between gap-3 px-1 sm:mt-4">
         <div className="min-w-0">
