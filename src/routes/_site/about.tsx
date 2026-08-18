@@ -1,6 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import storyImg from "@/assets/story.jpeg";
-import { BadgeCheck, Leaf, MapPin, Recycle, Sparkles, TriangleAlert } from "lucide-react";
+import {
+  BadgeCheck,
+  Leaf,
+  MapPin,
+  Recycle,
+  Sparkles,
+  TriangleAlert,
+} from "lucide-react";
 import { ALLERGENS, FSSAI_NUMBER, IMG } from "@/lib/products";
 
 export const Route = createFileRoute("/_site/about")({
@@ -10,10 +17,14 @@ export const Route = createFileRoute("/_site/about")({
       {
         name: "description",
         content:
-          "A home bakery from Bengaluru, baking small-batch brownies with Belgian chocolate and cultured butter. FSSAI certified.",
+          "The story behind Little Brownie Co. — a family recipe, three women, and a whole lot of love for brownies.",
       },
       { property: "og:title", content: "About Us — Little Brownie Co." },
-      { property: "og:description", content: "Where every bite earns you brownie points." },
+      {
+        property: "og:description",
+        content:
+          "Three women. One family recipe. A whole lot of love for brownies.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -24,55 +35,107 @@ export const Route = createFileRoute("/_site/about")({
 function About() {
   return (
     <>
+      {/* OUR STORY */}
       <section className="container-x pt-10 pb-10 md:pt-24 md:pb-16">
-        <span className="text-[11px] uppercase tracking-[0.28em] text-toffee">About Us</span>
-        <h1 className="mt-4 max-w-4xl font-serif text-3xl leading-[1.08] text-primary sm:text-5xl sm:leading-[1.05] md:text-7xl">
-          Hi, I’m Pragathi &hearts;
+        <span className="text-[11px] uppercase tracking-[0.28em] text-toffee">
+          Our Story
+        </span>
+
+        <h1 className="mt-4 max-w-5xl font-serif text-3xl leading-[1.08] text-primary sm:text-5xl sm:leading-[1.05] md:text-7xl">
+          Three women. One family recipe. A whole lot of love for brownies.
         </h1>
       </section>
 
       <section className="container-x grid gap-8 md:grid-cols-12 md:items-start md:gap-12">
+        {/* STORY CONTENT */}
         <div className="md:col-span-7 space-y-6 text-lg leading-relaxed text-primary/80">
           <p>
-            I’m an aerospace engineer by profession 🚀, someone who grew up valuing precision,
-            discipline, and consistency — and a baker by passion 👩🏽‍🍳, led by creativity, patience,
-            and heart. Somewhere between science and late-night baking experiments, Little Brownie
-            Co. was born.✨ 
-            </p>
-            <p>
-            What started as a simple love for baking slowly became a space where I
-            pour my time, effort, and emotions — learning, refining, and growing with every batch 🤍
-            </p>
-            <p>
-            I believe baking is not just about recipes, but about attention to detail, quality
-            ingredients, and intention behind every single piece. Every brownie you see here is
-            thoughtfully made — measured with care, baked with love, and created to feel just as
-            special as it tastes 🍫✨ 
-            </p> 
-            <p>
-            This page is a reflection of who I am, my journey, and my
-            belief in doing things the right way — one brownie at a time. Thank you for being here,
-            and welcome to Little Brownie Co. 🤎
+            What began as a little tradition at home eventually became the
+            beginning of Little Brownie Co.
           </p>
+
+          <p>
+            Growing up, brownies were never an everyday treat in our home.
+            They were usually made for birthdays, celebrations, or whenever we
+            wanted to make a day a little more special. We’d watch our mom
+            bake, wait for the familiar smell of chocolate to fill the house,
+            and sneak a little taste whenever we could.
+          </p>
+
+          <p>
+            It was a simple family tradition, but one that gave us some of our
+            fondest memories. Over the years, those brownies became more than
+            just a recipe — they became something we genuinely loved and wanted
+            to share beyond our home.
+          </p>
+
+          <p>
+            And that’s how Little Brownie Co. came to life.
+          </p>
+
+          <h2 className="pt-4 font-serif text-3xl leading-tight text-primary sm:text-4xl">
+            A little brownie, made a little differently.
+          </h2>
+
+          <p>
+            We wanted to make brownies that were not only delicious, but easy
+            to enjoy whenever a craving struck. That’s what led us to our mini
+            brownies — and we’re proud to have been the first to introduce them
+            in Bangalore.
+          </p>
+
+          <p>
+            Each mini brownie is baked individually, giving every piece the
+            soft, gooey centre, rich chocolate flavour and freshly baked
+            texture we love.
+          </p>
+
+          <p>
+            As a small, homegrown bakery, we keep our batches small and bake
+            fresh to order. We use quality ingredients in every batch and
+            maintain a clean, hygienic baking setup. For us, it’s not just
+            about how the brownie tastes, but also about the care and attention
+            that goes into making it.
+          </p>
+
+          <p>
+            What started as a family recipe and a simple idea in our kitchen
+            has grown into the heart of Little Brownie Co. Seeing our brownies
+            become part of your celebrations, cravings and everyday moments
+            has been incredibly special to us.
+          </p>
+
+          <p>
+            At its heart, Little Brownie Co. is about family, quality, and the
+            joy of sharing something we’ve loved for years.
+          </p>
+
+          <p>
+            From our family to yours, we hope our brownies become a little part
+            of your story, too. 🤎
+          </p>
+
+          <div className="pt-2">
+            <p className="font-serif text-xl text-primary">— Pragathi</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Founder, Little Brownie Co.
+            </p>
+          </div>
         </div>
+
+        {/* STORY IMAGE */}
         <div className="md:col-span-5 space-y-4">
           <div className="aspect-[4/5] overflow-hidden rounded-[1rem] border border-border/70 shadow-soft">
             <img
               src={storyImg}
-              alt="Fresh brownies arranged for a Little Brownie Co. tasting session"
+              alt="Little Brownie Co. family story"
               className="h-full w-full object-cover"
             />
           </div>
-          {/* <div className="aspect-video overflow-hidden rounded-[1rem] border border-border/70 shadow-soft">
-            <img
-              src={IMG.about2}
-              alt="A tray of Little Brownie Co. brownie bites during prep"
-              className="h-full w-full object-cover"
-            />
-          </div> */}
         </div>
       </section>
 
+      {/* BRAND HIGHLIGHTS */}
       <section className="container-x mt-16 grid gap-6 md:mt-24 md:grid-cols-3">
         {[
           {
@@ -91,10 +154,19 @@ function About() {
             body: "Never mass-produced. Every square hand-cut and inspected before it ships.",
           },
         ].map(({ icon: Icon, title, body }) => (
-          <div key={title} className="rounded-md border border-border bg-card p-8">
+          <div
+            key={title}
+            className="rounded-md border border-border bg-card p-8"
+          >
             <Icon className="h-6 w-6 text-accent" />
-            <h3 className="mt-4 font-serif text-2xl text-primary">{title}</h3>
-            <p className="mt-2 text-sm text-muted-foreground">{body}</p>
+
+            <h3 className="mt-4 font-serif text-2xl text-primary">
+              {title}
+            </h3>
+
+            <p className="mt-2 text-sm text-muted-foreground">
+              {body}
+            </p>
           </div>
         ))}
       </section>
@@ -110,23 +182,30 @@ function About() {
             />
           </div>
         </div>
+
         <div className="md:col-span-6">
           <span className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.28em] text-toffee">
-            <Leaf className="h-4 w-4" /> Sustainable Packaging
+            <Leaf className="h-4 w-4" />
+            Sustainable Packaging
           </span>
+
           <h2 className="mt-4 font-serif text-3xl leading-tight text-primary sm:text-4xl">
             Good for you, gentler on the planet.
           </h2>
+
           <p className="mt-5 text-lg leading-relaxed text-primary/80">
-            We package every order in 100% eco-friendly, recyclable kraft boxes and cups —
-            no single-use plastic. It's a small choice on our end that adds up: less waste, and
-            packaging that breaks down responsibly instead of sitting in a landfill.
+            We package every order in 100% eco-friendly, recyclable kraft boxes
+            and cups — no single-use plastic. It's a small choice on our end
+            that adds up: less waste, and packaging that breaks down
+            responsibly instead of sitting in a landfill.
           </p>
+
           <div className="mt-6 flex items-start gap-3 rounded-md border border-border bg-card p-5">
             <Recycle className="mt-0.5 h-5 w-5 shrink-0 text-accent" />
+
             <p className="text-sm text-muted-foreground">
-              Kraft boxes, paper cups and tubs — fully recyclable, sourced to reduce our footprint
-              with every order we pack.
+              Kraft boxes, paper cups and tubs — fully recyclable, sourced to
+              reduce our footprint with every order we pack.
             </p>
           </div>
         </div>
@@ -135,29 +214,45 @@ function About() {
       {/* CARE & ALLERGY */}
       <section className="container-x mt-16 mb-4 md:mt-24">
         <div className="grid gap-6 md:grid-cols-3">
+          {/* HEATING & STORAGE */}
           <div className="rounded-md border border-border bg-card p-8">
-            <h3 className="font-serif text-2xl text-primary">Heating &amp; storage</h3>
+            <h3 className="font-serif text-2xl text-primary">
+              Heating &amp; storage
+            </h3>
+
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-              A quick 10–15 seconds in the microwave makes your brownie perfectly warm and gooey.
-              Store in an airtight container — up to 4 days at room temperature, or up to 7 days
-              refrigerated (bring to room temperature or microwave before eating).
+              A quick 10–15 seconds in the microwave makes your brownie
+              perfectly warm and gooey. Store in an airtight container — up to
+              4 days at room temperature, or up to 7 days refrigerated (bring
+              to room temperature or microwave before eating).
             </p>
           </div>
+
+          {/* PRO TIP */}
           <div className="rounded-md border border-border bg-card p-8">
-            <h3 className="font-serif text-2xl text-primary">Pro tip</h3>
+            <h3 className="font-serif text-2xl text-primary">
+              Pro tip
+            </h3>
+
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-              Pairs perfectly with a scoop of ice cream, whipped cream, or an extra drizzle of our
-              signature chocolate dip.
+              Pairs perfectly with a scoop of ice cream, whipped cream, or an
+              extra drizzle of our signature chocolate dip.
             </p>
           </div>
+
+          {/* ALLERGY WARNING */}
           <div className="rounded-md border border-destructive/30 bg-card p-8">
             <div className="flex items-center gap-2">
               <TriangleAlert className="h-5 w-5 text-destructive" />
-              <h3 className="font-serif text-2xl text-primary">Allergy warning</h3>
+
+              <h3 className="font-serif text-2xl text-primary">
+                Allergy warning
+              </h3>
             </div>
+
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-              Contains {ALLERGENS.short}. {ALLERGENS.crossContamination} Please check with us
-              before ordering if you have a food allergy.
+              Contains {ALLERGENS.short}. {ALLERGENS.crossContamination} Please
+              check with us before ordering if you have a food allergy.
             </p>
           </div>
         </div>
