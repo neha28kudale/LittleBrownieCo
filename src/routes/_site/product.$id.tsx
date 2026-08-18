@@ -120,15 +120,6 @@ function ProductPage() {
               </div>
             </div>
 
-            <div className="mt-6">
-              <div className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
-                Ingredients
-              </div>
-              <p className="mt-3 text-sm leading-relaxed text-primary/80">
-                {product.ingredients.join(" · ")}
-              </p>
-            </div>
-
             <div className="mt-8 flex flex-wrap items-center gap-3 md:mt-10 md:gap-4">
               <div className="inline-flex items-center rounded-full border border-border">
                 <button
