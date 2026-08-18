@@ -10,7 +10,6 @@ import {
   maxDeliveryDate,
   formatDisplayDate,
   toISODate,
-  isDateSelectable,
 } from "@/lib/delivery";
 import { DELIVERY_AGREEMENT_TEXT } from "@/lib/site-content";
 import { supabase } from "@/lib/supabase";
@@ -27,7 +26,8 @@ export const Route = createFileRoute("/_site/checkout")({
   component: Checkout,
 });
 
-const CASHFREE_MODE = (import.meta.env.VITE_CASHFREE_MODE as string) || "sandbox";
+const CASHFREE_MODE =
+  (import.meta.env.VITE_CASHFREE_MODE as string) || "sandbox";
 
 function Checkout() {
   const { detailed, subtotal, clear } = useCart();
@@ -37,7 +37,7 @@ function Checkout() {
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [date, setDate] = useState("");
-  const [slot, setSlot] = useState<string>("");
+  const [slot, setSlot] = useState("");
   const [notes, setNotes] = useState("");
   const [deliveryAgreed, setDeliveryAgreed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -49,15 +49,13 @@ function Checkout() {
   const minDate = toISODate(earliestDeliveryDate());
   const maxDate = toISODate(maxDeliveryDate());
 
-  // Delivery charges are no longer collected at checkout — they're
-  // calculated by the team at dispatch time (based on distance/courier
-  // availability) and communicated to the customer separately.
-  const totalAmount = subtotal;
-
   if (detailed.length === 0) {
     return (
       <section className="container-x py-20 text-center md:py-24">
-        <h1 className="font-serif text-4xl text-primary sm:text-5xl">Your cart is empty.</h1>
+        <h1 className="font-serif text-4xl text-primary sm:text-5xl">
+          Your cart is empty.
+        </h1>
+
         <Link
           to="/menu"
           className="mt-8 inline-flex rounded-full bg-primary px-6 py-3 text-xs uppercase tracking-[0.18em] text-primary-foreground"
@@ -68,49 +66,59 @@ function Checkout() {
     );
   }
 
-  // A simple, permissive check for an active Indian WhatsApp number: 10
-  // digits, optionally prefixed with a country code.
-  const isValidWhatsAppNumber = (value: string) => {
-    const digits = value.replace(/[\s-]/g, "");
-    return /^(\+?91)?[6-9]\d{9}$/.test(digits);
-  };
-
   const submit = async () => {
-    if (!name.trim()) {
-      toast.error("Please enter your name.");
+    // Mandatory fields
+    if (!name.trim() || !phone.trim() || !address.trim()) {
+      toast.error(
+        "Please fill in your name, active WhatsApp number and delivery address.",
+      );
       return;
     }
-    if (!phone.trim() || !isValidWhatsAppNumber(phone)) {
-      toast.error("Please enter a valid, active WhatsApp phone number.");
+
+    if (!date || !slot) {
+      toast.error("Please choose a delivery date and time slot.");
       return;
     }
-    if (!address.trim()) {
-      toast.error("Please enter your delivery address.");
-      return;
-    }
-    if (!date || !isDateSelectable(date)) {
-      toast.error("Please choose a valid delivery date. Same-day delivery isn't available.");
-      return;
-    }
-    if (!slot) {
-      toast.error("Please choose a delivery time slot.");
-      return;
-    }
+
     if (!deliveryAgreed) {
       toast.error("Please agree to the delivery policy to proceed.");
+      return;
+    }
+
+    // Validate WhatsApp phone number
+    const cleanPhone = phone.replace(/\D/g, "");
+
+    if (cleanPhone.length !== 10) {
+      toast.error("Please enter a valid 10-digit WhatsApp number.");
+      return;
+    }
+
+    // Prevent users from manually selecting an invalid date
+    const selectedDate = new Date(`${date}T00:00:00`);
+    const earliestDate = new Date(`${minDate}T00:00:00`);
+
+    if (selectedDate < earliestDate) {
+      toast.error(
+        `Please select ${formatDisplayDate(minDate)} or a later delivery date.`,
+      );
+      setDate(minDate);
       return;
     }
 
     setSubmitting(true);
 
     const result = await createOrder({
-      customerName: name,
-      phone,
-      address,
+      customerName: name.trim(),
+      phone: cleanPhone,
+      address: address.trim(),
+
+      // Delivery charge is calculated at dispatch.
+      // Do not charge it through Cashfree.
       deliveryFee: 0,
+
       deliveryDate: date,
       deliverySlot: slot,
-      notes: notes || undefined,
+      notes: notes.trim() || undefined,
       items: detailed,
     });
 
@@ -123,18 +131,31 @@ function Checkout() {
     const order = result.order;
 
     try {
-      const { data, error } = await supabase.functions.invoke("create-cashfree-order", {
-        body: { orderId: order.id, mode: CASHFREE_MODE },
-      });
+      const { data, error } = await supabase.functions.invoke(
+        "create-cashfree-order",
+        {
+          body: {
+            orderId: order.id,
+            mode: CASHFREE_MODE,
+          },
+        },
+      );
 
       if (error || !data?.paymentSessionId) {
-        throw new Error(error?.message || "Payment gateway isn't configured yet.");
+        throw new Error(
+          error?.message || "Payment gateway isn't configured yet.",
+        );
       }
 
       clear();
 
-      const cashfree = (window as any).Cashfree?.({ mode: CASHFREE_MODE });
-      if (!cashfree) throw new Error("Payment SDK failed to load.");
+      const cashfree = (window as any).Cashfree?.({
+        mode: CASHFREE_MODE,
+      });
+
+      if (!cashfree) {
+        throw new Error("Payment SDK failed to load.");
+      }
 
       cashfree.checkout({
         paymentSessionId: data.paymentSessionId,
@@ -143,11 +164,19 @@ function Checkout() {
       });
     } catch (err) {
       console.error("[checkout] cashfree", err);
+
       toast.error(
         "Payment isn't set up yet — your order was saved, but couldn't be charged. We'll be in touch.",
       );
+
       clear();
-      navigate({ to: "/order-confirmation/$orderId", params: { orderId: order.id } });
+
+      navigate({
+        to: "/order-confirmation/$orderId",
+        params: {
+          orderId: order.id,
+        },
+      });
     } finally {
       setSubmitting(false);
     }
@@ -159,22 +188,33 @@ function Checkout() {
         to="/cart"
         className="inline-flex items-center gap-1.5 text-xs uppercase tracking-[0.18em] text-muted-foreground hover:text-accent"
       >
-        <ArrowLeft className="h-3.5 w-3.5" /> Back to cart
+        <ArrowLeft className="h-3.5 w-3.5" />
+        Back to cart
       </Link>
-      <h1 className="mt-3 font-serif text-4xl text-primary sm:text-5xl">Checkout</h1>
+
+      <h1 className="mt-3 font-serif text-4xl text-primary sm:text-5xl">
+        Checkout
+      </h1>
 
       <div className="mt-8 grid gap-8 lg:grid-cols-3 lg:gap-12">
         <div className="min-w-0 space-y-8 lg:col-span-2">
+          {/* DELIVERY DETAILS */}
           <div className="rounded-lg border border-border bg-card p-5 sm:p-6">
-            <h2 className="font-serif text-2xl text-primary">Delivery details</h2>
+            <h2 className="font-serif text-2xl text-primary">
+              Delivery details
+            </h2>
+
             <p className="mt-1 text-xs text-muted-foreground">
               Bangalore delivery only. Pick-up is not available.
             </p>
+
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
-              <label className="block sm:col-span-1">
+              {/* NAME */}
+              <label className="block">
                 <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-                  Full name <span className="text-destructive">*</span>
+                  Full name *
                 </span>
+
                 <input
                   value={name}
                   onChange={(e) => setName(e.target.value)}
@@ -182,27 +222,37 @@ function Checkout() {
                   className="mt-2 w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm text-primary outline-none focus:border-accent"
                 />
               </label>
-              <label className="block sm:col-span-1">
+
+              {/* WHATSAPP */}
+              <label className="block">
                 <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-                  WhatsApp phone number <span className="text-destructive">*</span>
+                  WhatsApp number *
                 </span>
+
                 <input
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  onChange={(e) =>
+                    setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))
+                  }
                   type="tel"
-                  inputMode="tel"
-                  placeholder="e.g., 98765 43210"
+                  inputMode="numeric"
+                  maxLength={10}
                   required
+                  placeholder="10-digit WhatsApp number"
                   className="mt-2 w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm text-primary outline-none focus:border-accent"
                 />
+
                 <span className="mt-1 block text-[11px] text-muted-foreground">
-                  We'll send delivery updates here — make sure it's active on WhatsApp.
+                  Please provide an active WhatsApp number.
                 </span>
               </label>
+
+              {/* ADDRESS */}
               <label className="block sm:col-span-2">
                 <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-                  Delivery address <span className="text-destructive">*</span>
+                  Delivery address *
                 </span>
+
                 <textarea
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
@@ -214,33 +264,62 @@ function Checkout() {
             </div>
           </div>
 
+          {/* DELIVERY DATE & TIME */}
           <div className="rounded-lg border border-border bg-card p-5 sm:p-6">
-            <h2 className="font-serif text-2xl text-primary">Delivery date &amp; time</h2>
+            <h2 className="font-serif text-2xl text-primary">
+              Delivery date &amp; time
+            </h2>
+
             <p className="mt-1 text-xs text-muted-foreground">
-              We don't offer same-day delivery. Orders placed 9 AM–5 PM can be delivered from
-              tomorrow; orders placed after 5 PM need one extra day.
+              We don't offer same-day delivery. Orders placed between 9 AM and
+              5 PM can be delivered from tomorrow. Orders placed after 5 PM can
+              be delivered from the day after tomorrow.
             </p>
+
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
+              {/* DATE */}
               <label className="block">
                 <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-                  Delivery date
+                  Delivery date *
                 </span>
+
                 <input
                   type="date"
                   value={date}
                   min={minDate}
                   max={maxDate}
-                  onChange={(e) => setDate(e.target.value)}
+                  onChange={(e) => {
+                    const selected = e.target.value;
+
+                    if (selected < minDate) {
+                      setDate(minDate);
+
+                      toast.error(
+                        `Earliest available delivery date is ${formatDisplayDate(
+                          minDate,
+                        )}.`,
+                      );
+
+                      return;
+                    }
+
+                    setDate(selected);
+                  }}
+                  required
                   className="mt-2 w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm text-primary outline-none focus:border-accent"
                 />
+
                 <span className="mt-1 block text-[11px] text-muted-foreground">
                   Earliest available: {formatDisplayDate(minDate)}
                 </span>
               </label>
+
+              {/* TIME SLOT */}
               <div>
                 <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-                  Time slot
+                  Delivery time *
                 </span>
+
                 <div className="mt-2 grid grid-cols-2 gap-2">
                   {DELIVERY_TIME_SLOTS.map((s) => (
                     <button
@@ -258,10 +337,13 @@ function Checkout() {
                   ))}
                 </div>
               </div>
+
+              {/* NOTES */}
               <label className="block sm:col-span-2">
                 <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
                   Notes for the kitchen (optional)
                 </span>
+
                 <textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
@@ -272,22 +354,32 @@ function Checkout() {
             </div>
           </div>
 
+          {/* DELIVERY AGREEMENT */}
           <div className="rounded-lg border border-border bg-secondary/30 p-5 sm:p-6">
             <p className="text-sm leading-relaxed text-muted-foreground">
               {DELIVERY_AGREEMENT_TEXT}
             </p>
+
             <div className="mt-4 flex items-start gap-3">
               <Checkbox
                 id="delivery-agreement"
                 checked={deliveryAgreed}
-                onCheckedChange={(checked) => setDeliveryAgreed(checked === true)}
+                onCheckedChange={(checked) =>
+                  setDeliveryAgreed(checked === true)
+                }
               />
+
               <Label
                 htmlFor="delivery-agreement"
                 className="cursor-pointer text-sm leading-snug text-primary/90"
               >
-                I understand and agree to the delivery charges as per the delivery policy.{" "}
-                <Link to="/policies" hash="delivery" className="text-accent hover:underline">
+                I understand and agree to the delivery charges as per the
+                delivery policy.{" "}
+                <Link
+                  to="/policies"
+                  hash="delivery"
+                  className="text-accent hover:underline"
+                >
                   View Delivery Policy
                 </Link>
               </Label>
@@ -295,37 +387,61 @@ function Checkout() {
           </div>
         </div>
 
+        {/* ORDER SUMMARY */}
         <aside className="h-fit min-w-0 rounded-lg border border-border bg-card p-5 shadow-soft lg:sticky lg:top-28 lg:p-6">
-          <h2 className="font-serif text-2xl text-primary">Order Summary</h2>
+          <h2 className="font-serif text-2xl text-primary">
+            Order Summary
+          </h2>
+
           <ul className="mt-4 space-y-2 text-sm">
             {detailed.map((d) => (
-              <li key={d.key} className="flex justify-between gap-2 text-primary/80">
+              <li
+                key={d.key}
+                className="flex justify-between gap-2 text-primary/80"
+              >
                 <span className="min-w-0 truncate">
                   {d.qty} × {d.product.name}{" "}
-                  <span className="text-muted-foreground">({d.variant.label})</span>
+                  <span className="text-muted-foreground">
+                    ({d.variant.label})
+                  </span>
                 </span>
+
                 <span className="shrink-0">₹{d.lineTotal}</span>
               </li>
             ))}
           </ul>
+
           <dl className="mt-5 space-y-3 border-t border-border pt-4 text-sm">
+            {/* SUBTOTAL */}
             <div className="flex justify-between">
               <dt className="text-muted-foreground">Subtotal</dt>
               <dd>₹{subtotal}</dd>
             </div>
+
+            {/* DELIVERY */}
             <div className="flex justify-between gap-2">
-              <dt className="text-muted-foreground">Delivery charges ({distance ? `${distance} km` : "TBD"})</dt>
-              <dd className="shrink-0">₹{deliveryFee}</dd>
+              <dt className="text-muted-foreground">
+                Delivery charges
+              </dt>
+
+              <dd className="shrink-0 text-right">
+                Calculated at dispatch
+              </dd>
             </div>
+
+            {/* PAY NOW */}
             <div className="flex justify-between border-t border-border pt-3 font-serif text-lg text-primary">
               <dt>Pay now</dt>
-              <dd>₹{totalAmount}</dd>
+              <dd>₹{subtotal}</dd>
             </div>
           </dl>
+
           <p className="mt-4 text-[11px] leading-relaxed text-muted-foreground">
-            Delivery charges are calculated separately and payable to the delivery partner when your
-            order arrives. We'll share the amount and tracking details once dispatched.
+            Delivery charges are calculated at dispatch based on your delivery
+            location. The final delivery charge will be shared with you before
+            dispatch.
           </p>
+
           <button
             onClick={submit}
             disabled={submitting}
@@ -333,14 +449,17 @@ function Checkout() {
           >
             {submitting ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" /> Processing…
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Processing…
               </>
             ) : (
               <>
-                Proceed to payment <ArrowRight className="h-4 w-4" />
+                Proceed to payment
+                <ArrowRight className="h-4 w-4" />
               </>
             )}
           </button>
+
           <p className="mt-3 text-center text-[11px] text-muted-foreground">
             You'll be redirected to Cashfree's secure checkout to pay.
           </p>
