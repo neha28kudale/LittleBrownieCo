@@ -601,8 +601,13 @@ export function isClosedDay(_dateStr: string) {
 export const WHATSAPP_NUMBER = "919019917398";
 export const PHONE_DISPLAY = "+91 90199 17398";
 export const EMAIL = "littlebrownieco25@gmail.com";
-export const ADDRESS = "105, Forum Mall Parking Road, Bengaluru 560095, Karnataka, India";
-export const HOURS = "9:00 AM – 5:00 PM";
+export const ADDRESS = "Koramangala, Bengaluru 560029, Karnataka, India";
+/** Hours during which we take new orders. */
+export const ORDER_HOURS = "9:00 AM – 5:00 PM";
+/** Hours during which orders are delivered. */
+export const DELIVERY_HOURS = "9:00 AM – 9:00 PM";
+/** @deprecated use ORDER_HOURS — kept so any lingering imports don't break. */
+export const HOURS = ORDER_HOURS;
 export const UPI_ID = "littlebrownieco@upi";
 export const FSSAI_NUMBER = "21225010000087";
 
