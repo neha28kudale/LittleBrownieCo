@@ -105,7 +105,7 @@ export function Footer() {
           <ul className="mt-5 space-y-2.5 text-sm">
             <li>
               <a
-                href="https://instagram.com/littlebrownieco"
+                href="https://www.instagram.com/littlebrownieco.blr?igsh=MXZjejM3YTNwOXczaA==&igsi=MXZjejM3YTNwOXczaA=="
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-2 text-primary/80 hover:text-accent"
