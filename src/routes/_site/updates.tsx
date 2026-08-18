@@ -130,7 +130,7 @@ function Updates() {
             </p>
             <div className="mt-4 flex gap-3 flex-wrap">
               <a
-                href="https://instagram.com/littlebrownieco"
+                href="https://www.instagram.com/littlebrownieco.blr?igsh=MXZjejM3YTNwOXczaA==&igsi=MXZjejM3YTNwOXczaA=="
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2 text-xs uppercase tracking-[0.18em] text-primary-foreground hover:bg-cocoa-dark transition-colors"
