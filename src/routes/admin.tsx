@@ -8,6 +8,7 @@ import {
   uploadProductImage,
   deleteProductImage,
   type Product,
+  type Variant,
   IMG,
   fromPrice,
 } from "@/lib/products";
@@ -702,6 +703,10 @@ function ReviewsAdmin({
 
 type Draft = Partial<Product> & { price?: number };
 
+function emptyVariant(): Variant {
+  return { id: `v-${Math.random().toString(36).slice(2, 9)}`, label: "", price: 0 };
+}
+
 function ProductsAdmin({
   products,
   refresh,
@@ -717,6 +722,13 @@ function ProductsAdmin({
       toast.error("Name and price are required");
       return;
     }
+    const cleanVariants = (draft.variants || [])
+      .filter((v) => v.label.trim() && v.price > 0)
+      .map((v) => ({ id: v.id, label: v.label.trim(), price: Number(v.price) }));
+    const cleanGallery = (draft.gallery || []).filter(Boolean);
+    const cleanFlavours = (draft.flavours || []).map((f) => f.trim()).filter(Boolean);
+    const cleanIngredients = (draft.ingredients || []).map((i) => i.trim()).filter(Boolean);
+
     setSaving(true);
     if (draft.id) {
       const result = await updateProductRow(draft.id, {
@@ -726,6 +738,10 @@ function ProductsAdmin({
         description: draft.description,
         image: draft.image,
         price: Number(draft.price),
+        variants: cleanVariants.length ? cleanVariants : undefined,
+        gallery: cleanGallery.length ? cleanGallery : draft.image ? [draft.image] : undefined,
+        flavours: cleanFlavours,
+        ingredients: cleanIngredients,
       });
       setSaving(false);
       if (!result.ok) {
@@ -741,6 +757,10 @@ function ProductsAdmin({
         description: draft.description,
         image: draft.image || IMG.littleBox,
         price: Number(draft.price),
+        variants: cleanVariants.length ? cleanVariants : undefined,
+        gallery: cleanGallery.length ? cleanGallery : undefined,
+        flavours: cleanFlavours,
+        ingredients: cleanIngredients,
       });
       setSaving(false);
       if (!result.ok) {
@@ -983,6 +1003,7 @@ function ProductModal({
 }) {
   const [d, setD] = useState<Draft>(draft);
   const [uploading, setUploading] = useState(false);
+  const [galleryUploading, setGalleryUploading] = useState(false);
   const [showUrlField, setShowUrlField] = useState(!draft.image);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -1107,6 +1128,139 @@ function ProductModal({
               className="input"
             />
           </Field>
+
+          <Field label="Flavours (comma separated)">
+            <input
+              value={(d.flavours || []).join(", ")}
+              onChange={(e) =>
+                setD({ ...d, flavours: e.target.value.split(",").map((s) => s.trim()) })
+              }
+              className="input"
+              placeholder="Dark Chocolate, Walnut, Nutella"
+            />
+          </Field>
+
+          <Field label="Ingredients (comma separated)">
+            <input
+              value={(d.ingredients || []).join(", ")}
+              onChange={(e) =>
+                setD({ ...d, ingredients: e.target.value.split(",").map((s) => s.trim()) })
+              }
+              className="input"
+              placeholder="Belgian dark chocolate, Butter, Eggs"
+            />
+          </Field>
+
+          {/* Variants: every size/flavour + price option shown as a button on the
+              product page. Full CRUD here, not just a single price field. */}
+          <div>
+            <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+              Options (label · price) — shown as choices on the product page
+            </span>
+            <div className="mt-2 space-y-2">
+              {(d.variants || []).map((v, i) => (
+                <div key={v.id} className="flex items-center gap-2">
+                  <input
+                    value={v.label}
+                    onChange={(e) => {
+                      const next = [...(d.variants || [])];
+                      next[i] = { ...next[i], label: e.target.value };
+                      setD({ ...d, variants: next });
+                    }}
+                    placeholder="e.g. 6 pcs · Dark Chocolate"
+                    className="input flex-1"
+                  />
+                  <input
+                    type="number"
+                    value={v.price || ""}
+                    onChange={(e) => {
+                      const next = [...(d.variants || [])];
+                      next[i] = { ...next[i], price: Number(e.target.value) };
+                      setD({ ...d, variants: next });
+                    }}
+                    placeholder="₹"
+                    className="input w-24"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const next = (d.variants || []).filter((_, idx) => idx !== i);
+                      setD({ ...d, variants: next });
+                    }}
+                    className="shrink-0 rounded-full border border-border p-2 text-muted-foreground hover:border-destructive hover:text-destructive"
+                    aria-label="Remove option"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={() => setD({ ...d, variants: [...(d.variants || []), emptyVariant()] })}
+                className="inline-flex items-center gap-2 rounded-full border border-dashed border-border px-3 py-1.5 text-[11px] uppercase tracking-[0.16em] text-primary hover:border-accent hover:text-accent"
+              >
+                <Plus className="h-3.5 w-3.5" /> Add option
+              </button>
+              <p className="text-[11px] text-muted-foreground">
+                Leave empty (or all options blank) to keep the single Price field above as the
+                only option.
+              </p>
+            </div>
+          </div>
+
+          {/* Gallery: extra photos shown in the product page image strip. */}
+          <div>
+            <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+              Gallery photos
+            </span>
+            <div className="mt-2 flex flex-wrap gap-3">
+              {(d.gallery || []).map((g, i) => (
+                <div key={i} className="relative h-20 w-20 shrink-0">
+                  <img src={g} alt="" className="h-full w-full rounded-md object-cover" />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const next = (d.gallery || []).filter((_, idx) => idx !== i);
+                      setD({ ...d, gallery: next });
+                    }}
+                    className="absolute -right-2 -top-2 grid h-6 w-6 place-items-center rounded-full border border-border bg-card text-muted-foreground hover:border-destructive hover:text-destructive"
+                    aria-label="Remove photo"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              ))}
+              <label className="grid h-20 w-20 shrink-0 cursor-pointer place-items-center rounded-md border border-dashed border-border text-muted-foreground hover:border-accent hover:text-accent">
+                {galleryUploading ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  <ImagePlus className="h-5 w-5" />
+                )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  disabled={galleryUploading}
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    e.target.value = "";
+                    if (!file) return;
+                    setGalleryUploading(true);
+                    const result = await uploadProductImage(file);
+                    setGalleryUploading(false);
+                    if (!result.ok) {
+                      toast.error(result.error);
+                      return;
+                    }
+                    setD((prev) => ({ ...prev, gallery: [...(prev.gallery || []), result.url] }));
+                  }}
+                />
+              </label>
+            </div>
+            <p className="mt-2 text-[11px] text-muted-foreground">
+              If left empty, the main product photo above is used as the only gallery image.
+            </p>
+          </div>
         </div>
         <div className="mt-6 flex justify-end gap-3">
           <button
