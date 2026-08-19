@@ -21,11 +21,6 @@ import {
 } from "@/lib/orders";
 
 import {
-  getDeliverySlabs,
-  updateDeliverySlab,
-  type DeliverySlab,
-} from "@/lib/delivery";
-import {
   getAdminSession,
   adminSignIn,
   adminSignOut,
@@ -50,7 +45,6 @@ import {
   LogOut,
   Star,
   MessageSquare,
-  Truck,
   Check,
   Ban,
   ImagePlus,
@@ -167,12 +161,11 @@ function AdminDashboard({
   onLogout: () => void;
 }) {
   const [tab, setTab] = useState<
-    "overview" | "orders" | "products" | "reviews" | "delivery" | "analytics"
+    "overview" | "orders" | "products" | "reviews" | "analytics"
   >("overview");
   const [orders, setOrders] = useState<Order[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
-  const [slabs, setSlabs] = useState<DeliverySlab[]>([]);
 
   const refreshProducts = () => getAllProductsAdmin().then(setProducts);
 
@@ -186,10 +179,6 @@ function AdminDashboard({
     };
     load();
     return subscribeOrders(load);
-  }, []);
-
-  useEffect(() => {
-    getDeliverySlabs().then(setSlabs);
   }, []);
 
   useEffect(() => {
@@ -212,16 +201,6 @@ function AdminDashboard({
     await setOrderStatus(id, status);
     setOrders(await getAllOrders());
     toast.success(`Order ${status.replace("_", " ")}`);
-  };
-
-  const saveSlabFee = async (id: string, fee: number) => {
-    const result = await updateDeliverySlab(id, fee);
-    if (!result.ok) {
-      toast.error(result.error);
-      return;
-    }
-    setSlabs(await getDeliverySlabs());
-    toast.success("Delivery fee updated");
   };
 
   const stats = useMemo(
@@ -255,7 +234,6 @@ function AdminDashboard({
             { id: "overview", label: "Overview", icon: LayoutDashboard },
             { id: "orders", label: "Orders", icon: ShoppingBag },
             { id: "products", label: "Products", icon: Package },
-            { id: "delivery", label: "Delivery Fees", icon: Truck },
             { id: "reviews", label: "Reviews", icon: MessageSquare, badge: pendingReviewCount },
             { id: "analytics", label: "Analytics", icon: LayoutDashboard },
           ].map(({ id, label, icon: Icon, badge }) => (
@@ -297,7 +275,7 @@ function AdminDashboard({
             <h1 className="mt-1 font-serif text-3xl text-primary capitalize">{tab}</h1>
           </div>
           <div className="flex gap-2 overflow-x-auto md:hidden">
-            {["overview", "orders", "products", "delivery", "reviews", "analytics"].map((t) => (
+            {["overview", "orders", "products", "reviews", "analytics"].map((t) => (
               <button
                 key={t}
                 onClick={() => setTab(t as typeof tab)}
@@ -313,7 +291,6 @@ function AdminDashboard({
           {tab === "overview" && <Overview stats={stats} orders={orders} />}
           {tab === "orders" && <Orders orders={orders} setStatus={setStatus} />}
           {tab === "products" && <ProductsAdmin products={products} refresh={refreshProducts} />}
-          {tab === "delivery" && <DeliveryAdmin slabs={slabs} saveFee={saveSlabFee} />}
           {tab === "reviews" && <ReviewsAdmin reviews={reviews} setStatus={reviewStatus} />}
           {tab === "analytics" && <Analytics orders={orders} products={products} />}
         </div>
@@ -525,8 +502,8 @@ function Orders({
                             ))}
                           </ul>
                           <div className="mt-3 flex justify-between text-xs text-muted-foreground">
-                            <span>Delivery fee{o.distanceKm ? ` (${o.distanceKm} km)` : ""}</span>
-                            <span>₹{o.deliveryFee}</span>
+                            <span>Delivery fee</span>
+                            <span>{o.deliveryFee > 0 ? `₹${o.deliveryFee}` : "Calculated at dispatch"}</span>
                           </div>
                         </div>
                         <div>
@@ -570,64 +547,9 @@ function Orders({
   );
 }
 
-function DeliveryAdmin({
-  slabs,
-  saveFee,
-}: {
-  slabs: DeliverySlab[];
-  saveFee: (id: string, fee: number) => void | Promise<void>;
-}) {
-  const [drafts, setDrafts] = useState<Record<string, string>>({});
-
-  return (
-    <div className="max-w-xl">
-      <h2 className="font-serif text-2xl text-primary">Delivery charge slabs</h2>
-      <p className="mt-1 text-sm text-muted-foreground">
-        Distance-based delivery fees for Bengaluru orders — shown live at checkout.
-      </p>
-      <div className="mt-6 overflow-hidden rounded-lg border border-border bg-card">
-        <table className="w-full text-sm">
-          <thead className="bg-secondary/60 text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
-            <tr>
-              <th className="px-5 py-3 text-left">Distance</th>
-              <th className="px-5 py-3 text-left">Fee (₹)</th>
-              <th className="px-5 py-3" />
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border">
-            {slabs.map((s) => (
-              <tr key={s.id}>
-                <td className="px-5 py-3 text-primary">
-                  {s.minKm}–{s.maxKm ?? "∞"} km
-                </td>
-                <td className="px-5 py-3">
-                  <input
-                    type="number"
-                    min={0}
-                    defaultValue={s.fee}
-                    onChange={(e) => setDrafts((d) => ({ ...d, [s.id]: e.target.value }))}
-                    className="w-24 rounded-md border border-border bg-background px-2.5 py-1.5 text-sm outline-none focus:border-accent"
-                  />
-                </td>
-                <td className="px-5 py-3">
-                  <button
-                    onClick={() => {
-                      const v = Number(drafts[s.id] ?? s.fee);
-                      if (!Number.isFinite(v) || v < 0) return;
-                      saveFee(s.id, v);
-                    }}
-                    className="rounded-full bg-primary px-4 py-1.5 text-xs uppercase tracking-wider text-primary-foreground hover:bg-cocoa-dark active:bg-cocoa-dark"
-                  >
-                    Save
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
+/* Delivery is now "Calculated at dispatch" — the old distance-based
+   delivery-fee-slab admin screen has been removed. Delivery fees are no
+   longer managed here. */
 }
 
 function ReviewsAdmin({
