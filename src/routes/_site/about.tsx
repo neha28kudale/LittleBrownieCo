@@ -1,14 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import storyImg from "@/assets/story.jpeg";
-import {
-  BadgeCheck,
-  Leaf,
-  MapPin,
-  Recycle,
-  Sparkles,
-  TriangleAlert,
-} from "lucide-react";
-import { ALLERGENS, FSSAI_NUMBER, IMG } from "@/lib/products";
+import { BadgeCheck, MapPin, Sparkles, TriangleAlert } from "lucide-react";
+import { ALLERGENS, FSSAI_NUMBER } from "@/lib/products";
 
 export const Route = createFileRoute("/_site/about")({
   head: () => ({
@@ -48,7 +41,7 @@ function About() {
 
       <section className="container-x grid gap-8 md:grid-cols-12 md:items-start md:gap-12">
         {/* STORY CONTENT */}
-        <div className="md:col-span-7 space-y-6 text-lg leading-relaxed text-primary/80">
+        <div className="md:col-span-7 space-y-6 text-base leading-relaxed text-primary/80">
           <p>
             What began as a little tradition at home eventually became the
             beginning of Little Brownie Co.
@@ -169,46 +162,6 @@ function About() {
             </p>
           </div>
         ))}
-      </section>
-
-      {/* SUSTAINABLE PACKAGING */}
-      <section className="container-x mt-16 grid gap-10 md:mt-24 md:grid-cols-12 md:items-center">
-        <div className="md:col-span-6">
-          <div className="overflow-hidden rounded-[1rem] border border-border/70 shadow-soft">
-            <img
-              src={IMG.sustainablePackaging}
-              alt="Kraft paper brownie box and compostable cups used for Little Brownie Co. packaging"
-              className="h-full w-full object-cover"
-            />
-          </div>
-        </div>
-
-        <div className="md:col-span-6">
-          <span className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.28em] text-toffee">
-            <Leaf className="h-4 w-4" />
-            Sustainable Packaging
-          </span>
-
-          <h2 className="mt-4 font-serif text-3xl leading-tight text-primary sm:text-4xl">
-            Good for you, gentler on the planet.
-          </h2>
-
-          <p className="mt-5 text-lg leading-relaxed text-primary/80">
-            We package every order in 100% eco-friendly, recyclable kraft boxes
-            and cups — no single-use plastic. It's a small choice on our end
-            that adds up: less waste, and packaging that breaks down
-            responsibly instead of sitting in a landfill.
-          </p>
-
-          <div className="mt-6 flex items-start gap-3 rounded-md border border-border bg-card p-5">
-            <Recycle className="mt-0.5 h-5 w-5 shrink-0 text-accent" />
-
-            <p className="text-sm text-muted-foreground">
-              Kraft boxes, paper cups and tubs — fully recyclable, sourced to
-              reduce our footprint with every order we pack.
-            </p>
-          </div>
-        </div>
       </section>
 
       {/* CARE & ALLERGY */}
