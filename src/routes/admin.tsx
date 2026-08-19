@@ -550,7 +550,6 @@ function Orders({
 /* Delivery is now "Calculated at dispatch" — the old distance-based
    delivery-fee-slab admin screen has been removed. Delivery fees are no
    longer managed here. */
-}
 
 function ReviewsAdmin({
   reviews,
