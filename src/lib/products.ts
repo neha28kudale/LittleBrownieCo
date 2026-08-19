@@ -178,6 +178,7 @@ const FALLBACK_PRODUCTS: Product[] = [
     description:
       "A rich, fudgy brownie baked in the shape of a mini loaf. It is dense, gooey with a crinkle top, offering the perfect balance of indulgence in a cute, single-serve size. Ideal for gifting, snacking, or satisfying solo cravings without overdoing it! Choose 1–5 loaves per flavour.",
     bestSeller: true,
+    signature: true,
   },
   {
     id: "p4",
@@ -282,6 +283,7 @@ const FALLBACK_PRODUCTS: Product[] = [
     description:
       "A rich, fudgy brownie slab cake topped with smooth chocolate ganache — dense, moist, and loaded with deep chocolate flavour. Perfect for celebrations or a decadent treat! Add a \"Happy Birthday\" topper for ₹10.",
     bestSeller: true,
+    signature: true,
   },
   {
     id: "p9",
