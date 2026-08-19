@@ -55,12 +55,12 @@ function Menu() {
     <>
       <section className="container-x pt-10 pb-6 text-center md:pt-20 md:pb-8">
         <span className="text-[11px] uppercase tracking-[0.28em] text-toffee">The Menu</span>
-        <h1 className="mx-auto mt-3 max-w-3xl font-serif text-4xl leading-[1.05] text-primary sm:text-5xl md:text-7xl">
-          Every square, loaf and little indulgence we bake.
+        <h1 className="mx-auto mt-3 max-w-3xl font-serif text-5xl leading-[1.05] text-primary sm:text-6xl md:text-8xl">
+          For cravings, celebrations and everything in between.
         </h1>
         <p className="mx-auto mt-4 max-w-xl text-sm text-muted-foreground md:text-base">
-          Pick a size or flavour, add it to your cart, then check out. Everything is baked to
-          order — delivered next day onwards, Bangalore only. No same-day delivery.
+          From Mini brownie tubs and classic brownie slabs to loaves and celebration cakes, find
+          something to suit every sweet moment — all baked fresh to order.
         </p>
       </section>
 
