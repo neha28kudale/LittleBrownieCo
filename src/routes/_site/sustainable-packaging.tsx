@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Leaf, Recycle, Droplet, Wind } from "lucide-react";
+import { Leaf } from "lucide-react";
+// TODO: import the green sustainable-packaging poster from Google Drive once confirmed, e.g.:
+// import sustainablePosterImg from "@/assets/sustainable-poster.jpg";
 
 export const Route = createFileRoute("/_site/sustainable-packaging")({
   head: () => ({
@@ -7,7 +9,8 @@ export const Route = createFileRoute("/_site/sustainable-packaging")({
       { title: "Sustainable Packaging — Little Brownie Co." },
       {
         name: "description",
-        content: "Learn about our eco-friendly packaging initiatives and commitment to sustainability.",
+        content:
+          "Baked with care, packed with purpose — how Little Brownie Co. uses eco-friendly Kraft paper packaging.",
       },
       {
         property: "og:title",
@@ -15,7 +18,8 @@ export const Route = createFileRoute("/_site/sustainable-packaging")({
       },
       {
         property: "og:description",
-        content: "Discover how Little Brownie Co. is reducing environmental impact through sustainable packaging.",
+        content:
+          "We use eco-friendly, sustainable Kraft paper packaging across our brownie boxes, covers and tubs.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -27,107 +31,45 @@ export const Route = createFileRoute("/_site/sustainable-packaging")({
 function SustainablePackaging() {
   return (
     <section className="container-x py-10 md:py-16">
-      <div className="max-w-3xl">
-        <span className="text-[11px] uppercase tracking-[0.28em] text-toffee">Our Commitment</span>
-        <h1 className="mt-3 font-serif text-4xl text-primary sm:text-5xl md:text-6xl">
-          Sustainable Packaging
-        </h1>
-        <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
-          At Little Brownie Co., we believe that great taste and environmental responsibility go
-          hand in hand. Our commitment to sustainable packaging is an integral part of how we
-          operate as a modern, conscious business.
-        </p>
-      </div>
+      <div className="grid gap-10 md:grid-cols-12 md:items-center">
+        <div className="md:col-span-6">
+          <span className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.28em] text-toffee">
+            <Leaf className="h-4 w-4" />
+            Good to Know
+          </span>
+          <h1 className="mt-3 font-serif text-4xl leading-tight text-primary sm:text-5xl md:text-6xl">
+            Baked with care. Packed with purpose.
+          </h1>
 
-      <div className="mt-12 grid gap-8 md:grid-cols-2">
-        <div className="rounded-lg border border-border bg-secondary/30 p-6">
-          <Leaf className="h-8 w-8 text-primary" />
-          <h2 className="mt-4 font-serif text-2xl text-primary">Eco-Friendly Materials</h2>
-          <p className="mt-3 leading-relaxed text-muted-foreground">
-            All our packaging is made from recyclable and biodegradable materials. We use kraft
-            paper boxes, recycled cardboard, and natural binding materials that minimize
-            environmental impact.
-          </p>
+          <div className="mt-6 space-y-5 text-base leading-relaxed text-muted-foreground">
+            <p>
+              We believe that great brownies and thoughtful choices can go hand in hand. That's
+              why we use eco-friendly, sustainable Kraft paper packaging across our brownie boxes,
+              covers and tubs — a simple, more conscious alternative to conventional plastic
+              packaging.
+            </p>
+            <p>
+              It's one of the little ways we're doing our bit to reduce unnecessary plastic and
+              make more conscious choices, without compromising on the experience of receiving
+              your brownies.
+            </p>
+            <p>
+              Sustainability doesn't have to be complicated. Sometimes, it starts with something
+              as simple as the box your brownies come in.
+            </p>
+            <p>
+              Because every brownie deserves a beautiful box — and every box can be a little
+              kinder to the planet. 🌿
+            </p>
+          </div>
         </div>
 
-        <div className="rounded-lg border border-border bg-secondary/30 p-6">
-          <Recycle className="h-8 w-8 text-primary" />
-          <h2 className="mt-4 font-serif text-2xl text-primary">100% Recyclable</h2>
-          <p className="mt-3 leading-relaxed text-muted-foreground">
-            Every component of our packaging can be recycled. Even our stickers use sustainable
-            adhesives. We encourage our customers to recycle or compost their boxes after use.
-          </p>
+        <div className="md:col-span-6">
+          {/* TODO: replace with the green sustainable-packaging poster image once confirmed */}
+          <div className="flex aspect-[4/5] items-center justify-center rounded-[1rem] border border-dashed border-border/70 bg-secondary/30 text-center text-sm text-muted-foreground">
+            Green poster image goes here
+          </div>
         </div>
-
-        <div className="rounded-lg border border-border bg-secondary/30 p-6">
-          <Droplet className="h-8 w-8 text-primary" />
-          <h2 className="mt-4 font-serif text-2xl text-primary">Water-Based Inks</h2>
-          <p className="mt-3 leading-relaxed text-muted-foreground">
-            Our labels and branding are printed with water-based, non-toxic inks that are safe
-            for recycling and composting processes.
-          </p>
-        </div>
-
-        <div className="rounded-lg border border-border bg-secondary/30 p-6">
-          <Wind className="h-8 w-8 text-primary" />
-          <h2 className="mt-4 font-serif text-2xl text-primary">Minimal Waste</h2>
-          <p className="mt-3 leading-relaxed text-muted-foreground">
-            We minimize packaging waste by using efficient designs that reduce excess material
-            while ensuring your brownies arrive fresh and protected.
-          </p>
-        </div>
-      </div>
-
-      <div className="mt-12 rounded-lg border border-border bg-card p-8">
-        <h2 className="font-serif text-2xl text-primary">Our Journey</h2>
-        <div className="mt-6 space-y-4 text-muted-foreground">
-          <p>
-            When we started Little Brownie Co., we made a conscious decision to prioritize
-            sustainability. We recognized that small choices in packaging can collectively make
-            a big difference for our planet.
-          </p>
-          <p>
-            Every brownie box that leaves our kitchen carries our values. We've eliminated single-use
-            plastics entirely, and we're continuously exploring new ways to reduce our environmental
-            footprint. Our goal is to make every delivery one step closer to a more sustainable future.
-          </p>
-          <p>
-            By choosing Little Brownie Co., you're not just enjoying premium brownies made with
-            Belgian chocolate and cultured butter—you're also supporting a business that cares about
-            the environment.
-          </p>
-        </div>
-      </div>
-
-      <div className="mt-12 rounded-lg border border-accent/20 bg-accent/5 p-8">
-        <h2 className="font-serif text-2xl text-primary">How You Can Help</h2>
-        <ul className="mt-6 space-y-3 text-muted-foreground">
-          <li className="flex gap-3">
-            <span className="mt-1 inline-block h-2 w-2 rounded-full bg-primary" />
-            <span>Recycle our packaging boxes along with your regular recycling.</span>
-          </li>
-          <li className="flex gap-3">
-            <span className="mt-1 inline-block h-2 w-2 rounded-full bg-primary" />
-            <span>Compost the padding materials if you use composting services.</span>
-          </li>
-          <li className="flex gap-3">
-            <span className="mt-1 inline-block h-2 w-2 rounded-full bg-primary" />
-            <span>Reuse the boxes for storage or gifting—they're sturdy and beautiful.</span>
-          </li>
-          <li className="flex gap-3">
-            <span className="mt-1 inline-block h-2 w-2 rounded-full bg-primary" />
-            <span>Spread the word about sustainable packaging and conscious businesses.</span>
-          </li>
-        </ul>
-      </div>
-
-      <div className="mt-12 text-center">
-        <p className="text-sm text-muted-foreground">
-          Questions about our packaging or sustainability practices?{" "}
-          <a href="/contact" className="text-accent hover:underline">
-            Get in touch
-          </a>
-        </p>
       </div>
     </section>
   );
