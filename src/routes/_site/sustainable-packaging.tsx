@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Leaf } from "lucide-react";
-// TODO: import the green sustainable-packaging poster from Google Drive once confirmed, e.g.:
-// import sustainablePosterImg from "@/assets/sustainable-poster.jpg";
+import sustainablePosterImg from "@/assets/sustainable-poster.png";
 
 export const Route = createFileRoute("/_site/sustainable-packaging")({
   head: () => ({
@@ -65,10 +64,11 @@ function SustainablePackaging() {
         </div>
 
         <div className="md:col-span-6">
-          {/* TODO: replace with the green sustainable-packaging poster image once confirmed */}
-          <div className="flex aspect-[4/5] items-center justify-center rounded-[1rem] border border-dashed border-border/70 bg-secondary/30 text-center text-sm text-muted-foreground">
-            Green poster image goes here
-          </div>
+          <img
+            src={sustainablePosterImg}
+            alt="Eco-friendly packaging for a greener future — Little Brownie Co. uses 100% sustainable Kraft paper packaging to reduce waste and protect the planet."
+            className="aspect-[4/5] w-full rounded-[1rem] border border-border/70 object-cover shadow-soft"
+          />
         </div>
       </div>
     </section>
