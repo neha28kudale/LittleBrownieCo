@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import storyImg from "@/assets/real/story-brownie-box.jpg";
+import storyImg from "@/assets/real/story-almond-brownie.jpg";
 import { BadgeCheck, MapPin, Sparkles, TriangleAlert } from "lucide-react";
 import { ALLERGENS, FSSAI_NUMBER } from "@/lib/products";
 
@@ -121,7 +121,7 @@ function About() {
           <div className="aspect-[4/5] overflow-hidden rounded-[1rem] border border-border/70 shadow-soft">
             <img
               src={storyImg}
-              alt="Little Brownie Co. — freshly baked brownie box, topped with roasted almonds"
+              alt="Little Brownie Co. — fudgy brownie slab topped with roasted almonds and chocolate drizzle"
               className="h-full w-full object-cover"
             />
           </div>
