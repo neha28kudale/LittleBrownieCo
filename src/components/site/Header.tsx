@@ -25,13 +25,13 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/92 backdrop-blur-xl">
-      <div className="container-x h-16 md:h-20">
+      <div className="container-x h-20 md:h-24">
         <div className="grid h-full grid-cols-[minmax(0,1fr)_auto] items-center gap-2 sm:gap-3 lg:grid-cols-[minmax(0,1.4fr)_auto_auto] lg:gap-6">
           <Link to="/" className="flex min-w-0 items-center gap-2 md:gap-3" onClick={closeMobile}>
             <img src={IMG.logo} alt="Little Brownie Co."
-  className="h-12 w-12 shrink-0 rounded-full border border-border/80 object-cover shadow-soft md:h-16 md:w-16" />
+  className="h-14 w-14 shrink-0 rounded-full border border-border/80 object-cover shadow-soft md:h-20 md:w-20" />
 <div className="min-w-0">
-  <div className="whitespace-nowrap font-serif text-[1.3rem] leading-none text-primary sm:text-[1.6rem] lg:text-[2rem]">
+  <div className="whitespace-nowrap font-serif text-[1.55rem] leading-none text-primary sm:text-[1.9rem] lg:text-[2.4rem]">
     Little Brownie Co.
   </div>
   <div className="truncate pt-1 text-[9px] uppercase tracking-[0.14em] text-muted-foreground sm:text-[11px] sm:tracking-[0.22em]">
@@ -56,10 +56,10 @@ export function Header() {
             >
               <Link
                 to="/menu"
-                className="relative inline-flex items-center gap-1 text-[0.95rem] text-primary/80 transition-colors hover:text-primary [&.active]:text-primary"
+                className="relative inline-flex items-center gap-1 text-[1.05rem] font-medium text-primary/80 transition-colors hover:text-primary [&.active]:text-primary"
               >
                 Menu
-                <ChevronDown className="h-3.5 w-3.5" />
+                <ChevronDown className="h-4 w-4" />
               </Link>
               {menuOpen && (
                 <div className="absolute left-1/2 top-full z-50 w-52 -translate-x-1/2 pt-2">
