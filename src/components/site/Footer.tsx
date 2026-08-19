@@ -43,11 +43,13 @@ export function Footer() {
                 Contact Us
               </Link>
             </li>
-            <li>
+            {/* "Updates" hidden for now per owner request — route still exists
+                at /updates, ready to re-enable by uncommenting this link. */}
+            {/* <li>
               <Link to="/updates" className="text-primary/80 hover:text-accent">
                 Updates
               </Link>
-            </li>
+            </li> */}
           </ul>
         </div>
 
