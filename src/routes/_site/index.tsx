@@ -67,7 +67,7 @@ function Home() {
               />
             </div>
             <h1 className="mt-6 max-w-2xl font-serif text-[2.6rem] leading-[0.98] text-primary sm:text-[3.35rem] sm:leading-[0.94] md:text-[6rem]">
-              Brownies baked with a quieter kind of luxury.
+              Brownies made for the little moments that matter.
             </h1>
             <p className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg">
               Brownies made for the little moments that matter. Crafted with premium ingredients
