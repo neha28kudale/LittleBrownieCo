@@ -57,22 +57,24 @@ function Home() {
     <>
       {/* HERO */}
       <section className="relative overflow-hidden">
-        <div className="container-x grid gap-10 pb-12 pt-10 md:grid-cols-12 md:items-center md:gap-8 md:pb-24 md:pt-20">
+        <div className="container-x pb-10 pt-8 md:pb-16 md:pt-14">
+          <div className="overflow-hidden rounded-[1.2rem] border border-border/80 shadow-soft">
+            <img
+              src={IMG.headerBanner}
+              alt="Little Brownie Co. — where every bite earns you brownie points"
+              className="h-auto w-full object-cover"
+            />
+          </div>
+        </div>
+        <div className="container-x grid gap-10 pb-12 md:grid-cols-12 md:items-center md:gap-8 md:pb-24">
           <div className="md:col-span-6 flex flex-col justify-center">
-            <div className="overflow-hidden rounded-[1.2rem] border border-border/80 shadow-soft">
-              <img
-                src={IMG.headerBanner}
-                alt="Little Brownie Co. — where every bite earns you brownie points"
-                className="h-auto w-full object-cover"
-              />
-            </div>
-            <h1 className="mt-6 max-w-2xl font-serif text-[2.6rem] leading-[0.98] text-primary sm:text-[3.35rem] sm:leading-[0.94] md:text-[6rem]">
+            <h1 className="max-w-xl font-serif text-[2.25rem] leading-[1.05] text-primary sm:text-[2.75rem] sm:leading-[1.02] md:text-[3.6rem] md:leading-[1.02]">
               Brownies made for the little moments that matter.
             </h1>
-            <p className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg">
-              Brownies made for the little moments that matter. Crafted with premium ingredients
-              and baked fresh in small batches, our brownies are irresistibly rich and fudgy, with
-              a delicate crackly top and an indulgently gooey centre.
+            <p className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg">
+              Crafted with premium ingredients and baked fresh in small batches, our brownies are
+              irresistibly rich and fudgy, with a delicate crackly top and an indulgently gooey
+              centre.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Link
@@ -101,28 +103,28 @@ function Home() {
               </a>
             </div>
             <div className="mt-10 max-w-xl border-t border-border/70 pt-7">
-              <p className="font-serif text-2xl leading-tight text-primary md:text-3xl">
+              <p className="font-serif text-xl leading-snug text-primary md:text-2xl">
                 Rich. Fudgy. Gooey. The kind of brownie you take your time with.
               </p>
             </div>
           </div>
-          <div className="relative md:col-span-6 md:pl-10">
+          <div className="relative md:col-span-6 md:pl-6">
             <div className="relative aspect-[4/5] overflow-hidden rounded-[1.6rem] border border-border/80 bg-card shadow-display">
               <img
                 src={IMG.biteSizedHand}
                 alt="A single bite-sized Little Brownie Co. brownie held in hand"
                 className="h-full w-full object-cover"
               />
+              <div className="absolute right-4 top-4 flex h-24 w-24 items-center justify-center rounded-full border-4 border-background bg-surface-soft p-3 text-center font-serif text-[0.72rem] leading-tight text-primary shadow-display md:h-28 md:w-28 md:text-sm">
+                Where every bite earns brownie points.
+              </div>
             </div>
-            <div className="absolute -bottom-8 left-6 hidden w-48 rounded-[1.25rem] border border-border/70 bg-background/98 p-5 shadow-soft md:block">
+            <div className="mx-auto mt-5 max-w-sm rounded-[1.25rem] border border-border/70 bg-background/98 p-5 text-center shadow-soft md:absolute md:-bottom-8 md:left-6 md:mx-0 md:max-w-[13rem] md:text-left">
               <div className="text-[10px] uppercase tracking-[0.3em] text-toffee">Baked Fresh</div>
-              <p className="mt-3 font-serif text-[1.55rem] leading-tight text-primary">
+              <p className="mt-3 font-serif text-lg leading-tight text-primary md:text-xl">
                 From birthday cakes to brownie trays, everything is packed the day it leaves our
                 kitchen.
               </p>
-            </div>
-            <div className="absolute -right-6 top-8 hidden h-34 w-34 items-center justify-center rounded-full border-4 border-background bg-surface-soft p-5 text-center font-serif text-base leading-tight text-primary shadow-display md:flex">
-              Where every bite earns brownie points.
             </div>
           </div>
         </div>
