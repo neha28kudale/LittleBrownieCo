@@ -45,11 +45,9 @@ export type Order = {
   items: OrderItemRow[];
 };
 
-function nextOrderNumber() {
-  // Human-friendly, collision-resistant enough for a small bakery's volume.
-  const rand = Math.floor(1000 + Math.random() * 9000);
-  return `LBC-${Date.now().toString().slice(-6)}${rand}`;
-}
+// Order numbers (LBC-000001, LBC-000002, ...) are now assigned sequentially
+// by a Postgres trigger (see supabase/migrations/0004_sequential_order_number.sql)
+// so they're never random and never collide, even under concurrent orders.
 
 export async function createOrder(input: {
   customerName: string;
@@ -65,12 +63,12 @@ export async function createOrder(input: {
 }): Promise<{ ok: true; order: Order } | { ok: false; error: string }> {
   const subtotal = input.items.reduce((s, i) => s + i.lineTotal, 0);
   const total = subtotal + input.deliveryFee;
-  const orderNumber = nextOrderNumber();
 
   const { data: orderRow, error: orderError } = await supabase
     .from("orders")
     .insert({
-      order_number: orderNumber,
+      // order_number is intentionally omitted — assigned sequentially by
+      // the trg_set_order_number database trigger.
       customer_name: input.customerName,
       phone: input.phone,
       email: input.email || null,
