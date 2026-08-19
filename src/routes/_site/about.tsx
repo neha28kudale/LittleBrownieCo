@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import storyImg from "@/assets/story.jpeg";
+import storyImg from "@/assets/real/story-brownie-box.jpg";
 import { BadgeCheck, MapPin, Sparkles, TriangleAlert } from "lucide-react";
 import { ALLERGENS, FSSAI_NUMBER } from "@/lib/products";
 
@@ -41,7 +41,7 @@ function About() {
 
       <section className="container-x grid gap-8 md:grid-cols-12 md:items-start md:gap-12">
         {/* STORY CONTENT */}
-        <div className="md:col-span-7 space-y-6 text-base leading-relaxed text-primary/80">
+        <div className="md:col-span-7 space-y-6 text-sm leading-relaxed text-primary/80">
           <p>
             What began as a little tradition at home eventually became the
             beginning of Little Brownie Co.
@@ -121,7 +121,7 @@ function About() {
           <div className="aspect-[4/5] overflow-hidden rounded-[1rem] border border-border/70 shadow-soft">
             <img
               src={storyImg}
-              alt="Little Brownie Co. family story"
+              alt="Little Brownie Co. — freshly baked brownie box, topped with roasted almonds"
               className="h-full w-full object-cover"
             />
           </div>
