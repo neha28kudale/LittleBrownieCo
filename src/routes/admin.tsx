@@ -269,17 +269,19 @@ function AdminDashboard({
       </aside>
 
       <main className="md:pl-64">
-        <header className="flex items-center justify-between border-b border-border bg-background/85 px-6 py-5 backdrop-blur md:px-10">
-          <div>
-            <div className="text-[11px] uppercase tracking-[0.22em] text-toffee">Dashboard</div>
-            <h1 className="mt-1 font-serif text-3xl text-primary capitalize">{tab}</h1>
+        <header className="sticky top-0 z-10 border-b border-border bg-background/95 backdrop-blur">
+          <div className="flex items-center justify-between px-4 py-4 md:px-10 md:py-5">
+            <div>
+              <div className="text-[11px] uppercase tracking-[0.22em] text-toffee">Dashboard</div>
+              <h1 className="mt-1 font-serif text-2xl text-primary capitalize md:text-3xl">{tab}</h1>
+            </div>
           </div>
-          <div className="flex gap-2 overflow-x-auto md:hidden">
+          <div className="flex gap-2 overflow-x-auto px-4 pb-3 md:hidden">
             {["overview", "orders", "products", "reviews", "analytics"].map((t) => (
               <button
                 key={t}
                 onClick={() => setTab(t as typeof tab)}
-                className={`rounded-full px-3 py-1 text-xs capitalize ${tab === t ? "bg-primary text-primary-foreground" : "border border-border text-primary"}`}
+                className={`shrink-0 rounded-full px-3 py-1.5 text-xs capitalize ${tab === t ? "bg-primary text-primary-foreground" : "border border-border text-primary"}`}
               >
                 {t}
               </button>
@@ -287,7 +289,7 @@ function AdminDashboard({
           </div>
         </header>
 
-        <div className="p-6 md:p-10">
+        <div className="p-4 md:p-10">
           {tab === "overview" && <Overview stats={stats} orders={orders} />}
           {tab === "orders" && <Orders orders={orders} setStatus={setStatus} />}
           {tab === "products" && <ProductsAdmin products={products} refresh={refreshProducts} />}
@@ -314,13 +316,13 @@ function Overview({
   ];
   return (
     <div className="space-y-8">
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         {cards.map((c) => (
-          <div key={c.label} className="rounded-lg border border-border bg-card p-6">
-            <div className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+          <div key={c.label} className="rounded-lg border border-border bg-card p-4 sm:p-6">
+            <div className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground sm:text-[11px] sm:tracking-[0.18em]">
               {c.label}
             </div>
-            <div className="mt-3 font-serif text-4xl text-primary">{c.value}</div>
+            <div className="mt-2 font-serif text-2xl text-primary sm:mt-3 sm:text-4xl">{c.value}</div>
           </div>
         ))}
       </div>
@@ -347,14 +349,14 @@ function Overview({
             </div>
           )}
           {orders.slice(0, 5).map((o) => (
-            <div key={o.id} className="flex items-center justify-between gap-4 px-6 py-4">
+            <div key={o.id} className="flex flex-wrap items-center justify-between gap-3 px-4 py-4 sm:gap-4 sm:px-6">
               <div className="min-w-0">
-                <div className="font-medium text-primary">
+                <div className="truncate font-medium text-primary">
                   {o.orderNumber} · {o.customerName}
                 </div>
                 <div className="truncate text-xs text-muted-foreground">{itemsSummary(o)}</div>
               </div>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3 sm:gap-4">
                 <StatusBadge order={o} />
                 <div className="font-serif text-lg text-primary">₹{o.total}</div>
               </div>
@@ -409,8 +411,129 @@ function Orders({
   setStatus: (id: string, status: OrderStatus) => void | Promise<void>;
 }) {
   const [expanded, setExpanded] = useState<string | null>(null);
+
+  const ActionButtons = ({ o }: { o: Order }) => (
+    <div className="flex gap-1.5" onClick={(e) => e.stopPropagation()}>
+      {o.orderStatus !== "order_confirmed" && (
+        <button
+          onClick={() => setStatus(o.id, "order_confirmed")}
+          title="Approve — customer sees 'Order confirmed'"
+          className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-[11px] text-primary-foreground hover:bg-cocoa-dark"
+        >
+          <Check className="h-3.5 w-3.5" /> Approve
+        </button>
+      )}
+      {o.orderStatus !== "rejected" && (
+        <button
+          onClick={() => setStatus(o.id, "rejected")}
+          title="Reject"
+          className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-[11px] text-primary hover:bg-destructive/10 hover:text-destructive"
+        >
+          <Ban className="h-3.5 w-3.5" /> Reject
+        </button>
+      )}
+    </div>
+  );
+
+  const OrderDetails = ({ o }: { o: Order }) => (
+    <div className="grid gap-6 sm:grid-cols-2">
+      <div>
+        <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Items</div>
+        <ul className="mt-2 space-y-1.5 text-sm">
+          {o.items.map((it, i) => (
+            <li key={i} className="flex justify-between gap-3 text-primary/85">
+              <span>
+                {it.qty} × {it.productName}{" "}
+                <span className="text-xs text-muted-foreground">({it.variantLabel})</span>
+              </span>
+              <span className="shrink-0">₹{it.lineTotal}</span>
+            </li>
+          ))}
+        </ul>
+        <div className="mt-3 flex justify-between text-xs text-muted-foreground">
+          <span>Delivery fee</span>
+          <span>{o.deliveryFee > 0 ? `₹${o.deliveryFee}` : "Calculated at dispatch"}</span>
+        </div>
+      </div>
+      <div>
+        <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+          Delivery
+        </div>
+        <p className="mt-2 text-sm text-primary/85">
+          {o.address}
+          <br />
+          {o.deliveryDate} · {o.deliverySlot}
+          {o.email && (
+            <>
+              <br />
+              {o.email}
+            </>
+          )}
+          {o.notes && (
+            <>
+              <br />
+              Notes: {o.notes}
+            </>
+          )}
+          {o.cashfreeOrderId && (
+            <>
+              <br />
+              Cashfree order: {o.cashfreeOrderId}
+            </>
+          )}
+        </p>
+      </div>
+    </div>
+  );
+
   return (
-    <div className="overflow-hidden rounded-lg border border-border bg-card">
+    <div className="space-y-4">
+      {/* MOBILE: card list */}
+      <div className="space-y-3 md:hidden">
+        {orders.length === 0 && (
+          <div className="rounded-lg border border-border bg-card px-5 py-10 text-center text-sm text-muted-foreground">
+            No orders yet — orders placed at checkout will show up here in real time.
+          </div>
+        )}
+        {orders.map((o) => (
+          <div key={o.id} className="overflow-hidden rounded-lg border border-border bg-card">
+            <button
+              className="flex w-full flex-col gap-3 px-4 py-4 text-left"
+              onClick={() => setExpanded((e) => (e === o.id ? null : o.id))}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="font-medium text-primary">{o.orderNumber}</div>
+                  <div className="truncate text-sm text-primary/80">{o.customerName}</div>
+                  <div className="text-xs text-muted-foreground">{o.phone}</div>
+                </div>
+                <div className="shrink-0 text-right font-serif text-lg text-primary">
+                  ₹{o.total}
+                </div>
+              </div>
+              <div className="truncate text-xs text-muted-foreground">{itemsSummary(o)}</div>
+              <div className="flex flex-wrap items-center gap-2">
+                <PaymentBadge status={o.paymentStatus} />
+                <StatusBadge order={o} />
+                <span className="ml-auto text-[11px] text-muted-foreground">
+                  {formatPlacedAt(o.createdAt)}
+                </span>
+              </div>
+            </button>
+            <div className="border-t border-border px-4 py-3">
+              <ActionButtons o={o} />
+            </div>
+            {expanded === o.id && (
+              <div className="border-t border-border bg-secondary/20 px-4 py-4">
+                <OrderDetails o={o} />
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* DESKTOP: table */}
+      <div className="hidden overflow-hidden rounded-lg border border-border bg-card md:block">
       <div className="overflow-x-auto">
         <table className="min-w-full text-sm">
           <thead className="bg-secondary/60 text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
@@ -457,84 +580,14 @@ function Orders({
                   <td className="px-6 py-4">
                     <StatusBadge order={o} />
                   </td>
-                  <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
-                    <div className="flex gap-1.5">
-                      {o.orderStatus !== "order_confirmed" && (
-                        <button
-                          onClick={() => setStatus(o.id, "order_confirmed")}
-                          title="Approve — customer sees 'Order confirmed'"
-                          className="rounded-full bg-primary p-1.5 text-primary-foreground hover:bg-cocoa-dark"
-                        >
-                          <Check className="h-3.5 w-3.5" />
-                        </button>
-                      )}
-                      {o.orderStatus !== "rejected" && (
-                        <button
-                          onClick={() => setStatus(o.id, "rejected")}
-                          title="Reject"
-                          className="rounded-full border border-border p-1.5 text-primary hover:bg-destructive/10 hover:text-destructive"
-                        >
-                          <Ban className="h-3.5 w-3.5" />
-                        </button>
-                      )}
-                    </div>
+                  <td className="px-6 py-4">
+                    <ActionButtons o={o} />
                   </td>
                 </tr>
                 {expanded === o.id && (
                   <tr className="bg-secondary/20">
                     <td colSpan={8} className="px-6 py-5">
-                      <div className="grid gap-6 sm:grid-cols-2">
-                        <div>
-                          <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-                            Items
-                          </div>
-                          <ul className="mt-2 space-y-1.5 text-sm">
-                            {o.items.map((it, i) => (
-                              <li key={i} className="flex justify-between gap-3 text-primary/85">
-                                <span>
-                                  {it.qty} × {it.productName}{" "}
-                                  <span className="text-xs text-muted-foreground">
-                                    ({it.variantLabel})
-                                  </span>
-                                </span>
-                                <span className="shrink-0">₹{it.lineTotal}</span>
-                              </li>
-                            ))}
-                          </ul>
-                          <div className="mt-3 flex justify-between text-xs text-muted-foreground">
-                            <span>Delivery fee</span>
-                            <span>{o.deliveryFee > 0 ? `₹${o.deliveryFee}` : "Calculated at dispatch"}</span>
-                          </div>
-                        </div>
-                        <div>
-                          <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-                            Delivery
-                          </div>
-                          <p className="mt-2 text-sm text-primary/85">
-                            {o.address}
-                            <br />
-                            {o.deliveryDate} · {o.deliverySlot}
-                            {o.email && (
-                              <>
-                                <br />
-                                {o.email}
-                              </>
-                            )}
-                            {o.notes && (
-                              <>
-                                <br />
-                                Notes: {o.notes}
-                              </>
-                            )}
-                            {o.cashfreeOrderId && (
-                              <>
-                                <br />
-                                Cashfree order: {o.cashfreeOrderId}
-                              </>
-                            )}
-                          </p>
-                        </div>
-                      </div>
+                      <OrderDetails o={o} />
                     </td>
                   </tr>
                 )}
@@ -542,6 +595,7 @@ function Orders({
             ))}
           </tbody>
         </table>
+      </div>
       </div>
     </div>
   );
@@ -715,7 +769,51 @@ function ProductsAdmin({
           <Plus className="h-4 w-4" /> Add Product
         </button>
       </div>
-      <div className="overflow-hidden rounded-lg border border-border bg-card">
+      {/* MOBILE: card list */}
+      <div className="space-y-3 md:hidden">
+        {products.length === 0 && (
+          <div className="rounded-lg border border-border bg-card px-5 py-10 text-center text-sm text-muted-foreground">
+            No products yet — add your first one above.
+          </div>
+        )}
+        {products.map((p) => (
+          <div key={p.id} className="flex items-center gap-3 rounded-lg border border-border bg-card p-4">
+            <img
+              src={p.image}
+              alt=""
+              className="h-16 w-16 shrink-0 rounded-md object-cover"
+            />
+            <div className="min-w-0 flex-1">
+              <div className="truncate font-medium text-primary">{p.name}</div>
+              <div className="truncate text-xs text-muted-foreground">{p.tagline}</div>
+              <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
+                <span>{p.category}</span>
+                <span>·</span>
+                <span className="font-serif text-sm text-primary">₹{fromPrice(p)}</span>
+              </div>
+            </div>
+            <div className="flex shrink-0 flex-col gap-2">
+              <button
+                onClick={() => setEditing({ ...p, price: fromPrice(p) })}
+                className="rounded-full border border-border p-2 hover:border-accent hover:text-accent"
+                aria-label="Edit"
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </button>
+              <button
+                onClick={() => remove(p.id)}
+                className="rounded-full border border-border p-2 hover:border-destructive hover:text-destructive"
+                aria-label="Delete"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* DESKTOP: table */}
+      <div className="hidden overflow-hidden rounded-lg border border-border bg-card md:block">
         <div className="overflow-x-auto">
           <table className="min-w-full text-sm">
             <thead className="bg-secondary/60 text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
