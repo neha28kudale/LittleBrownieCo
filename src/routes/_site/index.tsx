@@ -303,6 +303,7 @@ function Home() {
   );
   const [heroSlide, setHeroSlide] = useState(0);
   const heroScrollRef = useRef<HTMLDivElement>(null);
+  const heroPausedRef = useRef(false);
 
   useEffect(() => {
     getApprovedReviews().then((r) => setReviews(r.slice(0, 4)));
@@ -316,7 +317,7 @@ function Home() {
   const scrollHeroTo = (index: number) => {
     const el = heroScrollRef.current;
     if (!el) return;
-    const clamped = Math.max(0, Math.min(index, HERO_GALLERY.length - 1));
+    const clamped = (index + HERO_GALLERY.length) % HERO_GALLERY.length;
     el.scrollTo({ left: clamped * el.clientWidth, behavior: "smooth" });
     setHeroSlide(clamped);
   };
@@ -326,6 +327,33 @@ function Home() {
     if (!el) return;
     const index = Math.round(el.scrollLeft / el.clientWidth);
     setHeroSlide(index);
+  };
+
+  // Auto-advance the hero gallery every 4s; pause while the user is
+  // hovering, touching, or has just interacted with it.
+  useEffect(() => {
+    if (HERO_GALLERY.length <= 1) return;
+    const interval = setInterval(() => {
+      if (heroPausedRef.current) return;
+      setHeroSlide((prev) => {
+        const next = (prev + 1) % HERO_GALLERY.length;
+        const el = heroScrollRef.current;
+        if (el) el.scrollTo({ left: next * el.clientWidth, behavior: "smooth" });
+        return next;
+      });
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const pauseHeroAutoplay = () => {
+    heroPausedRef.current = true;
+  };
+  const resumeHeroAutoplay = () => {
+    // brief delay so a manual tap/scroll doesn't immediately get
+    // overridden by the next auto-advance tick
+    setTimeout(() => {
+      heroPausedRef.current = false;
+    }, 1500);
   };
 
   return (
@@ -382,7 +410,13 @@ function Home() {
             </div>
           </div>
           <div className="relative md:col-span-6 md:pl-10">
-            <div className="relative aspect-[4/5] overflow-hidden rounded-[1.6rem] border border-border/80 bg-card shadow-display">
+            <div
+              className="relative aspect-[4/5] overflow-hidden rounded-[1.6rem] border border-border/80 bg-card shadow-display"
+              onMouseEnter={pauseHeroAutoplay}
+              onMouseLeave={resumeHeroAutoplay}
+              onTouchStart={pauseHeroAutoplay}
+              onTouchEnd={resumeHeroAutoplay}
+            >
               <div
                 ref={heroScrollRef}
                 onScroll={handleHeroScroll}
@@ -402,7 +436,11 @@ function Home() {
                   <button
                     type="button"
                     aria-label="Previous photo"
-                    onClick={() => scrollHeroTo(heroSlide - 1)}
+                    onClick={() => {
+                      pauseHeroAutoplay();
+                      scrollHeroTo(heroSlide - 1);
+                      resumeHeroAutoplay();
+                    }}
                     className="absolute left-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-background/80 text-primary shadow-soft transition hover:bg-background"
                   >
                     ‹
@@ -410,7 +448,11 @@ function Home() {
                   <button
                     type="button"
                     aria-label="Next photo"
-                    onClick={() => scrollHeroTo(heroSlide + 1)}
+                    onClick={() => {
+                      pauseHeroAutoplay();
+                      scrollHeroTo(heroSlide + 1);
+                      resumeHeroAutoplay();
+                    }}
                     className="absolute right-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-background/80 text-primary shadow-soft transition hover:bg-background"
                   >
                     ›
@@ -421,7 +463,11 @@ function Home() {
                         key={i}
                         type="button"
                         aria-label={`Go to photo ${i + 1}`}
-                        onClick={() => scrollHeroTo(i)}
+                        onClick={() => {
+                          pauseHeroAutoplay();
+                          scrollHeroTo(i);
+                          resumeHeroAutoplay();
+                        }}
                         className={`h-1.5 rounded-full transition-all ${
                           i === heroSlide ? "w-5 bg-background" : "w-1.5 bg-background/60"
                         }`}
