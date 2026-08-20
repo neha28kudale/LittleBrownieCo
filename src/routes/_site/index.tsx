@@ -320,7 +320,7 @@ function Home() {
               Brownies made for the little moments that matter.
             </h1>
             <p className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg">
-              Brownies made for the little moments that matter. Crafted with premium ingredients
+              Crafted with premium ingredients
               and baked fresh in small batches, our brownies are irresistibly rich and fudgy, with
               a delicate crackly top and an indulgently gooey centre.
             </p>
