@@ -341,7 +341,7 @@ function Home() {
         if (el) el.scrollTo({ left: next * el.clientWidth, behavior: "smooth" });
         return next;
       });
-    }, 4000);
+    }, 2000);
     return () => clearInterval(interval);
   }, []);
 
