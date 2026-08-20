@@ -27,6 +27,16 @@ import heroPhoto from "@/assets/real/hero.jpg";
 import headerBannerPhoto from "@/assets/header-banner.png";
 import biteSizedHandPhoto from "@/assets/bite-sized-hand.jpg";
 
+// Home page hero gallery photos — auto-switching image strip
+import homeImg1 from "@/assets/himg1.jpg";
+import homeImg2 from "@/assets/himg2.jpg";
+import homeImg3 from "@/assets/himg3.jpg";
+import homeImg4 from "@/assets/himg4.jpg";
+import homeImg5 from "@/assets/himg5.jpg";
+import homeImg6 from "@/assets/himg6.jpg";
+import homeImg7 from "@/assets/himg7.jpg";
+import homeImg8 from "@/assets/himg8.jpg";
+
 // Real gifting photography supplied earlier — plain local imports too
 import hamperBagHeart from "@/assets/gifting/hamper-bag-heart.png";
 import hamperWoodenBox from "@/assets/gifting/hamper-wooden-box.png";
@@ -70,6 +80,14 @@ export const IMG = {
   gallery6: galleryPhoto6,
   gallery7: galleryPhoto7,
   gallery8: galleryPhoto8,
+  homeImg1,
+  homeImg2,
+  homeImg3,
+  homeImg4,
+  homeImg5,
+  homeImg6,
+  homeImg7,
+  homeImg8,
   // Real gifting photography — plain local imports, not Lovable CDN assets
   hamperBagHeart,
   hamperWoodenBox,
