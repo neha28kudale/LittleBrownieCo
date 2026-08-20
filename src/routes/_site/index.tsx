@@ -250,7 +250,7 @@
 // }
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, ArrowUpRight, MessageCircleMore, Star } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   IMG,
   getProducts,
@@ -286,6 +286,14 @@ export const Route = createFileRoute("/_site/")({
   component: Home,
 });
 
+const HERO_GALLERY = [
+  IMG.biteSizedHand,
+  IMG.gallery1,
+  IMG.gallery2,
+  IMG.gallery3,
+  IMG.gallery4,
+];
+
 function Home() {
   const { products } = Route.useLoaderData() as { products: Product[] };
   const signature = signatureOf(products);
@@ -293,6 +301,8 @@ function Home() {
   const [googleRating, setGoogleRating] = useState<{ rating: number; count: number } | null>(
     null,
   );
+  const [heroSlide, setHeroSlide] = useState(0);
+  const heroScrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     getApprovedReviews().then((r) => setReviews(r.slice(0, 4)));
@@ -302,6 +312,21 @@ function Home() {
       }
     });
   }, []);
+
+  const scrollHeroTo = (index: number) => {
+    const el = heroScrollRef.current;
+    if (!el) return;
+    const clamped = Math.max(0, Math.min(index, HERO_GALLERY.length - 1));
+    el.scrollTo({ left: clamped * el.clientWidth, behavior: "smooth" });
+    setHeroSlide(clamped);
+  };
+
+  const handleHeroScroll = () => {
+    const el = heroScrollRef.current;
+    if (!el) return;
+    const index = Math.round(el.scrollLeft / el.clientWidth);
+    setHeroSlide(index);
+  };
 
   return (
     <>
@@ -358,11 +383,53 @@ function Home() {
           </div>
           <div className="relative md:col-span-6 md:pl-10">
             <div className="relative aspect-[4/5] overflow-hidden rounded-[1.6rem] border border-border/80 bg-card shadow-display">
-              <img
-                src={IMG.biteSizedHand}
-                alt="A single bite-sized Little Brownie Co. brownie held in hand"
-                className="h-full w-full object-cover"
-              />
+              <div
+                ref={heroScrollRef}
+                onScroll={handleHeroScroll}
+                className="flex h-full w-full snap-x snap-mandatory overflow-x-auto scroll-smooth [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              >
+                {HERO_GALLERY.map((src, i) => (
+                  <img
+                    key={i}
+                    src={src}
+                    alt="Little Brownie Co. brownies"
+                    className="h-full w-full flex-shrink-0 snap-center object-cover"
+                  />
+                ))}
+              </div>
+              {HERO_GALLERY.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    aria-label="Previous photo"
+                    onClick={() => scrollHeroTo(heroSlide - 1)}
+                    className="absolute left-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-background/80 text-primary shadow-soft transition hover:bg-background"
+                  >
+                    ‹
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Next photo"
+                    onClick={() => scrollHeroTo(heroSlide + 1)}
+                    className="absolute right-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-background/80 text-primary shadow-soft transition hover:bg-background"
+                  >
+                    ›
+                  </button>
+                  <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
+                    {HERO_GALLERY.map((_, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        aria-label={`Go to photo ${i + 1}`}
+                        onClick={() => scrollHeroTo(i)}
+                        className={`h-1.5 rounded-full transition-all ${
+                          i === heroSlide ? "w-5 bg-background" : "w-1.5 bg-background/60"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
             <div className="absolute -bottom-8 left-6 hidden w-48 rounded-[1.25rem] border border-border/70 bg-background/98 p-5 shadow-soft md:block">
               <div className="text-[10px] uppercase tracking-[0.3em] text-toffee">Baked Fresh</div>
