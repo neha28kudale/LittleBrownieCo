@@ -34,6 +34,7 @@ import {
   subscribeReviews,
   type Review,
 } from "@/lib/reviews";
+import { exportAdminDataToExcel } from "@/lib/excel-export";
 import {
   LayoutDashboard,
   Package,
@@ -55,6 +56,7 @@ import {
   Phone,
   Mail,
   MapPin,
+  Download,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "sonner";
@@ -182,6 +184,7 @@ function AdminDashboard({
   const [orders, setOrders] = useState<Order[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [exporting, setExporting] = useState(false);
 
   const refreshProducts = () => getAllProductsAdmin().then(setProducts);
 
@@ -217,6 +220,22 @@ function AdminDashboard({
     await setOrderStatus(id, status);
     setOrders(await getAllOrders());
     toast.success(`Order ${status.replace("_", " ")}`);
+  };
+
+  const handleExport = () => {
+    if (orders.length === 0) {
+      toast.error("No orders to export yet");
+      return;
+    }
+    try {
+      setExporting(true);
+      exportAdminDataToExcel(orders, products);
+      toast.success("Report downloaded");
+    } catch (err) {
+      toast.error("Export failed — please try again");
+    } finally {
+      setExporting(false);
+    }
   };
 
   const stats = useMemo(
@@ -310,6 +329,13 @@ function AdminDashboard({
           ))}
         </nav>
         <button
+          onClick={handleExport}
+          disabled={exporting}
+          className="flex items-center gap-2 border-t border-border p-4 text-left text-[10px] uppercase tracking-[0.18em] text-primary/80 hover:text-accent disabled:opacity-50"
+        >
+          <Download className="h-3.5 w-3.5" /> {exporting ? "Exporting…" : "Export to Excel"}
+        </button>
+        <button
           onClick={async () => {
             await adminSignOut();
             onLogout();
@@ -332,9 +358,19 @@ function AdminDashboard({
                 </div>
               </div>
             </Link>
-            <div className="hidden md:block">
-              <div className="text-[11px] uppercase tracking-[0.22em] text-toffee">Dashboard</div>
-              <h1 className="mt-1 font-serif text-2xl text-primary capitalize md:text-3xl">{tab}</h1>
+            <div className="hidden md:flex md:flex-1 md:items-center md:justify-between">
+              <div>
+                <div className="text-[11px] uppercase tracking-[0.22em] text-toffee">Dashboard</div>
+                <h1 className="mt-1 font-serif text-2xl text-primary capitalize md:text-3xl">{tab}</h1>
+              </div>
+              <button
+                onClick={handleExport}
+                disabled={exporting}
+                className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2.5 text-xs uppercase tracking-[0.18em] text-primary hover:border-accent hover:text-accent disabled:opacity-50"
+              >
+                <Download className="h-3.5 w-3.5" />
+                {exporting ? "Exporting…" : "Export to Excel"}
+              </button>
             </div>
             <button
               onClick={async () => {
@@ -347,8 +383,16 @@ function AdminDashboard({
               <LogOut className="h-4 w-4" />
             </button>
           </div>
-          <div className="px-4 pb-3 md:hidden">
+          <div className="flex items-center justify-between gap-3 px-4 pb-3 md:hidden">
             <h1 className="font-serif text-xl text-primary capitalize">{tab}</h1>
+            <button
+              onClick={handleExport}
+              disabled={exporting}
+              className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-[10px] uppercase tracking-[0.16em] text-primary disabled:opacity-50"
+            >
+              <Download className="h-3.5 w-3.5" />
+              {exporting ? "…" : "Export"}
+            </button>
           </div>
         </header>
 
@@ -984,104 +1028,6 @@ function ProductsAdmin({
   );
 }
 
-// function ProductModal({
-//   draft,
-//   saving,
-//   onClose,
-//   onSave,
-// }: {
-//   draft: Draft;
-//   saving: boolean;
-//   onClose: () => void;
-//   onSave: (d: Draft) => void;
-// }) {
-//   const [d, setD] = useState<Draft>(draft);
-//   return (
-//     <div className="fixed inset-0 z-50 flex items-center justify-center bg-primary/40 p-4 backdrop-blur-sm">
-//       <div className="relative w-full max-w-lg rounded-lg bg-card p-8">
-//         <button
-//           onClick={onClose}
-//           className="absolute right-4 top-4 text-muted-foreground hover:text-primary"
-//           aria-label="Close"
-//         >
-//           <X className="h-5 w-5" />
-//         </button>
-//         <h2 className="font-serif text-3xl text-primary">
-//           {d.id ? "Edit product" : "New product"}
-//         </h2>
-//         <div className="mt-6 space-y-3">
-//           <Field label="Name">
-//             <input
-//               value={d.name || ""}
-//               onChange={(e) => setD({ ...d, name: e.target.value })}
-//               className="input"
-//             />
-//           </Field>
-//           <Field label="Tagline">
-//             <input
-//               value={d.tagline || ""}
-//               onChange={(e) => setD({ ...d, tagline: e.target.value })}
-//               className="input"
-//             />
-//           </Field>
-//           <div className="grid grid-cols-2 gap-3">
-//             <Field label="Price (₹)">
-//               <input
-//                 type="number"
-//                 value={d.price || ""}
-//                 onChange={(e) => setD({ ...d, price: Number(e.target.value) })}
-//                 className="input"
-//               />
-//             </Field>
-//             <Field label="Category">
-//               <select
-//                 value={d.category || "Signature"}
-//                 onChange={(e) => setD({ ...d, category: e.target.value as Product["category"] })}
-//                 className="input"
-//               >
-//                 {["Signature", "Bites", "Loaves", "Cakes", "Hampers"].map((c) => (
-//                   <option key={c}>{c}</option>
-//                 ))}
-//               </select>
-//             </Field>
-//           </div>
-//           <Field label="Image URL">
-//             <input
-//               value={d.image || ""}
-//               onChange={(e) => setD({ ...d, image: e.target.value })}
-//               className="input"
-//               placeholder="https://..."
-//             />
-//           </Field>
-//           <Field label="Description">
-//             <textarea
-//               rows={3}
-//               value={d.description || ""}
-//               onChange={(e) => setD({ ...d, description: e.target.value })}
-//               className="input"
-//             />
-//           </Field>
-//         </div>
-//         <div className="mt-6 flex justify-end gap-3">
-//           <button
-//             onClick={onClose}
-//             className="rounded-full border border-border px-5 py-2 text-xs uppercase tracking-[0.18em] text-primary hover:bg-secondary"
-//           >
-//             Cancel
-//           </button>
-//           <button
-//             onClick={() => onSave(d)}
-//             disabled={saving}
-//             className="rounded-full bg-primary px-5 py-2 text-xs uppercase tracking-[0.18em] text-primary-foreground transition-colors hover:bg-cocoa-dark active:bg-cocoa-dark disabled:opacity-50"
-//           >
-//             {saving ? "Saving…" : "Save"}
-//           </button>
-//         </div>
-//       </div>
-//       <style>{`.input{width:100%;border:1px solid var(--border);background:var(--background);padding:0.5rem 0.75rem;border-radius:0.375rem;font-size:0.875rem;color:var(--foreground)}`}</style>
-//     </div>
-//   );
-// }
 function ProductModal({
   draft,
   saving,
