@@ -29,7 +29,7 @@ import biteSizedHandPhoto from "@/assets/bite-sized-hand.jpg";
 
 // Home page hero gallery photos — auto-switching image strip
 import homeImg1 from "@/assets/himg1.jpg";
-import homeImg2 from "@/assets/himg2.jpeg";
+import homeImg2 from "@/assets/himg2.jpeg"; 
 import homeImg3 from "@/assets/himg3.jpeg";
 import homeImg4 from "@/assets/himg4.jpg";
 import homeImg5 from "@/assets/himg5.jpg";
