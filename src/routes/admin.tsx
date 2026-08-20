@@ -34,7 +34,7 @@ import {
   subscribeReviews,
   type Review,
 } from "@/lib/reviews";
-import { exportAdminDataToExcel } from "@/lib/excel-export";
+import { exportAdminDataToExcel } from "@/lib/export";
 import {
   LayoutDashboard,
   Package,
