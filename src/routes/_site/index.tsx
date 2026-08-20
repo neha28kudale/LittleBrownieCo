@@ -1,1383 +1,616 @@
-// Real product photography, supplied directly by the bakery (Aug 2026 drive
-// share) — extracted from the brand's own order-form PDF and photo library.
-// These are plain local imports (bundled by Vite), not remote CDN pointers,
-// so the site no longer depends on an external Lovable-hosted domain staying
-// online to render images.
-import logo from "@/assets/real/logo.png";
-import tubPhoto from "@/assets/real/tub.jpg";
-import tubAssortedPhoto from "@/assets/real/tub-assorted.jpg";
-import loafPhoto from "@/assets/real/loaf.jpg";
-import assortedBoxPhoto from "@/assets/real/assorted-box.jpg";
-import littleBoxPhoto from "@/assets/real/little-box.jpg";
-import slabPhoto from "@/assets/real/slab.jpg";
-import lavaPhoto from "@/assets/real/lava-cake.jpg";
-import loadedCakePhoto from "@/assets/real/loaded-cake.jpg";
-import dipsPhoto from "@/assets/real/dips.jpg";
-import ribbonPhoto from "@/assets/real/ribbon.jpg";
-import sustainablePackagingPhoto from "@/assets/real/sustainable-packaging.jpg";
-import galleryPhoto1 from "@/assets/real/gallery-1.jpg";
-import galleryPhoto2 from "@/assets/real/gallery-2.jpg";
-import galleryPhoto3 from "@/assets/real/gallery-3.jpg";
-import galleryPhoto4 from "@/assets/real/gallery-4.jpg";
-import galleryPhoto5 from "@/assets/real/gallery-5.jpg";
-import galleryPhoto6 from "@/assets/real/gallery-6.jpg";
-import galleryPhoto7 from "@/assets/real/gallery-7.jpg";
-import galleryPhoto8 from "@/assets/real/gallery-8.jpg";
-import heroPhoto from "@/assets/real/hero.jpg";
-import headerBannerPhoto from "@/assets/header-banner.png";
-import biteSizedHandPhoto from "@/assets/bite-sized-hand.jpg";
+// import { createFileRoute, Link } from "@tanstack/react-router";
+// import { ArrowRight, ArrowUpRight, MessageCircleMore, Star } from "lucide-react";
+// import { useEffect, useState } from "react";
+// import {
+//   IMG,
+//   getProducts,
+//   signatureOf,
+//   fromPrice,
+//   whatsappLink,
+//   GOOGLE_REVIEWS_URL,
+//   type Product,
+// } from "@/lib/products";
+// import { getApprovedReviews, getGoogleReviews, type Review } from "@/lib/reviews";
+// import { ProductCard } from "@/components/site/ProductCard";
+// import { Reveal } from "@/components/site/Reveal";
 
-// Home page hero gallery photos — auto-switching image strip
-import homeImg1 from "@/assets/himg1.jpg";
-import homeImg2 from "@/assets/himg2.jpeg"; 
-import homeImg3 from "@/assets/himg3.jpeg";
-import homeImg4 from "@/assets/himg4.jpg";
-import homeImg5 from "@/assets/himg5.jpg";
-import homeImg6 from "@/assets/himg6.jpeg";
-import homeImg7 from "@/assets/himg7.jpeg";
-import homeImg8 from "@/assets/himg8.jpeg";
-
-// Real gifting photography supplied earlier — plain local imports too
-import hamperBagHeart from "@/assets/gifting/hamper-bag-heart.png";
-import hamperWoodenBox from "@/assets/gifting/hamper-wooden-box.png";
-import hamperValentineSet from "@/assets/gifting/hamper-valentine-set.png";
-import hamperRibbonBoxes from "@/assets/gifting/hamper-ribbon-boxes.png";
-import hamperBowCloseup from "@/assets/gifting/hamper-bow-closeup.png";
-import hamperPostcardFlowers from "@/assets/gifting/hamper-postcard-flowers.png";
-
-export const IMG = {
-  logo,
-  heroPortrait: heroPhoto,
-  headerBanner: headerBannerPhoto,
-  biteSizedHand: biteSizedHandPhoto,
-  tub: tubPhoto,
-  tubSquare: tubPhoto,
-  loaf: loafPhoto,
-  loafSquare: loafPhoto,
-  assortedTub: tubAssortedPhoto,
-  assortedTubSquare: tubAssortedPhoto,
-  assortedBox: assortedBoxPhoto,
-  assortedBoxSquare: assortedBoxPhoto,
-  littleBox: littleBoxPhoto,
-  littleBoxSquare: littleBoxPhoto,
-  slab: slabPhoto,
-  slabSquare: slabPhoto,
-  lava: lavaPhoto,
-  lavaSquare: lavaPhoto,
-  cake: loadedCakePhoto,
-  cakeSquare: loadedCakePhoto,
-  dips: dipsPhoto,
-  dipsSquare: dipsPhoto,
-  ribbon: ribbonPhoto,
-  sustainablePackaging: sustainablePackagingPhoto,
-  about1: galleryPhoto2,
-  about2: galleryPhoto4,
-  gallery1: galleryPhoto1,
-  gallery2: galleryPhoto2,
-  gallery3: galleryPhoto3,
-  gallery4: galleryPhoto4,
-  gallery5: galleryPhoto5,
-  gallery6: galleryPhoto6,
-  gallery7: galleryPhoto7,
-  gallery8: galleryPhoto8,
-  homeImg1,
-  homeImg2,
-  homeImg3,
-  homeImg4,
-  homeImg5,
-  homeImg6,
-  homeImg7,
-  homeImg8,
-  // Real gifting photography — plain local imports, not Lovable CDN assets
-  hamperBagHeart,
-  hamperWoodenBox,
-  hamperValentineSet,
-  hamperRibbonBoxes,
-  hamperBowCloseup,
-  hamperPostcardFlowers,
-};
-
-/** Real, non-stock photos of actual packed hampers for the gifting page gallery. */
-export const giftingGallery = [
-  { src: IMG.hamperValentineSet, alt: "Valentine's gifting set with brownies, dip and card" },
-  { src: IMG.hamperRibbonBoxes, alt: "Brownie loaf box and tin, ribbon-tied" },
-  { src: IMG.hamperBowCloseup, alt: "Close-up of a satin bow on a kraft brownie box" },
-  { src: IMG.hamperPostcardFlowers, alt: "Gift hamper with flowers and a handwritten postcard" },
-  { src: IMG.hamperWoodenBox, alt: "Ribbon-tied wooden brownie gift box" },
-  { src: IMG.hamperBagHeart, alt: "Kraft gift bag with hand-stamped hearts" },
-];
-
-export type Variant = { id: string; label: string; price: number };
-
-export type Product = {
-  id: string;
-  slug: string;
-  name: string;
-  tagline: string;
-  category: "Signature" | "Bites" | "Loaves" | "Cakes" | "Hampers" | "Add-ons" | "Limited Editions";
-  image: string;
-  square: string;
-  gallery: string[];
-  variants: Variant[];
-  flavours: string[];
-  ingredients: string[];
-  description: string;
-  bestSeller?: boolean;
-  signature?: boolean;
-  isActive?: boolean;
-};
-
-import { supabase } from "./supabase";
-
-/**
- * Fallback/seed catalog. Supabase (`products` + `product_variants` tables,
- * see supabase/migrations/) is the real source of truth — this array is
- * only used if that fetch fails (offline, misconfigured env) so the site
- * still renders something, and it's what supabase/migrations/0003_seed_products.sql
- * was generated from.
- */
-// Product line-up, flavours and prices below are taken directly from the
-// bakery's own order form ("Menu-items with price.pdf", shared Aug 2026).
-// Update prices here (and keep supabase/migrations/0003_seed_products.sql in
-// sync) whenever the owner revises pricing.
-const FALLBACK_PRODUCTS: Product[] = [
-  {
-    id: "p1",
-    slug: "mini-brownie-tub",
-    name: "Mini Brownie Tub",
-    tagline: "Soft, fudgy mini brownie bites in a kraft tub.",
-    category: "Bites",
-    image: IMG.tub,
-    square: IMG.tubSquare,
-    gallery: [IMG.tub, IMG.assortedTub, IMG.biteSizedHand],
-    variants: [
-      { id: "6-dark", label: "6 pcs · Dark Chocolate", price: 215 },
-      { id: "6-walnut", label: "6 pcs · Walnut", price: 265 },
-      { id: "6-nutella", label: "6 pcs · Nutella", price: 245 },
-      { id: "6-assorted", label: "6 pcs · Assorted (2 each)", price: 295 },
-      { id: "12-dark", label: "12 pcs · Dark Chocolate", price: 385 },
-      { id: "12-walnut", label: "12 pcs · Walnut", price: 465 },
-      { id: "12-nutella", label: "12 pcs · Nutella", price: 425 },
-      { id: "12-assorted", label: "12 pcs · Assorted (4 each)", price: 475 },
-      { id: "24-dark", label: "24 pcs · Dark Chocolate", price: 665 },
-      { id: "24-walnut", label: "24 pcs · Walnut", price: 775 },
-      { id: "24-nutella", label: "24 pcs · Nutella", price: 745 },
-      { id: "24-assorted", label: "24 pcs · Assorted (8 each)", price: 835 },
-    ],
-    flavours: ["Dark Chocolate", "Walnut", "Nutella", "Assorted"],
-    ingredients: ["Belgian dark chocolate", "Butter", "Eggs", "Cane sugar", "All-purpose flour"],
-    description:
-      "Soft, fudgy mini brownie bites, ideal for casual snacking, sharing with friends, or enjoying a quick treat whenever a craving hits. Choose a single flavour, or go Assorted for all three (Dark Chocolate, Walnut, Nutella) in one tub — 2 pcs of each in the 6 pcs tub, 4 pcs of each in the 12 pcs tub, and 8 pcs of each in the 24 pcs tub.",
-    bestSeller: true,
-    signature: true,
-  },
-  {
-    id: "p3",
-    slug: "mini-brownie-loaf",
-    name: "Mini Brownie Loaf",
-    tagline: "A dense, gooey single-serve loaf.",
-    category: "Loaves",
-    image: IMG.loaf,
-    square: IMG.loafSquare,
-    gallery: [IMG.loaf],
-    variants: [
-      { id: "1-dark", label: "1 loaf · Dark Chocolate", price: 355 },
-      { id: "1-walnut", label: "1 loaf · Walnut", price: 425 },
-      { id: "1-nutella", label: "1 loaf · Nutella", price: 385 },
-      { id: "2-dark", label: "2 loaves · Dark Chocolate", price: 710 },
-      { id: "2-walnut", label: "2 loaves · Walnut", price: 850 },
-      { id: "2-nutella", label: "2 loaves · Nutella", price: 770 },
-      { id: "5-dark", label: "5 loaves · Dark Chocolate", price: 1775 },
-      { id: "5-walnut", label: "5 loaves · Walnut", price: 2125 },
-      { id: "5-nutella", label: "5 loaves · Nutella", price: 1925 },
-    ],
-    flavours: ["Dark Chocolate", "Walnut", "Nutella"],
-    ingredients: ["Belgian dark chocolate", "Butter", "Eggs", "Vanilla", "Flour"],
-    description:
-      "A rich, fudgy brownie baked in the shape of a mini loaf. It is dense, gooey with a crinkle top, offering the perfect balance of indulgence in a cute, single-serve size. Ideal for gifting, snacking, or satisfying solo cravings without overdoing it! Choose 1–5 loaves per flavour.",
-    bestSeller: true,
-    signature: true,
-  },
-  {
-    id: "p4",
-    slug: "assorted-brownie-box",
-    name: "Assorted Brownie Box",
-    tagline: "Bite-sized squares, mixed flavours.",
-    category: "Hampers",
-    image: IMG.assortedBox,
-    square: IMG.assortedBoxSquare,
-    gallery: [IMG.assortedBox],
-    variants: [
-      { id: "dark-nutella", label: "2 pcs Dark Chocolate + 2 pcs Nutella", price: 385 },
-      { id: "dark-walnut", label: "2 pcs Dark Chocolate + 2 pcs Walnut", price: 415 },
-      { id: "walnut-nutella", label: "2 pcs Walnut + 2 pcs Nutella", price: 435 },
-      { id: "all-three", label: "2 pcs each · All Three Flavours", price: 585 },
-    ],
-    flavours: ["Dark Chocolate", "Walnut", "Nutella"],
-    ingredients: ["Belgian dark chocolate", "Butter", "Eggs", "Walnuts", "Nutella", "Kraft gift box"],
-    description:
-      "A curated mix of our best-loved flavours, packed into bite-sized square brownie pieces. Perfect for sharing, gifting, or sampling a little bit of everything!",
-  },
-  {
-    id: "p5",
-    slug: "the-little-brownie-box",
-    name: "The Little Brownie Box",
-    tagline: "Nine hand-cut squares of pure fudge.",
-    category: "Signature",
-    image: IMG.littleBox,
-    square: IMG.littleBoxSquare,
-    gallery: [IMG.littleBox],
-    variants: [
-      { id: "1-dark", label: "1 box · Dark Chocolate", price: 355 },
-      { id: "1-nutella", label: "1 box · Nutella", price: 395 },
-      { id: "2-dark", label: "2 boxes · Dark Chocolate", price: 710 },
-      { id: "2-nutella", label: "2 boxes · Nutella", price: 790 },
-      { id: "5-dark", label: "5 boxes · Dark Chocolate", price: 1775 },
-      { id: "5-nutella", label: "5 boxes · Nutella", price: 1975 },
-    ],
-    flavours: ["Dark Chocolate", "Nutella"],
-    ingredients: ["Belgian dark chocolate", "Butter", "Eggs", "Cane sugar", "Flour"],
-    description:
-      "The Little Brownie Box is filled with bite-sized dark chocolate brownie pieces, rich, fudgy, and perfectly indulgent. Each piece delivers a deep cocoa flavour in a small, satisfying bite — perfect for sharing or treating yourself. Choose 1–5 boxes.",
-    signature: true,
-  },
-  {
-    id: "p6",
-    slug: "brownie-slab",
-    name: "Brownie Slab",
-    tagline: "One big slab. Cut it your way.",
-    category: "Signature",
-    image: IMG.slab,
-    square: IMG.slabSquare,
-    gallery: [IMG.slab],
-    variants: [
-      { id: "1-dark", label: "1 slab · Dark Chocolate", price: 585 },
-      { id: "1-nutella", label: "1 slab · Nutella", price: 665 },
-      { id: "2-dark", label: "2 slabs · Dark Chocolate", price: 1170 },
-      { id: "2-nutella", label: "2 slabs · Nutella", price: 1330 },
-      { id: "5-dark", label: "5 slabs · Dark Chocolate", price: 2925 },
-      { id: "5-nutella", label: "5 slabs · Nutella", price: 3325 },
-    ],
-    flavours: ["Dark Chocolate", "Nutella"],
-    ingredients: ["Belgian dark chocolate", "Butter", "Eggs", "Cane sugar", "Flour"],
-    description:
-      "Rich, fudgy, and irresistibly chocolatey, this soft brownie slab is packed with deep cocoa flavour and melts in your mouth with every bite. Uncut, so you can slice it however suits your party or platter. Choose 1–5 slabs.",
-    signature: true,
-  },
-  {
-    id: "p7",
-    slug: "choco-lava-cake",
-    name: "Choco Lava Cake",
-    tagline: "Molten centre, heart-shaped tin.",
-    category: "Cakes",
-    image: IMG.lava,
-    square: IMG.lavaSquare,
-    gallery: [IMG.lava],
-    variants: [
-      { id: "1", label: "1 tin · Dark Chocolate", price: 195 },
-      { id: "2", label: "2 tins · Dark Chocolate", price: 390 },
-      { id: "5", label: "5 tins · Dark Chocolate", price: 975 },
-    ],
-    flavours: ["Dark Chocolate"],
-    ingredients: ["Belgian dark chocolate", "Butter", "Eggs", "Cocoa", "Flour"],
-    description:
-      "A rich and moist chocolate cake with a warm, gooey molten chocolate centre that melts in every bite. A decadent dessert that's perfect for satisfying any chocolate craving, served in a heart-shaped, ready-to-heat-and-eat tin. Choose 1–5 tins.",
-  },
-  {
-    id: "p8",
-    slug: "brownie-slab-cake-loaded-chocolate",
-    name: "Brownie Slab Cake · Loaded Chocolate",
-    tagline: "Ganache-topped celebration slab.",
-    category: "Cakes",
-    image: IMG.cake,
-    square: IMG.cakeSquare,
-    gallery: [IMG.cake],
-    variants: [
-      { id: "half-kg", label: "1/2 kg Brownie Slab Cake", price: 655 },
-      { id: "topper", label: "\"Happy Birthday\" cake topper (add-on)", price: 10 },
-    ],
-    flavours: ["Loaded Chocolate"],
-    ingredients: ["Brownie sponge", "Chocolate ganache", "Chocolate truffles", "Chocolate bars"],
-    description:
-      "A rich, fudgy brownie slab cake topped with smooth chocolate ganache — dense, moist, and loaded with deep chocolate flavour. Perfect for celebrations or a decadent treat! Add a \"Happy Birthday\" topper for ₹10.",
-    bestSeller: true,
-    signature: true,
-  },
-  {
-    id: "p9",
-    slug: "signature-dips",
-    name: "Signature Dips",
-    tagline: "Pourable chocolate, for the extra bit.",
-    category: "Add-ons",
-    image: IMG.dips,
-    square: IMG.dipsSquare,
-    gallery: [IMG.dips],
-    variants: [
-      { id: "dark", label: "Dark Chocolate Dip", price: 25 },
-      { id: "nutella", label: "Nutella Dip", price: 35 },
-    ],
-    flavours: ["Dark Chocolate", "Nutella"],
-    ingredients: ["Belgian couverture chocolate", "Fresh cream", "Nutella"],
-    description:
-      "Take your brownies to the next level with our rich, creamy dips! From silky chocolate to nutty spreads, each dip is crafted to make every bite extra indulgent. Perfect for sharing… or not.",
-  },
-];
-
-export function findProduct(list: Product[], id: string) {
-  return list.find((p) => p.id === id || p.slug === id);
-}
-
-export function fromPrice(p: Product) {
-  return Math.min(...p.variants.map((v) => v.price));
-}
-
-/* ---------------- Supabase-backed catalog ---------------- */
-
-function rowToProduct(row: any, variantRows: any[]): Product {
-  const variants: Variant[] = variantRows
-    .filter((v) => v.product_id === row.id)
-    .sort((a, b) => a.sort_order - b.sort_order)
-    .map((v) => ({ id: v.id, label: v.label, price: Number(v.price) }));
-
-  return {
-    id: row.id,
-    slug: row.slug,
-    name: row.name,
-    tagline: row.tagline ?? "",
-    category: row.category,
-    image: row.image_url ?? IMG.littleBox,
-    square: row.square_image_url ?? row.image_url ?? IMG.littleBox,
-    gallery: row.gallery?.length ? row.gallery : [row.image_url].filter(Boolean),
-    variants: variants.length ? variants : [{ id: "default", label: "Standard", price: 0 }],
-    flavours: row.flavours ?? [],
-    ingredients: row.ingredients ?? [],
-    description: row.description ?? "",
-    bestSeller: row.best_seller ?? false,
-    signature: row.is_signature ?? false,
-    isActive: row.is_active ?? true,
-  };
-}
-
-/** Live catalog from Supabase (active products only). Falls back to the
- * local seed list if the fetch fails or the table is empty. */
-export async function getProducts(): Promise<Product[]> {
-  const { data: rows, error } = await supabase
-    .from("products")
-    .select("*")
-    .eq("is_active", true)
-    .order("sort_order", { ascending: true });
-
-  if (error || !rows || rows.length === 0) {
-    if (error) console.error("[products] getProducts", error);
-    return FALLBACK_PRODUCTS;
-  }
-
-  const { data: variantRows } = await supabase
-    .from("product_variants")
-    .select("*")
-    .in(
-      "product_id",
-      rows.map((r: any) => r.id),
-    )
-    .eq("is_active", true);
-
-  return rows.map((r: any) => rowToProduct(r, variantRows ?? []));
-}
-
-/** All products including inactive — for the admin dashboard. */
-export async function getAllProductsAdmin(): Promise<Product[]> {
-  const { data: rows, error } = await supabase
-    .from("products")
-    .select("*")
-    .order("created_at", { ascending: false });
-  if (error || !rows) {
-    if (error) console.error("[products] getAllProductsAdmin", error);
-    return [];
-  }
-  const { data: variantRows } = await supabase
-    .from("product_variants")
-    .select("*")
-    .in(
-      "product_id",
-      rows.map((r: any) => r.id),
-    );
-  return rows.map((r: any) => rowToProduct(r, variantRows ?? []));
-}
-
-export type ProductDraft = {
-  name: string;
-  tagline?: string;
-  category: Product["category"];
-  image: string;
-  description?: string;
-  price: number;
-  isActive?: boolean;
-  /** Full list of purchasable options shown on the product page. If omitted,
-   * a single "Standard" variant at `price` is used (create) or the existing
-   * variants are left untouched (update). */
-  variants?: Variant[];
-  /** Extra photos shown in the product page image strip. If omitted, falls
-   * back to just `image`. */
-  gallery?: string[];
-  flavours?: string[];
-  ingredients?: string[];
-};
-
-function slugify(name: string) {
-  return (
-    name
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "") || `product-${Date.now()}`
-  );
-}
-
-/** Admin: create a product. Uses the full `variants`/`gallery` lists when
- * provided, otherwise falls back to a single "Standard" variant at `price`
- * and a one-photo gallery. */
-export async function createProductRow(
-  draft: ProductDraft,
-): Promise<{ ok: true } | { ok: false; error: string }> {
-  const gallery = draft.gallery?.length ? draft.gallery : [draft.image];
-
-  const { data: product, error } = await supabase
-    .from("products")
-    .insert({
-      slug: slugify(draft.name),
-      name: draft.name,
-      tagline: draft.tagline || null,
-      category: draft.category,
-      description: draft.description || null,
-      image_url: draft.image,
-      square_image_url: draft.image,
-      gallery,
-      flavours: draft.flavours ?? [],
-      ingredients: draft.ingredients ?? [],
-      is_active: true,
-    })
-    .select()
-    .single();
-
-  if (error || !product) return { ok: false, error: error?.message ?? "Could not create product." };
-
-  const variantsToInsert =
-    draft.variants && draft.variants.length
-      ? draft.variants.map((v, i) => ({
-          product_id: product.id,
-          label: v.label,
-          price: v.price,
-          sort_order: i,
-        }))
-      : [{ product_id: product.id, label: "Standard", price: draft.price, sort_order: 0 }];
-
-  const { error: variantError } = await supabase.from("product_variants").insert(variantsToInsert);
-
-  if (variantError) return { ok: false, error: variantError.message };
-  return { ok: true };
-}
-
-/** Admin: update a product's fields. When `variants` is provided, the
- * product's entire variant list is replaced with it (full product-page
- * editability); otherwise a bare `price` update just adjusts the first
- * (lowest sort_order) variant, same as before. */
-export async function updateProductRow(
-  id: string,
-  draft: Partial<ProductDraft>,
-): Promise<{ ok: true } | { ok: false; error: string }> {
-  const { error } = await supabase
-    .from("products")
-    .update({
-      ...(draft.name !== undefined ? { name: draft.name } : {}),
-      ...(draft.tagline !== undefined ? { tagline: draft.tagline } : {}),
-      ...(draft.category !== undefined ? { category: draft.category } : {}),
-      ...(draft.description !== undefined ? { description: draft.description } : {}),
-      ...(draft.image !== undefined ? { image_url: draft.image, square_image_url: draft.image } : {}),
-      ...(draft.gallery !== undefined ? { gallery: draft.gallery } : {}),
-      ...(draft.flavours !== undefined ? { flavours: draft.flavours } : {}),
-      ...(draft.ingredients !== undefined ? { ingredients: draft.ingredients } : {}),
-      ...(draft.isActive !== undefined ? { is_active: draft.isActive } : {}),
-    })
-    .eq("id", id);
-
-  if (error) return { ok: false, error: error.message };
-
-  if (draft.variants && draft.variants.length) {
-    // Full replace: clear the old option list, then insert the edited one —
-    // simplest way to support adding/removing/reordering options from the
-    // product page (sizes, flavours, etc.), not just editing prices in place.
-    const { error: delError } = await supabase.from("product_variants").delete().eq("product_id", id);
-    if (delError) return { ok: false, error: delError.message };
-
-    const { error: insError } = await supabase.from("product_variants").insert(
-      draft.variants.map((v, i) => ({
-        product_id: id,
-        label: v.label,
-        price: v.price,
-        sort_order: i,
-      })),
-    );
-    if (insError) return { ok: false, error: insError.message };
-  } else if (draft.price !== undefined) {
-    const { data: variants } = await supabase
-      .from("product_variants")
-      .select("id")
-      .eq("product_id", id)
-      .order("sort_order", { ascending: true })
-      .limit(1);
-    if (variants && variants[0]) {
-      await supabase.from("product_variants").update({ price: draft.price }).eq("id", variants[0].id);
-    }
-  }
-
-  return { ok: true };
-}
-
-export async function deleteProductRow(id: string) {
-  const { error } = await supabase.from("products").delete().eq("id", id);
-  if (error) console.error("[products] deleteProductRow", error);
-}
-
-export async function setProductActive(id: string, isActive: boolean) {
-  const { error } = await supabase.from("products").update({ is_active: isActive }).eq("id", id);
-  if (error) console.error("[products] setProductActive", error);
-  return !error;
-}
-
-const PRODUCT_IMAGE_BUCKET = "product-images";
-const MAX_IMAGE_BYTES = 5 * 1024 * 1024; // 5MB
-
-/** Admin: upload a file to Supabase Storage and return its public URL. */
-export async function uploadProductImage(
-  file: File,
-): Promise<{ ok: true; url: string } | { ok: false; error: string }> {
-  if (!file.type.startsWith("image/")) {
-    return { ok: false, error: "Please choose an image file." };
-  }
-  if (file.size > MAX_IMAGE_BYTES) {
-    return { ok: false, error: "Image must be under 5MB." };
-  }
-
-  const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
-  const path = `${crypto.randomUUID()}.${ext}`;
-
-  const { error } = await supabase.storage
-    .from(PRODUCT_IMAGE_BUCKET)
-    .upload(path, file, { cacheControl: "3600", upsert: false });
-
-  if (error) return { ok: false, error: error.message };
-
-  const { data } = supabase.storage.from(PRODUCT_IMAGE_BUCKET).getPublicUrl(path);
-  return { ok: true, url: data.publicUrl };
-}
-
-/** Admin: delete a previously uploaded image, given its public URL (no-op for external URLs). */
-export async function deleteProductImage(url: string) {
-  const marker = `/${PRODUCT_IMAGE_BUCKET}/`;
-  const idx = url.indexOf(marker);
-  if (idx === -1) return; // not one of our uploaded files — leave it alone
-  const path = url.slice(idx + marker.length);
-  await supabase.storage.from(PRODUCT_IMAGE_BUCKET).remove([path]);
-}
-
-export function bestSellersOf(list: Product[]) {
-  return list.filter((p) => p.bestSeller);
-}
-export function signatureOf(list: Product[]) {
-  return list.filter((p) => p.signature);
-}
-export function hampersOf(list: Product[]) {
-  return list.filter((p) => p.category === "Hampers" || p.category === "Cakes");
-}
-
-/* ---------- Order form configuration ---------- */
-
-export const ADD_ONS: Variant[] = [
-  { id: "ribbon", label: "Satin ribbon & gift wrap", price: 40 },
-  { id: "card", label: "Handwritten message card", price: 30 },
-  { id: "candles", label: "Candles & knife set", price: 25 },
-  { id: "topper", label: "Celebration cake topper", price: 10 },
-  { id: "dip-dark", label: "Dark chocolate dip pot", price: 25 },
-  { id: "dip-nutella", label: "Nutella dip pot", price: 35 },
-];
-
-export const RIBBON_COLOURS = [
-  "Dusty Blue Stripe",
-  "Navy Gingham",
-  "Ivory Floral",
-  "Lilac Gingham",
-  "Olive Twill",
-  "Sage Gingham",
-  "No ribbon",
-];
-
-export const DELIVERY_SLOTS = [
-  "11:00 AM – 1:00 PM",
-  "1:00 PM – 3:00 PM",
-  "3:00 PM – 5:00 PM",
-  "5:00 PM – 7:00 PM",
-  "7:00 PM – 9:00 PM",
-];
-
-export const OCCASIONS = [
-  "Just because",
-  "Birthday",
-  "Anniversary",
-  "Corporate gifting",
-  "Festival",
-  "Wedding / Return gifts",
-];
-
-export const DELIVERY_AREAS = [
-  { id: "indiranagar", label: "Indiranagar / Domlur", fee: 60 },
-  { id: "koramangala", label: "Koramangala / HSR", fee: 80 },
-  { id: "whitefield", label: "Whitefield / Marathahalli", fee: 120 },
-  { id: "north", label: "Hebbal / Yelahanka", fee: 140 },
-  { id: "other", label: "Other Bengaluru pincode", fee: 150 },
-];
-
-/**
- * NOTE: these helpers (LEAD_TIME_DAYS/minOrderDate/maxOrderDate/isClosedDay)
- * are legacy from an earlier version of the order form and are not used by
- * the current checkout flow — see src/lib/delivery.ts for the real,
- * live lead-time logic (next-day only, 9am–5pm / after-5pm cutoff) that
- * actually powers the checkout page. Kept only in case any older code still
- * imports them; safe to delete once confirmed unused.
- */
-export const LEAD_TIME_DAYS = 1;
-
-export function minOrderDate() {
-  const d = new Date();
-  d.setDate(d.getDate() + LEAD_TIME_DAYS);
-  return d.toISOString().slice(0, 10);
-}
-
-export function maxOrderDate() {
-  const d = new Date();
-  d.setDate(d.getDate() + 60);
-  return d.toISOString().slice(0, 10);
-}
-
-/** Not used by the live checkout flow — see note above. Always returns false. */
-export function isClosedDay(_dateStr: string) {
-  return false;
-}
-
-export const WHATSAPP_NUMBER = "919019917398";
-export const PHONE_DISPLAY = "+91 90199 17398";
-export const EMAIL = "littlebrownieco25@gmail.com";
-export const ADDRESS = "Koramangala, Bengaluru 560029, Karnataka, India";
-/** Hours during which we take new orders. */
-export const ORDER_HOURS = "9:00 AM – 5:00 PM";
-/** Hours during which orders are delivered. */
-export const DELIVERY_HOURS = "9:00 AM – 9:00 PM";
-/** @deprecated use ORDER_HOURS — kept so any lingering imports don't break. */
-export const HOURS = ORDER_HOURS;
-export const UPI_ID = "littlebrownieco@upi";
-export const FSSAI_NUMBER = "21225010000087";
-
-/**
- * Single source of truth for the allergen list, taken from the owner's own
- * "What Goes Inside Our Brownies?" allergy graphic (Aug 2026). Update this
- * one constant and it updates everywhere the allergen list appears
- * (Footer, About page, AllergyBanner). The owner said she may send a
- * slightly revised version — when she does, just edit the arrays below.
- */
-export const ALLERGENS = {
-  short: "eggs, milk/dairy, wheat (gluten), hazelnuts (Nutella), walnuts and soy",
-  groups: [
-    { label: "Eggs", items: [] as string[] },
-    { label: "Dairy", items: ["from butter, chocolate & Nutella"] },
-    { label: "Gluten", items: ["all-purpose flour (wheat)"] },
-    { label: "Nuts", items: ["Hazelnuts (Nutella)", "Walnuts (in walnut flavour)"] },
-    { label: "Soy", items: ["may be present in chocolate & Nutella-based products"] },
-  ],
-  crossContamination:
-    "Prepared in a kitchen that handles these ingredients, so cross-contact with allergens is possible.",
-};
-
-export function whatsappLink(message: string) {
-  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
-}
-
-/**
- * Google Reviews link. This is a search-based fallback (business name +
- * address) that works without any API key. Once the owner shares her
- * Google Business Profile "Place ID", swap this for
- * `https://search.google.com/local/writereview?placeid=<PLACE_ID>` (to
- * collect new reviews) and/or wire up the Places API to embed reviews
- * directly — see the note in src/lib/reviews.ts.
- */
-export const GOOGLE_REVIEWS_URL =
-  "https://www.google.com/search?q=Little+Brownie+Co.+Bengaluru+reviews";
-
-export const galleryImages = [
-  IMG.gallery1,
-  IMG.gallery2,
-  IMG.gallery3,
-  IMG.gallery4,
-  IMG.gallery5,
-  IMG.gallery6,
-  IMG.gallery7,
-  IMG.gallery8,
-];
-// // Real product photography, supplied directly by the bakery (Aug 2026 drive
-// // share) — extracted from the brand's own order-form PDF and photo library.
-// // These are plain local imports (bundled by Vite), not remote CDN pointers,
-// // so the site no longer depends on an external Lovable-hosted domain staying
-// // online to render images.
-// import logo from "@/assets/real/logo.png";
-// import tubPhoto from "@/assets/real/tub.jpg";
-// import tubAssortedPhoto from "@/assets/real/tub-assorted.jpg";
-// import loafPhoto from "@/assets/real/loaf.jpg";
-// import assortedBoxPhoto from "@/assets/real/assorted-box.jpg";
-// import littleBoxPhoto from "@/assets/real/little-box.jpg";
-// import slabPhoto from "@/assets/real/slab.jpg";
-// import lavaPhoto from "@/assets/real/lava-cake.jpg";
-// import loadedCakePhoto from "@/assets/real/loaded-cake.jpg";
-// import dipsPhoto from "@/assets/real/dips.jpg";
-// import ribbonPhoto from "@/assets/real/ribbon.jpg";
-// import sustainablePackagingPhoto from "@/assets/real/sustainable-packaging.jpg";
-// import galleryPhoto1 from "@/assets/real/gallery-1.jpg";
-// import galleryPhoto2 from "@/assets/real/gallery-2.jpg";
-// import galleryPhoto3 from "@/assets/real/gallery-3.jpg";
-// import galleryPhoto4 from "@/assets/real/gallery-4.jpg";
-// import galleryPhoto5 from "@/assets/real/gallery-5.jpg";
-// import galleryPhoto6 from "@/assets/real/gallery-6.jpg";
-// import galleryPhoto7 from "@/assets/real/gallery-7.jpg";
-// import galleryPhoto8 from "@/assets/real/gallery-8.jpg";
-// import heroPhoto from "@/assets/real/hero.jpg";
-// import headerBannerPhoto from "@/assets/header-banner.png";
-// import biteSizedHandPhoto from "@/assets/bite-sized-hand.jpg";
-
-// // Real gifting photography supplied earlier — plain local imports too
-// import hamperBagHeart from "@/assets/gifting/hamper-bag-heart.png";
-// import hamperWoodenBox from "@/assets/gifting/hamper-wooden-box.png";
-// import hamperValentineSet from "@/assets/gifting/hamper-valentine-set.png";
-// import hamperRibbonBoxes from "@/assets/gifting/hamper-ribbon-boxes.png";
-// import hamperBowCloseup from "@/assets/gifting/hamper-bow-closeup.png";
-// import hamperPostcardFlowers from "@/assets/gifting/hamper-postcard-flowers.png";
-
-// export const IMG = {
-//   logo,
-//   heroPortrait: heroPhoto,
-//   headerBanner: headerBannerPhoto,
-//   biteSizedHand: biteSizedHandPhoto,
-//   tub: tubPhoto,
-//   tubSquare: tubPhoto,
-//   loaf: loafPhoto,
-//   loafSquare: loafPhoto,
-//   assortedTub: tubAssortedPhoto,
-//   assortedTubSquare: tubAssortedPhoto,
-//   assortedBox: assortedBoxPhoto,
-//   assortedBoxSquare: assortedBoxPhoto,
-//   littleBox: littleBoxPhoto,
-//   littleBoxSquare: littleBoxPhoto,
-//   slab: slabPhoto,
-//   slabSquare: slabPhoto,
-//   lava: lavaPhoto,
-//   lavaSquare: lavaPhoto,
-//   cake: loadedCakePhoto,
-//   cakeSquare: loadedCakePhoto,
-//   dips: dipsPhoto,
-//   dipsSquare: dipsPhoto,
-//   ribbon: ribbonPhoto,
-//   sustainablePackaging: sustainablePackagingPhoto,
-//   about1: galleryPhoto2,
-//   about2: galleryPhoto4,
-//   gallery1: galleryPhoto1,
-//   gallery2: galleryPhoto2,
-//   gallery3: galleryPhoto3,
-//   gallery4: galleryPhoto4,
-//   gallery5: galleryPhoto5,
-//   gallery6: galleryPhoto6,
-//   gallery7: galleryPhoto7,
-//   gallery8: galleryPhoto8,
-//   // Real gifting photography — plain local imports, not Lovable CDN assets
-//   hamperBagHeart,
-//   hamperWoodenBox,
-//   hamperValentineSet,
-//   hamperRibbonBoxes,
-//   hamperBowCloseup,
-//   hamperPostcardFlowers,
-// };
-
-// /** Real, non-stock photos of actual packed hampers for the gifting page gallery. */
-// export const giftingGallery = [
-//   { src: IMG.hamperValentineSet, alt: "Valentine's gifting set with brownies, dip and card" },
-//   { src: IMG.hamperRibbonBoxes, alt: "Brownie loaf box and tin, ribbon-tied" },
-//   { src: IMG.hamperBowCloseup, alt: "Close-up of a satin bow on a kraft brownie box" },
-//   { src: IMG.hamperPostcardFlowers, alt: "Gift hamper with flowers and a handwritten postcard" },
-//   { src: IMG.hamperWoodenBox, alt: "Ribbon-tied wooden brownie gift box" },
-//   { src: IMG.hamperBagHeart, alt: "Kraft gift bag with hand-stamped hearts" },
-// ];
-
-// export type Variant = { id: string; label: string; price: number };
-
-// export type Product = {
-//   id: string;
-//   slug: string;
-//   name: string;
-//   tagline: string;
-//   category: "Signature" | "Bites" | "Loaves" | "Cakes" | "Hampers" | "Add-ons" | "Limited Editions";
-//   image: string;
-//   square: string;
-//   gallery: string[];
-//   variants: Variant[];
-//   flavours: string[];
-//   ingredients: string[];
-//   description: string;
-//   bestSeller?: boolean;
-//   signature?: boolean;
-//   isActive?: boolean;
-// };
-
-// import { supabase } from "./supabase";
-
-// /**
-//  * Fallback/seed catalog. Supabase (`products` + `product_variants` tables,
-//  * see supabase/migrations/) is the real source of truth — this array is
-//  * only used if that fetch fails (offline, misconfigured env) so the site
-//  * still renders something, and it's what supabase/migrations/0003_seed_products.sql
-//  * was generated from.
-//  */
-// // Product line-up, flavours and prices below are taken directly from the
-// // bakery's own order form ("Menu-items with price.pdf", shared Aug 2026).
-// // Update prices here (and keep supabase/migrations/0003_seed_products.sql in
-// // sync) whenever the owner revises pricing.
-// const FALLBACK_PRODUCTS: Product[] = [
-//   {
-//     id: "p1",
-//     slug: "mini-brownie-tub",
-//     name: "Mini Brownie Tub",
-//     tagline: "Soft, fudgy mini brownie bites in a kraft tub.",
-//     category: "Bites",
-//     image: IMG.tub,
-//     square: IMG.tubSquare,
-//     gallery: [IMG.tub, IMG.assortedTub, IMG.biteSizedHand],
-//     variants: [
-//       { id: "6-dark", label: "6 pcs · Dark Chocolate", price: 215 },
-//       { id: "6-walnut", label: "6 pcs · Walnut", price: 265 },
-//       { id: "6-nutella", label: "6 pcs · Nutella", price: 245 },
-//       { id: "6-assorted", label: "6 pcs · Assorted (2 each)", price: 295 },
-//       { id: "12-dark", label: "12 pcs · Dark Chocolate", price: 385 },
-//       { id: "12-walnut", label: "12 pcs · Walnut", price: 465 },
-//       { id: "12-nutella", label: "12 pcs · Nutella", price: 425 },
-//       { id: "12-assorted", label: "12 pcs · Assorted (4 each)", price: 475 },
-//       { id: "24-dark", label: "24 pcs · Dark Chocolate", price: 665 },
-//       { id: "24-walnut", label: "24 pcs · Walnut", price: 775 },
-//       { id: "24-nutella", label: "24 pcs · Nutella", price: 745 },
-//       { id: "24-assorted", label: "24 pcs · Assorted (8 each)", price: 835 },
+// export const Route = createFileRoute("/_site/")({
+//   loader: async () => ({ products: await getProducts() }),
+//   head: () => ({
+//     meta: [
+//       { title: "Little Brownie Co. | Handcrafted Brownies in Bengaluru" },
+//       {
+//         name: "description",
+//         content:
+//           "Handcrafted, small-batch brownies from Bengaluru. Order online — Belgian chocolate, cultured butter, baked fresh to order.",
+//       },
+//       { property: "og:title", content: "Little Brownie Co. | Handcrafted Brownies in Bengaluru" },
+//       {
+//         property: "og:description",
+//         content: "Where every bite earns you brownie points. Order online from Bengaluru.",
+//       },
+//       { property: "og:type", content: "website" },
+//       { name: "twitter:card", content: "summary_large_image" },
 //     ],
-//     flavours: ["Dark Chocolate", "Walnut", "Nutella", "Assorted"],
-//     ingredients: ["Belgian dark chocolate", "Butter", "Eggs", "Cane sugar", "All-purpose flour"],
-//     description:
-//       "Soft, fudgy mini brownie bites, ideal for casual snacking, sharing with friends, or enjoying a quick treat whenever a craving hits. Choose a single flavour, or go Assorted for all three (Dark Chocolate, Walnut, Nutella) in one tub — 2 pcs of each in the 6 pcs tub, 4 pcs of each in the 12 pcs tub, and 8 pcs of each in the 24 pcs tub.",
-//     bestSeller: true,
-//     signature: true,
-//   },
-//   {
-//     id: "p3",
-//     slug: "mini-brownie-loaf",
-//     name: "Mini Brownie Loaf",
-//     tagline: "A dense, gooey single-serve loaf.",
-//     category: "Loaves",
-//     image: IMG.loaf,
-//     square: IMG.loafSquare,
-//     gallery: [IMG.loaf],
-//     variants: [
-//       { id: "1-dark", label: "1 loaf · Dark Chocolate", price: 355 },
-//       { id: "1-walnut", label: "1 loaf · Walnut", price: 425 },
-//       { id: "1-nutella", label: "1 loaf · Nutella", price: 385 },
-//       { id: "2-dark", label: "2 loaves · Dark Chocolate", price: 710 },
-//       { id: "2-walnut", label: "2 loaves · Walnut", price: 850 },
-//       { id: "2-nutella", label: "2 loaves · Nutella", price: 770 },
-//       { id: "5-dark", label: "5 loaves · Dark Chocolate", price: 1775 },
-//       { id: "5-walnut", label: "5 loaves · Walnut", price: 2125 },
-//       { id: "5-nutella", label: "5 loaves · Nutella", price: 1925 },
-//     ],
-//     flavours: ["Dark Chocolate", "Walnut", "Nutella"],
-//     ingredients: ["Belgian dark chocolate", "Butter", "Eggs", "Vanilla", "Flour"],
-//     description:
-//       "A rich, fudgy brownie baked in the shape of a mini loaf. It is dense, gooey with a crinkle top, offering the perfect balance of indulgence in a cute, single-serve size. Ideal for gifting, snacking, or satisfying solo cravings without overdoing it! Choose 1–5 loaves per flavour.",
-//     bestSeller: true,
-//     signature: true,
-//   },
-//   {
-//     id: "p4",
-//     slug: "assorted-brownie-box",
-//     name: "Assorted Brownie Box",
-//     tagline: "Bite-sized squares, mixed flavours.",
-//     category: "Hampers",
-//     image: IMG.assortedBox,
-//     square: IMG.assortedBoxSquare,
-//     gallery: [IMG.assortedBox],
-//     variants: [
-//       { id: "dark-nutella", label: "2 pcs Dark Chocolate + 2 pcs Nutella", price: 385 },
-//       { id: "dark-walnut", label: "2 pcs Dark Chocolate + 2 pcs Walnut", price: 415 },
-//       { id: "walnut-nutella", label: "2 pcs Walnut + 2 pcs Nutella", price: 435 },
-//       { id: "all-three", label: "2 pcs each · All Three Flavours", price: 585 },
-//     ],
-//     flavours: ["Dark Chocolate", "Walnut", "Nutella"],
-//     ingredients: ["Belgian dark chocolate", "Butter", "Eggs", "Walnuts", "Nutella", "Kraft gift box"],
-//     description:
-//       "A curated mix of our best-loved flavours, packed into bite-sized square brownie pieces. Perfect for sharing, gifting, or sampling a little bit of everything!",
-//   },
-//   {
-//     id: "p5",
-//     slug: "the-little-brownie-box",
-//     name: "The Little Brownie Box",
-//     tagline: "Nine hand-cut squares of pure fudge.",
-//     category: "Signature",
-//     image: IMG.littleBox,
-//     square: IMG.littleBoxSquare,
-//     gallery: [IMG.littleBox],
-//     variants: [
-//       { id: "1-dark", label: "1 box · Dark Chocolate", price: 355 },
-//       { id: "1-nutella", label: "1 box · Nutella", price: 395 },
-//       { id: "2-dark", label: "2 boxes · Dark Chocolate", price: 710 },
-//       { id: "2-nutella", label: "2 boxes · Nutella", price: 790 },
-//       { id: "5-dark", label: "5 boxes · Dark Chocolate", price: 1775 },
-//       { id: "5-nutella", label: "5 boxes · Nutella", price: 1975 },
-//     ],
-//     flavours: ["Dark Chocolate", "Nutella"],
-//     ingredients: ["Belgian dark chocolate", "Butter", "Eggs", "Cane sugar", "Flour"],
-//     description:
-//       "The Little Brownie Box is filled with bite-sized dark chocolate brownie pieces, rich, fudgy, and perfectly indulgent. Each piece delivers a deep cocoa flavour in a small, satisfying bite — perfect for sharing or treating yourself. Choose 1–5 boxes.",
-//     signature: true,
-//   },
-//   {
-//     id: "p6",
-//     slug: "brownie-slab",
-//     name: "Brownie Slab",
-//     tagline: "One big slab. Cut it your way.",
-//     category: "Signature",
-//     image: IMG.slab,
-//     square: IMG.slabSquare,
-//     gallery: [IMG.slab],
-//     variants: [
-//       { id: "1-dark", label: "1 slab · Dark Chocolate", price: 585 },
-//       { id: "1-nutella", label: "1 slab · Nutella", price: 665 },
-//       { id: "2-dark", label: "2 slabs · Dark Chocolate", price: 1170 },
-//       { id: "2-nutella", label: "2 slabs · Nutella", price: 1330 },
-//       { id: "5-dark", label: "5 slabs · Dark Chocolate", price: 2925 },
-//       { id: "5-nutella", label: "5 slabs · Nutella", price: 3325 },
-//     ],
-//     flavours: ["Dark Chocolate", "Nutella"],
-//     ingredients: ["Belgian dark chocolate", "Butter", "Eggs", "Cane sugar", "Flour"],
-//     description:
-//       "Rich, fudgy, and irresistibly chocolatey, this soft brownie slab is packed with deep cocoa flavour and melts in your mouth with every bite. Uncut, so you can slice it however suits your party or platter. Choose 1–5 slabs.",
-//     signature: true,
-//   },
-//   {
-//     id: "p7",
-//     slug: "choco-lava-cake",
-//     name: "Choco Lava Cake",
-//     tagline: "Molten centre, heart-shaped tin.",
-//     category: "Cakes",
-//     image: IMG.lava,
-//     square: IMG.lavaSquare,
-//     gallery: [IMG.lava],
-//     variants: [
-//       { id: "1", label: "1 tin · Dark Chocolate", price: 195 },
-//       { id: "2", label: "2 tins · Dark Chocolate", price: 390 },
-//       { id: "5", label: "5 tins · Dark Chocolate", price: 975 },
-//     ],
-//     flavours: ["Dark Chocolate"],
-//     ingredients: ["Belgian dark chocolate", "Butter", "Eggs", "Cocoa", "Flour"],
-//     description:
-//       "A rich and moist chocolate cake with a warm, gooey molten chocolate centre that melts in every bite. A decadent dessert that's perfect for satisfying any chocolate craving, served in a heart-shaped, ready-to-heat-and-eat tin. Choose 1–5 tins.",
-//   },
-//   {
-//     id: "p8",
-//     slug: "brownie-slab-cake-loaded-chocolate",
-//     name: "Brownie Slab Cake · Loaded Chocolate",
-//     tagline: "Ganache-topped celebration slab.",
-//     category: "Cakes",
-//     image: IMG.cake,
-//     square: IMG.cakeSquare,
-//     gallery: [IMG.cake],
-//     variants: [
-//       { id: "half-kg", label: "1/2 kg Brownie Slab Cake", price: 655 },
-//       { id: "topper", label: "\"Happy Birthday\" cake topper (add-on)", price: 10 },
-//     ],
-//     flavours: ["Loaded Chocolate"],
-//     ingredients: ["Brownie sponge", "Chocolate ganache", "Chocolate truffles", "Chocolate bars"],
-//     description:
-//       "A rich, fudgy brownie slab cake topped with smooth chocolate ganache — dense, moist, and loaded with deep chocolate flavour. Perfect for celebrations or a decadent treat! Add a \"Happy Birthday\" topper for ₹10.",
-//     bestSeller: true,
-//     signature: true,
-//   },
-//   {
-//     id: "p9",
-//     slug: "signature-dips",
-//     name: "Signature Dips",
-//     tagline: "Pourable chocolate, for the extra bit.",
-//     category: "Add-ons",
-//     image: IMG.dips,
-//     square: IMG.dipsSquare,
-//     gallery: [IMG.dips],
-//     variants: [
-//       { id: "dark", label: "Dark Chocolate Dip", price: 25 },
-//       { id: "nutella", label: "Nutella Dip", price: 35 },
-//     ],
-//     flavours: ["Dark Chocolate", "Nutella"],
-//     ingredients: ["Belgian couverture chocolate", "Fresh cream", "Nutella"],
-//     description:
-//       "Take your brownies to the next level with our rich, creamy dips! From silky chocolate to nutty spreads, each dip is crafted to make every bite extra indulgent. Perfect for sharing… or not.",
-//   },
-// ];
+//   }),
+//   component: Home,
+// });
 
-// export function findProduct(list: Product[], id: string) {
-//   return list.find((p) => p.id === id || p.slug === id);
-// }
+// function Home() {
+//   const { products } = Route.useLoaderData() as { products: Product[] };
+//   const signature = signatureOf(products);
+//   const [reviews, setReviews] = useState<Review[]>([]);
+//   const [googleRating, setGoogleRating] = useState<{ rating: number; count: number } | null>(
+//     null,
+//   );
 
-// export function fromPrice(p: Product) {
-//   return Math.min(...p.variants.map((v) => v.price));
-// }
+//   useEffect(() => {
+//     getApprovedReviews().then((r) => setReviews(r.slice(0, 4)));
+//     getGoogleReviews().then((g) => {
+//       if (g.configured && g.rating != null && g.ratingCount != null) {
+//         setGoogleRating({ rating: g.rating, count: g.ratingCount });
+//       }
+//     });
+//   }, []);
 
-// /* ---------------- Supabase-backed catalog ---------------- */
-
-// function rowToProduct(row: any, variantRows: any[]): Product {
-//   const variants: Variant[] = variantRows
-//     .filter((v) => v.product_id === row.id)
-//     .sort((a, b) => a.sort_order - b.sort_order)
-//     .map((v) => ({ id: v.id, label: v.label, price: Number(v.price) }));
-
-//   return {
-//     id: row.id,
-//     slug: row.slug,
-//     name: row.name,
-//     tagline: row.tagline ?? "",
-//     category: row.category,
-//     image: row.image_url ?? IMG.littleBox,
-//     square: row.square_image_url ?? row.image_url ?? IMG.littleBox,
-//     gallery: row.gallery?.length ? row.gallery : [row.image_url].filter(Boolean),
-//     variants: variants.length ? variants : [{ id: "default", label: "Standard", price: 0 }],
-//     flavours: row.flavours ?? [],
-//     ingredients: row.ingredients ?? [],
-//     description: row.description ?? "",
-//     bestSeller: row.best_seller ?? false,
-//     signature: row.is_signature ?? false,
-//     isActive: row.is_active ?? true,
-//   };
-// }
-
-// /** Live catalog from Supabase (active products only). Falls back to the
-//  * local seed list if the fetch fails or the table is empty. */
-// export async function getProducts(): Promise<Product[]> {
-//   const { data: rows, error } = await supabase
-//     .from("products")
-//     .select("*")
-//     .eq("is_active", true)
-//     .order("sort_order", { ascending: true });
-
-//   if (error || !rows || rows.length === 0) {
-//     if (error) console.error("[products] getProducts", error);
-//     return FALLBACK_PRODUCTS;
-//   }
-
-//   const { data: variantRows } = await supabase
-//     .from("product_variants")
-//     .select("*")
-//     .in(
-//       "product_id",
-//       rows.map((r: any) => r.id),
-//     )
-//     .eq("is_active", true);
-
-//   return rows.map((r: any) => rowToProduct(r, variantRows ?? []));
-// }
-
-// /** All products including inactive — for the admin dashboard. */
-// export async function getAllProductsAdmin(): Promise<Product[]> {
-//   const { data: rows, error } = await supabase
-//     .from("products")
-//     .select("*")
-//     .order("created_at", { ascending: false });
-//   if (error || !rows) {
-//     if (error) console.error("[products] getAllProductsAdmin", error);
-//     return [];
-//   }
-//   const { data: variantRows } = await supabase
-//     .from("product_variants")
-//     .select("*")
-//     .in(
-//       "product_id",
-//       rows.map((r: any) => r.id),
-//     );
-//   return rows.map((r: any) => rowToProduct(r, variantRows ?? []));
-// }
-
-// export type ProductDraft = {
-//   name: string;
-//   tagline?: string;
-//   category: Product["category"];
-//   image: string;
-//   description?: string;
-//   price: number;
-//   isActive?: boolean;
-// };
-
-// function slugify(name: string) {
 //   return (
-//     name
-//       .toLowerCase()
-//       .trim()
-//       .replace(/[^a-z0-9]+/g, "-")
-//       .replace(/^-+|-+$/g, "") || `product-${Date.now()}`
+//     <>
+//       {/* HERO */}
+//       <section className="relative overflow-hidden">
+//         <div className="container-x grid gap-10 pb-12 pt-10 md:grid-cols-12 md:items-center md:gap-8 md:pb-24 md:pt-20">
+//           <div className="md:col-span-6 flex flex-col justify-center">
+//             <div className="overflow-hidden rounded-[1.2rem] border border-border/80 shadow-soft">
+//               <img
+//                 src={IMG.headerBanner}
+//                 alt="Little Brownie Co. — where every bite earns you brownie points"
+//                 className="h-auto w-full object-cover"
+//               />
+//             </div>
+//             <h1 className="mt-6 max-w-2xl font-serif text-[2.6rem] leading-[0.98] text-primary sm:text-[3.35rem] sm:leading-[0.94] md:text-[6rem]">
+//               Brownies made for the little moments that matter.
+//             </h1>
+//             <p className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg">
+//               Brownies made for the little moments that matter. Crafted with premium ingredients
+//               and baked fresh in small batches, our brownies are irresistibly rich and fudgy, with
+//               a delicate crackly top and an indulgently gooey centre.
+//             </p>
+//             <div className="mt-8 flex flex-wrap items-center gap-3">
+//               <Link
+//                 to="/menu"
+//                 className="inline-flex items-center gap-2 rounded-full border border-primary/80 px-6 py-3 text-sm uppercase tracking-[0.18em] text-primary transition hover:bg-primary hover:text-primary-foreground"
+//               >
+//                 View Menu
+//               </Link>
+//               <Link
+//                 to="/menu"
+//                 className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm uppercase tracking-[0.18em] text-primary-foreground transition-colors hover:bg-cocoa-dark active:bg-cocoa-dark"
+//               >
+//                 Order <ArrowRight className="h-4 w-4" />
+//               </Link>
+//             </div>
+//             <div className="mt-5 flex flex-wrap items-center gap-3 text-sm text-primary/80">
+//               <a
+//                 href={whatsappLink(
+//                   "Hi Little Brownie Co., I'd like a quote for gifting or a custom order.",
+//                 )}
+//                 target="_blank"
+//                 rel="noreferrer"
+//                 className="inline-flex items-center gap-2 hover:text-accent"
+//               >
+//                 <MessageCircleMore className="h-4 w-4 text-accent" /> Request a Quote on WhatsApp
+//               </a>
+//             </div>
+//             <div className="mt-10 max-w-xl border-t border-border/70 pt-7">
+//               <p className="font-serif text-2xl leading-tight text-primary md:text-3xl">
+//                 Rich. Fudgy. Gooey. The kind of brownie you take your time with.
+//               </p>
+//             </div>
+//           </div>
+//           <div className="relative md:col-span-6 md:pl-10">
+//             <div className="relative aspect-[4/5] overflow-hidden rounded-[1.6rem] border border-border/80 bg-card shadow-display">
+//               <img
+//                 src={IMG.biteSizedHand}
+//                 alt="A single bite-sized Little Brownie Co. brownie held in hand"
+//                 className="h-full w-full object-cover"
+//               />
+//             </div>
+//             <div className="absolute -bottom-8 left-6 hidden w-48 rounded-[1.25rem] border border-border/70 bg-background/98 p-5 shadow-soft md:block">
+//               <div className="text-[10px] uppercase tracking-[0.3em] text-toffee">Baked Fresh</div>
+//               <p className="mt-3 font-serif text-[1.55rem] leading-tight text-primary">
+//                 From birthday cakes to brownie trays, everything is packed the day it leaves our
+//                 kitchen.
+//               </p>
+//             </div>
+//             <div className="absolute -right-6 top-8 hidden h-34 w-34 items-center justify-center rounded-full border-4 border-background bg-surface-soft p-5 text-center font-serif text-base leading-tight text-primary shadow-display md:flex">
+//               Where every bite earns brownie points.
+//             </div>
+//           </div>
+//         </div>
+//       </section>
+
+//       {/* SIGNATURE */}
+//       <Reveal as="section" className="mt-20 md:mt-28">
+//         <div className="container-x">
+//           <div className="max-w-2xl">
+//             <span className="text-[11px] uppercase tracking-[0.28em] text-toffee">
+//               THE SIGNATURE COLLECTION
+//             </span>
+//             <h2 className="mt-4 font-serif text-4xl leading-tight text-primary md:text-5xl">
+//               Recipes we're known for.
+//             </h2>
+//             <p className="mt-5 text-muted-foreground">
+//               From timeless classics to indulgent favourites, there's a brownie for every kind of
+//               craving.
+//             </p>
+//           </div>
+//           <div className="mt-10 grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4">
+//             {signature.map((p) => (
+//               <Link key={p.id} to="/product/$id" params={{ id: p.slug }} className="group">
+//                 <div className="aspect-square overflow-hidden rounded-md">
+//                   <img
+//                     src={p.square}
+//                     alt={p.name}
+//                     loading="lazy"
+//                     className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+//                   />
+//                 </div>
+//                 <div className="mt-4 font-serif text-lg text-primary">{p.name}</div>
+//                 <div className="text-xs uppercase tracking-wider text-muted-foreground">
+//                   from ₹{fromPrice(p)}
+//                 </div>
+//               </Link>
+//             ))}
+//           </div>
+//           <div className="mt-10 text-center">
+//             <Link
+//               to="/menu"
+//               className="inline-flex items-center gap-1 text-sm uppercase tracking-[0.18em] text-accent hover:text-primary"
+//             >
+//               View full menu <ArrowUpRight className="h-4 w-4" />
+//             </Link>
+//           </div>
+//         </div>
+//       </Reveal>
+
+//       {/* REVIEWS */}
+//       <Reveal as="section" className="mt-20 bg-[oklch(0.9_0.03_78)] py-24">
+//         <div className="container-x">
+//           <div className="mx-auto max-w-2xl text-center">
+//             <span className="text-[11px] uppercase tracking-[0.28em] text-toffee">Kind words</span>
+//             <h2 className="mt-4 font-serif text-4xl leading-tight text-primary md:text-5xl">
+//               Baked with love, reviewed with love.
+//             </h2>
+//             <a
+//               href={GOOGLE_REVIEWS_URL}
+//               target="_blank"
+//               rel="noreferrer"
+//               className="mt-4 inline-flex items-center gap-1.5 text-sm text-accent hover:underline"
+//             >
+//               {googleRating
+//                 ? `${googleRating.rating.toFixed(1)}★ on Google (${googleRating.count} reviews)`
+//                 : "Read our Google reviews"}{" "}
+//               <ArrowUpRight className="h-3.5 w-3.5" />
+//             </a>
+//           </div>
+//           {reviews.length > 0 ? (
+//             <div className="mt-14 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+//               {reviews.map((r) => (
+//                 <figure key={r.id} className="flex flex-col rounded-md bg-background p-6">
+//                   <div className="flex gap-0.5 text-accent">
+//                     {Array.from({ length: r.rating }).map((_, i) => (
+//                       <Star key={i} className="h-4 w-4 fill-current" />
+//                     ))}
+//                   </div>
+//                   <blockquote className="mt-4 flex-1 font-serif text-lg leading-snug text-primary">
+//                     "{r.text}"
+//                   </blockquote>
+//                   <figcaption className="mt-6 text-xs uppercase tracking-[0.18em] text-muted-foreground">
+//                     {r.name}
+//                     {r.location ? ` · ${r.location}` : ""}
+//                   </figcaption>
+//                 </figure>
+//               ))}
+//             </div>
+//           ) : (
+//             <div className="mx-auto mt-14 max-w-md text-center text-sm text-muted-foreground">
+//               Be the first to{" "}
+//               <Link to="/reviews" className="text-accent hover:underline">
+//                 leave a review
+//               </Link>
+//               , or read what customers say on Google.
+//             </div>
+//           )}
+//         </div>
+//       </Reveal>
+
+//       {/* CTA */}
+//       <Reveal as="section" className="container-x mt-20">
+//         <div className="rounded-[1.2rem] border border-border bg-secondary/50 px-5 py-12 text-center sm:px-8 md:py-24">
+//           <span className="text-[11px] uppercase tracking-[0.28em] text-toffee">
+//             Let's make it just right
+//           </span>
+//           <h2 className="mx-auto mt-4 max-w-2xl font-serif text-4xl leading-tight text-primary md:text-5xl">
+//             Let's make your brownie box just right.
+//           </h2>
+//           <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
+//             Have a question or a special request? We're just a WhatsApp message away.
+//           </p>
+//           <a
+//             href={whatsappLink("Hi Little Brownie Co., I'd like to place an order.")}
+//             target="_blank"
+//             rel="noreferrer"
+//             className="mt-8 inline-flex items-center gap-2 rounded-full bg-primary px-8 py-3.5 text-sm uppercase tracking-[0.18em] text-primary-foreground transition-colors hover:bg-cocoa-dark active:bg-cocoa-dark"
+//           >
+//             Chat on WhatsApp <ArrowUpRight className="h-4 w-4" />
+//           </a>
+//         </div>
+//       </Reveal>
+//     </>
 //   );
 // }
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowRight, ArrowUpRight, MessageCircleMore, Star } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import {
+  IMG,
+  getProducts,
+  signatureOf,
+  fromPrice,
+  whatsappLink,
+  GOOGLE_REVIEWS_URL,
+  type Product,
+} from "@/lib/products";
+import { getApprovedReviews, getGoogleReviews, type Review } from "@/lib/reviews";
+import { ProductCard } from "@/components/site/ProductCard";
+import { Reveal } from "@/components/site/Reveal";
 
-// /** Admin: create a product with a single "Standard" variant at the given price. */
-// export async function createProductRow(
-//   draft: ProductDraft,
-// ): Promise<{ ok: true } | { ok: false; error: string }> {
-//   const { data: product, error } = await supabase
-//     .from("products")
-//     .insert({
-//       slug: slugify(draft.name),
-//       name: draft.name,
-//       tagline: draft.tagline || null,
-//       category: draft.category,
-//       description: draft.description || null,
-//       image_url: draft.image,
-//       square_image_url: draft.image,
-//       gallery: [draft.image],
-//       is_active: true,
-//     })
-//     .select()
-//     .single();
+export const Route = createFileRoute("/_site/")({
+  loader: async () => ({ products: await getProducts() }),
+  head: () => ({
+    meta: [
+      { title: "Little Brownie Co. | Handcrafted Brownies in Bengaluru" },
+      {
+        name: "description",
+        content:
+          "Handcrafted, small-batch brownies from Bengaluru. Order online — Belgian chocolate, cultured butter, baked fresh to order.",
+      },
+      { property: "og:title", content: "Little Brownie Co. | Handcrafted Brownies in Bengaluru" },
+      {
+        property: "og:description",
+        content: "Where every bite earns you brownie points. Order online from Bengaluru.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
+  component: Home,
+});
 
-//   if (error || !product) return { ok: false, error: error?.message ?? "Could not create product." };
+const HERO_GALLERY = [
+  IMG.homeImg1,
+  IMG.homeImg2,
+  IMG.homeImg3,
+  IMG.homeImg4,
+  IMG.homeImg5,
+  IMG.homeImg6,
+  IMG.homeImg7,
+  IMG.homeImg8,
+];
 
-//   const { error: variantError } = await supabase
-//     .from("product_variants")
-//     .insert({ product_id: product.id, label: "Standard", price: draft.price, sort_order: 0 });
+function Home() {
+  const { products } = Route.useLoaderData() as { products: Product[] };
+  const signature = signatureOf(products);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [googleRating, setGoogleRating] = useState<{ rating: number; count: number } | null>(
+    null,
+  );
+  const [heroSlide, setHeroSlide] = useState(0);
+  const heroScrollRef = useRef<HTMLDivElement>(null);
+  const heroPausedRef = useRef(false);
 
-//   if (variantError) return { ok: false, error: variantError.message };
-//   return { ok: true };
-// }
+  useEffect(() => {
+    getApprovedReviews().then((r) => setReviews(r.slice(0, 4)));
+    getGoogleReviews().then((g) => {
+      if (g.configured && g.rating != null && g.ratingCount != null) {
+        setGoogleRating({ rating: g.rating, count: g.ratingCount });
+      }
+    });
+  }, []);
 
-// /** Admin: update a product's core fields and its first ("Standard"/lowest sort_order) variant's price. */
-// export async function updateProductRow(
-//   id: string,
-//   draft: Partial<ProductDraft>,
-// ): Promise<{ ok: true } | { ok: false; error: string }> {
-//   const { error } = await supabase
-//     .from("products")
-//     .update({
-//       ...(draft.name !== undefined ? { name: draft.name } : {}),
-//       ...(draft.tagline !== undefined ? { tagline: draft.tagline } : {}),
-//       ...(draft.category !== undefined ? { category: draft.category } : {}),
-//       ...(draft.description !== undefined ? { description: draft.description } : {}),
-//       ...(draft.image !== undefined ? { image_url: draft.image, square_image_url: draft.image } : {}),
-//       ...(draft.isActive !== undefined ? { is_active: draft.isActive } : {}),
-//     })
-//     .eq("id", id);
+  const scrollHeroTo = (index: number) => {
+    const el = heroScrollRef.current;
+    if (!el) return;
+    const clamped = (index + HERO_GALLERY.length) % HERO_GALLERY.length;
+    el.scrollTo({ left: clamped * el.clientWidth, behavior: "smooth" });
+    setHeroSlide(clamped);
+  };
 
-//   if (error) return { ok: false, error: error.message };
+  const handleHeroScroll = () => {
+    const el = heroScrollRef.current;
+    if (!el) return;
+    const index = Math.round(el.scrollLeft / el.clientWidth);
+    setHeroSlide(index);
+  };
 
-//   if (draft.price !== undefined) {
-//     const { data: variants } = await supabase
-//       .from("product_variants")
-//       .select("id")
-//       .eq("product_id", id)
-//       .order("sort_order", { ascending: true })
-//       .limit(1);
-//     if (variants && variants[0]) {
-//       await supabase.from("product_variants").update({ price: draft.price }).eq("id", variants[0].id);
-//     }
-//   }
+  // Auto-advance the hero gallery every 4s; pause while the user is
+  // hovering, touching, or has just interacted with it.
+  useEffect(() => {
+    if (HERO_GALLERY.length <= 1) return;
+    const interval = setInterval(() => {
+      if (heroPausedRef.current) return;
+      setHeroSlide((prev) => {
+        const next = (prev + 1) % HERO_GALLERY.length;
+        const el = heroScrollRef.current;
+        if (el) el.scrollTo({ left: next * el.clientWidth, behavior: "smooth" });
+        return next;
+      });
+    }, 2800);
+    return () => clearInterval(interval);
+  }, []);
 
-//   return { ok: true };
-// }
+  const pauseHeroAutoplay = () => {
+    heroPausedRef.current = true;
+  };
+  const resumeHeroAutoplay = () => {
+    // brief delay so a manual tap/scroll doesn't immediately get
+    // overridden by the next auto-advance tick
+    setTimeout(() => {
+      heroPausedRef.current = false;
+    }, 1500);
+  };
 
-// export async function deleteProductRow(id: string) {
-//   const { error } = await supabase.from("products").delete().eq("id", id);
-//   if (error) console.error("[products] deleteProductRow", error);
-// }
+  return (
+    <>
+      {/* HERO */}
+      <section className="relative overflow-hidden">
+        <div className="container-x grid gap-10 pb-10 pt-8 md:grid-cols-12 md:items-center md:gap-8 md:pb-16 md:pt-14">
+          <div className="md:col-span-6 flex flex-col justify-center">
+            <div className="overflow-hidden rounded-[1.2rem] border border-border/80 shadow-soft">
+              <img
+                src={IMG.headerBanner}
+                alt="Little Brownie Co. — where every bite earns you brownie points"
+                className="h-auto w-full object-cover"
+              />
+            </div>
+            <h1 className="mt-6 max-w-2xl font-serif text-[2.6rem] leading-[0.98] text-primary sm:text-[3.35rem] sm:leading-[0.94] md:text-[6rem]">
+              Brownies made for the little moments that matter.
+            </h1>
+            <p className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg">
+              Crafted with premium ingredients
+              and baked fresh in small batches, our brownies are irresistibly rich and fudgy, with
+              a delicate crackly top and an indulgently gooey centre.
+            </p>
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              <Link
+                to="/menu"
+                className="inline-flex items-center gap-2 rounded-full border border-primary/80 px-6 py-3 text-sm uppercase tracking-[0.18em] text-primary transition hover:bg-primary hover:text-primary-foreground"
+              >
+                View Menu
+              </Link>
+              <Link
+                to="/menu"
+                className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm uppercase tracking-[0.18em] text-primary-foreground transition-colors hover:bg-cocoa-dark active:bg-cocoa-dark"
+              >
+                Order <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+            <div className="mt-5 flex flex-wrap items-center gap-3 text-sm text-primary/80">
+              <a
+                href={whatsappLink(
+                  "Hi Little Brownie Co., I'd like a quote for gifting or a custom order.",
+                )}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 hover:text-accent"
+              >
+                <MessageCircleMore className="h-4 w-4 text-accent" /> Request a Quote on WhatsApp
+              </a>
+            </div>
+            <div className="mt-10 max-w-xl border-t border-border/70 pt-7">
+              <p className="font-serif text-2xl leading-tight text-primary md:text-3xl">
+                Rich. Fudgy. Gooey. The kind of brownie you take your time with.
+              </p>
+            </div>
+          </div>
+          <div className="relative md:col-span-6 md:pl-10">
+            <div
+              className="relative aspect-[4/5] overflow-hidden rounded-[1.6rem] border border-border/80 bg-card shadow-display"
+              onMouseEnter={pauseHeroAutoplay}
+              onMouseLeave={resumeHeroAutoplay}
+              onTouchStart={pauseHeroAutoplay}
+              onTouchEnd={resumeHeroAutoplay}
+            >
+              <div
+                ref={heroScrollRef}
+                onScroll={handleHeroScroll}
+                className="flex h-full w-full snap-x snap-mandatory overflow-x-auto scroll-smooth [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              >
+                {HERO_GALLERY.map((src, i) => (
+                  <img
+                    key={i}
+                    src={src}
+                    alt="Little Brownie Co. brownies"
+                    className="h-full w-full flex-shrink-0 snap-center object-cover"
+                  />
+                ))}
+              </div>
+              {HERO_GALLERY.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    aria-label="Previous photo"
+                    onClick={() => {
+                      pauseHeroAutoplay();
+                      scrollHeroTo(heroSlide - 1);
+                      resumeHeroAutoplay();
+                    }}
+                    className="absolute left-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-background/80 text-primary shadow-soft transition hover:bg-background"
+                  >
+                    ‹
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Next photo"
+                    onClick={() => {
+                      pauseHeroAutoplay();
+                      scrollHeroTo(heroSlide + 1);
+                      resumeHeroAutoplay();
+                    }}
+                    className="absolute right-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-background/80 text-primary shadow-soft transition hover:bg-background"
+                  >
+                    ›
+                  </button>
+                  <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
+                    {HERO_GALLERY.map((_, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        aria-label={`Go to photo ${i + 1}`}
+                        onClick={() => {
+                          pauseHeroAutoplay();
+                          scrollHeroTo(i);
+                          resumeHeroAutoplay();
+                        }}
+                        className={`h-1.5 rounded-full transition-all ${
+                          i === heroSlide ? "w-5 bg-background" : "w-1.5 bg-background/60"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+            <div className="absolute -bottom-8 left-6 hidden w-48 rounded-[1.25rem] border border-border/70 bg-background/98 p-5 shadow-soft md:block">
+              <div className="text-[10px] uppercase tracking-[0.3em] text-toffee">Baked Fresh</div>
+              <p className="mt-3 font-serif text-[1.55rem] leading-tight text-primary">
+                From birthday cakes to brownie trays, everything is packed the day it leaves our
+                kitchen.
+              </p>
+            </div>
+            <div className="absolute -right-6 top-8 hidden h-34 w-34 items-center justify-center rounded-full border-4 border-background bg-surface-soft p-5 text-center font-serif text-base leading-tight text-primary shadow-display md:flex">
+              Where every bite earns brownie points.
+            </div>
+          </div>
+        </div>
+      </section>
 
-// export async function setProductActive(id: string, isActive: boolean) {
-//   const { error } = await supabase.from("products").update({ is_active: isActive }).eq("id", id);
-//   if (error) console.error("[products] setProductActive", error);
-//   return !error;
-// }
+      {/* SIGNATURE */}
+      <Reveal as="section" className="mt-14 md:mt-20">
+        <div className="container-x">
+          <div className="max-w-2xl">
+            <span className="text-[11px] uppercase tracking-[0.28em] text-toffee">
+              THE SIGNATURE COLLECTION
+            </span>
+            <h2 className="mt-4 font-serif text-4xl leading-tight text-primary md:text-5xl">
+              Recipes we're known for.
+            </h2>
+            <p className="mt-5 text-muted-foreground">
+              From timeless classics to indulgent favourites, there's a brownie for every kind of
+              craving.
+            </p>
+          </div>
+          <div className="mt-10 grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4">
+            {signature.map((p) => (
+              <Link key={p.id} to="/product/$id" params={{ id: p.slug }} className="group">
+                <div className="aspect-square overflow-hidden rounded-md">
+                  <img
+                    src={p.square}
+                    alt={p.name}
+                    loading="lazy"
+                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                </div>
+                <div className="mt-4 font-serif text-lg text-primary">{p.name}</div>
+                <div className="text-xs uppercase tracking-wider text-muted-foreground">
+                  from ₹{fromPrice(p)}
+                </div>
+              </Link>
+            ))}
+          </div>
+          <div className="mt-10 text-center">
+            <Link
+              to="/menu"
+              className="inline-flex items-center gap-1 text-sm uppercase tracking-[0.18em] text-accent hover:text-primary"
+            >
+              View full menu <ArrowUpRight className="h-4 w-4" />
+            </Link>
+          </div>
+        </div>
+      </Reveal>
 
-// const PRODUCT_IMAGE_BUCKET = "product-images";
-// const MAX_IMAGE_BYTES = 5 * 1024 * 1024; // 5MB
+      {/* REVIEWS */}
+      <Reveal as="section" className="mt-14 bg-[oklch(0.9_0.03_78)] py-16">
+        <div className="container-x">
+          <div className="mx-auto max-w-2xl text-center">
+            <span className="text-[11px] uppercase tracking-[0.28em] text-toffee">Kind words</span>
+            <h2 className="mt-4 font-serif text-4xl leading-tight text-primary md:text-5xl">
+              Baked with love, reviewed with love.
+            </h2>
+            <a
+              href={GOOGLE_REVIEWS_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-4 inline-flex items-center gap-1.5 text-sm text-accent hover:underline"
+            >
+              {googleRating
+                ? `${googleRating.rating.toFixed(1)}★ on Google (${googleRating.count} reviews)`
+                : "Read our Google reviews"}{" "}
+              <ArrowUpRight className="h-3.5 w-3.5" />
+            </a>
+          </div>
+          {reviews.length > 0 ? (
+            <div className="mt-10 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+              {reviews.map((r) => (
+                <figure key={r.id} className="flex flex-col rounded-md bg-background p-6">
+                  <div className="flex gap-0.5 text-accent">
+                    {Array.from({ length: r.rating }).map((_, i) => (
+                      <Star key={i} className="h-4 w-4 fill-current" />
+                    ))}
+                  </div>
+                  <blockquote className="mt-4 flex-1 font-serif text-lg leading-snug text-primary">
+                    "{r.text}"
+                  </blockquote>
+                  <figcaption className="mt-6 text-xs uppercase tracking-[0.18em] text-muted-foreground">
+                    {r.name}
+                    {r.location ? ` · ${r.location}` : ""}
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
+          ) : (
+            <div className="mx-auto mt-10 max-w-md text-center text-sm text-muted-foreground">
+              Be the first to{" "}
+              <Link to="/reviews" className="text-accent hover:underline">
+                leave a review
+              </Link>
+              , or read what customers say on Google.
+            </div>
+          )}
+        </div>
+      </Reveal>
 
-// /** Admin: upload a file to Supabase Storage and return its public URL. */
-// export async function uploadProductImage(
-//   file: File,
-// ): Promise<{ ok: true; url: string } | { ok: false; error: string }> {
-//   if (!file.type.startsWith("image/")) {
-//     return { ok: false, error: "Please choose an image file." };
-//   }
-//   if (file.size > MAX_IMAGE_BYTES) {
-//     return { ok: false, error: "Image must be under 5MB." };
-//   }
-
-//   const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
-//   const path = `${crypto.randomUUID()}.${ext}`;
-
-//   const { error } = await supabase.storage
-//     .from(PRODUCT_IMAGE_BUCKET)
-//     .upload(path, file, { cacheControl: "3600", upsert: false });
-
-//   if (error) return { ok: false, error: error.message };
-
-//   const { data } = supabase.storage.from(PRODUCT_IMAGE_BUCKET).getPublicUrl(path);
-//   return { ok: true, url: data.publicUrl };
-// }
-
-// /** Admin: delete a previously uploaded image, given its public URL (no-op for external URLs). */
-// export async function deleteProductImage(url: string) {
-//   const marker = `/${PRODUCT_IMAGE_BUCKET}/`;
-//   const idx = url.indexOf(marker);
-//   if (idx === -1) return; // not one of our uploaded files — leave it alone
-//   const path = url.slice(idx + marker.length);
-//   await supabase.storage.from(PRODUCT_IMAGE_BUCKET).remove([path]);
-// }
-
-// export function bestSellersOf(list: Product[]) {
-//   return list.filter((p) => p.bestSeller);
-// }
-// export function signatureOf(list: Product[]) {
-//   return list.filter((p) => p.signature);
-// }
-// export function hampersOf(list: Product[]) {
-//   return list.filter((p) => p.category === "Hampers" || p.category === "Cakes");
-// }
-
-// /* ---------- Order form configuration ---------- */
-
-// export const ADD_ONS: Variant[] = [
-//   { id: "ribbon", label: "Satin ribbon & gift wrap", price: 40 },
-//   { id: "card", label: "Handwritten message card", price: 30 },
-//   { id: "candles", label: "Candles & knife set", price: 25 },
-//   { id: "topper", label: "Celebration cake topper", price: 10 },
-//   { id: "dip-dark", label: "Dark chocolate dip pot", price: 25 },
-//   { id: "dip-nutella", label: "Nutella dip pot", price: 35 },
-// ];
-
-// export const RIBBON_COLOURS = [
-//   "Dusty Blue Stripe",
-//   "Navy Gingham",
-//   "Ivory Floral",
-//   "Lilac Gingham",
-//   "Olive Twill",
-//   "Sage Gingham",
-//   "No ribbon",
-// ];
-
-// export const DELIVERY_SLOTS = [
-//   "11:00 AM – 1:00 PM",
-//   "1:00 PM – 3:00 PM",
-//   "3:00 PM – 5:00 PM",
-//   "5:00 PM – 7:00 PM",
-//   "7:00 PM – 9:00 PM",
-// ];
-
-// export const OCCASIONS = [
-//   "Just because",
-//   "Birthday",
-//   "Anniversary",
-//   "Corporate gifting",
-//   "Festival",
-//   "Wedding / Return gifts",
-// ];
-
-// export const DELIVERY_AREAS = [
-//   { id: "indiranagar", label: "Indiranagar / Domlur", fee: 60 },
-//   { id: "koramangala", label: "Koramangala / HSR", fee: 80 },
-//   { id: "whitefield", label: "Whitefield / Marathahalli", fee: 120 },
-//   { id: "north", label: "Hebbal / Yelahanka", fee: 140 },
-//   { id: "other", label: "Other Bengaluru pincode", fee: 150 },
-// ];
-
-// /**
-//  * NOTE: these helpers (LEAD_TIME_DAYS/minOrderDate/maxOrderDate/isClosedDay)
-//  * are legacy from an earlier version of the order form and are not used by
-//  * the current checkout flow — see src/lib/delivery.ts for the real,
-//  * live lead-time logic (next-day only, 9am–5pm / after-5pm cutoff) that
-//  * actually powers the checkout page. Kept only in case any older code still
-//  * imports them; safe to delete once confirmed unused.
-//  */
-// export const LEAD_TIME_DAYS = 1;
-
-// export function minOrderDate() {
-//   const d = new Date();
-//   d.setDate(d.getDate() + LEAD_TIME_DAYS);
-//   return d.toISOString().slice(0, 10);
-// }
-
-// export function maxOrderDate() {
-//   const d = new Date();
-//   d.setDate(d.getDate() + 60);
-//   return d.toISOString().slice(0, 10);
-// }
-
-// /** Not used by the live checkout flow — see note above. Always returns false. */
-// export function isClosedDay(_dateStr: string) {
-//   return false;
-// }
-
-// export const WHATSAPP_NUMBER = "919019917398";
-// export const PHONE_DISPLAY = "+91 90199 17398";
-// export const EMAIL = "littlebrownieco25@gmail.com";
-// export const ADDRESS = "Koramangala, Bengaluru 560029, Karnataka, India";
-// /** Hours during which we take new orders. */
-// export const ORDER_HOURS = "9:00 AM – 5:00 PM";
-// /** Hours during which orders are delivered. */
-// export const DELIVERY_HOURS = "9:00 AM – 9:00 PM";
-// /** @deprecated use ORDER_HOURS — kept so any lingering imports don't break. */
-// export const HOURS = ORDER_HOURS;
-// export const UPI_ID = "littlebrownieco@upi";
-// export const FSSAI_NUMBER = "21225010000087";
-
-// /**
-//  * Single source of truth for the allergen list, taken from the owner's own
-//  * "What Goes Inside Our Brownies?" allergy graphic (Aug 2026). Update this
-//  * one constant and it updates everywhere the allergen list appears
-//  * (Footer, About page, AllergyBanner). The owner said she may send a
-//  * slightly revised version — when she does, just edit the arrays below.
-//  */
-// export const ALLERGENS = {
-//   short: "eggs, milk/dairy, wheat (gluten), hazelnuts (Nutella), walnuts and soy",
-//   groups: [
-//     { label: "Eggs", items: [] as string[] },
-//     { label: "Dairy", items: ["from butter, chocolate & Nutella"] },
-//     { label: "Gluten", items: ["all-purpose flour (wheat)"] },
-//     { label: "Nuts", items: ["Hazelnuts (Nutella)", "Walnuts (in walnut flavour)"] },
-//     { label: "Soy", items: ["may be present in chocolate & Nutella-based products"] },
-//   ],
-//   crossContamination:
-//     "Prepared in a kitchen that handles these ingredients, so cross-contact with allergens is possible.",
-// };
-
-// export function whatsappLink(message: string) {
-//   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
-// }
-
-// /**
-//  * Google Reviews link. This is a search-based fallback (business name +
-//  * address) that works without any API key. Once the owner shares her
-//  * Google Business Profile "Place ID", swap this for
-//  * `https://search.google.com/local/writereview?placeid=<PLACE_ID>` (to
-//  * collect new reviews) and/or wire up the Places API to embed reviews
-//  * directly — see the note in src/lib/reviews.ts.
-//  */
-// export const GOOGLE_REVIEWS_URL =
-//   "https://www.google.com/search?q=Little+Brownie+Co.+Bengaluru+reviews";
-
-// export const galleryImages = [
-//   IMG.gallery1,
-//   IMG.gallery2,
-//   IMG.gallery3,
-//   IMG.gallery4,
-//   IMG.gallery5,
-//   IMG.gallery6,
-//   IMG.gallery7,
-//   IMG.gallery8,
-// ];
+      {/* CTA */}
+      <Reveal as="section" className="container-x mt-14">
+        <div className="rounded-[1.2rem] border border-border bg-secondary/50 px-5 py-10 text-center sm:px-8 md:py-16">
+          <span className="text-[11px] uppercase tracking-[0.28em] text-toffee">
+            Let's make it just right
+          </span>
+          <h2 className="mx-auto mt-4 max-w-2xl font-serif text-4xl leading-tight text-primary md:text-5xl">
+            Let's make your brownie box just right.
+          </h2>
+          <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
+            Have a question or a special request? We're just a WhatsApp message away.
+          </p>
+          <a
+            href={whatsappLink("Hi Little Brownie Co., I'd like to place an order.")}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-8 inline-flex items-center gap-2 rounded-full bg-primary px-8 py-3.5 text-sm uppercase tracking-[0.18em] text-primary-foreground transition-colors hover:bg-cocoa-dark active:bg-cocoa-dark"
+          >
+            Chat on WhatsApp <ArrowUpRight className="h-4 w-4" />
+          </a>
+        </div>
+      </Reveal>
+    </>
+  );
+}
