@@ -29,13 +29,13 @@ import biteSizedHandPhoto from "@/assets/bite-sized-hand.jpg";
 
 // Home page hero gallery photos — auto-switching image strip
 import homeImg1 from "@/assets/himg1.jpg";
-import homeImg2 from "@/assets/himg2.jpg";
-import homeImg3 from "@/assets/himg3.jpg";
+import homeImg2 from "@/assets/himg2.jpeg";
+import homeImg3 from "@/assets/himg3.jpeg";
 import homeImg4 from "@/assets/himg4.jpg";
 import homeImg5 from "@/assets/himg5.jpg";
-import homeImg6 from "@/assets/himg6.jpg";
-import homeImg7 from "@/assets/himg7.jpg";
-import homeImg8 from "@/assets/himg8.jpg";
+import homeImg6 from "@/assets/himg6.jpeg";
+import homeImg7 from "@/assets/himg7.jpeg";
+import homeImg8 from "@/assets/himg8.jpeg";
 
 // Real gifting photography supplied earlier — plain local imports too
 import hamperBagHeart from "@/assets/gifting/hamper-bag-heart.png";
