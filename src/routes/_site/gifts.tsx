@@ -47,7 +47,7 @@ function Gifts() {
             href={whatsappLink("Hi! I'd like to enquire about custom gift hampers.")}
             target="_blank"
             rel="noreferrer"
-            className="mt-8 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm uppercase tracking-[0.18em] text-primary-foreground hover:bg-primary/90"
+            className="mt-8 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm uppercase tracking-[0.18em] text-primary-foreground transition-colors hover:bg-cocoa-dark active:bg-cocoa-dark"
           >
             Custom Enquiry <ArrowUpRight className="h-4 w-4" />
           </a>
@@ -107,7 +107,7 @@ function Gifts() {
                 <Link
                   to="/product/$id"
                   params={{ id: p.slug }}
-                  className="rounded-full bg-primary px-6 py-3 text-xs uppercase tracking-[0.18em] text-primary-foreground hover:bg-primary/90"
+                  className="rounded-full bg-primary px-6 py-3 text-xs uppercase tracking-[0.18em] text-primary-foreground transition-colors hover:bg-cocoa-dark active:bg-cocoa-dark"
                 >
                   View details
                 </Link>
@@ -117,7 +117,7 @@ function Gifts() {
                   )}
                   target="_blank"
                   rel="noreferrer"
-                  className="rounded-full border border-primary px-6 py-3 text-xs uppercase tracking-[0.18em] text-primary hover:bg-primary hover:text-primary-foreground"
+                  className="rounded-full border border-primary px-6 py-3 text-xs uppercase tracking-[0.18em] text-primary transition-colors hover:bg-primary hover:text-primary-foreground active:bg-cocoa-dark active:text-primary-foreground"
                 >
                   Order on WhatsApp
                 </a>
