@@ -82,7 +82,7 @@ function CartPage() {
                   <div className="inline-flex items-center rounded-full border border-border">
                     <button
                       onClick={() => update(d.key, d.qty - 1)}
-                      className="p-2 hover:text-accent"
+                      className="rounded-full p-2 transition-colors hover:bg-caramel hover:text-cocoa active:bg-caramel-dark active:text-parchment"
                       aria-label="Decrease"
                     >
                       <Minus className="h-3.5 w-3.5" />
@@ -90,7 +90,7 @@ function CartPage() {
                     <span className="w-8 text-center text-sm">{d.qty}</span>
                     <button
                       onClick={() => update(d.key, d.qty + 1)}
-                      className="p-2 hover:text-accent"
+                      className="rounded-full p-2 transition-colors hover:bg-caramel hover:text-cocoa active:bg-caramel-dark active:text-parchment"
                       aria-label="Increase"
                     >
                       <Plus className="h-3.5 w-3.5" />
