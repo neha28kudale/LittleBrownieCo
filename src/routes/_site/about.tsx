@@ -1,7 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
 import storyImg from "@/assets/About.jpg";
-import { BadgeCheck, MapPin, Sparkles, TriangleAlert } from "lucide-react";
-import { ALLERGENS, FSSAI_NUMBER } from "@/lib/products";
+import { BadgeCheck, MapPin, Sparkles } from "lucide-react";
+import { FSSAI_NUMBER } from "@/lib/products";
+
+import ab1 from "@/assets/real/ab1.jpg";
+import ab2 from "@/assets/real/ab2.jpg";
+import ab3 from "@/assets/real/ab3.jpg";
+import ab4 from "@/assets/real/ab4.jpg";
+import ab5 from "@/assets/real/ab5.jpg";
+import ab6 from "@/assets/real/ab6.jpg";
+import ab7 from "@/assets/real/ab7.jpg";
+import ab8 from "@/assets/real/ab8.jpg";
+
+const GALLERY_IMAGES = [ab1, ab2, ab3, ab4, ab5, ab6, ab7, ab8];
 
 export const Route = createFileRoute("/_site/about")({
   head: () => ({
@@ -164,49 +175,29 @@ function About() {
         ))}
       </section>
 
-      {/* CARE & ALLERGY */}
-      <section className="container-x mt-16 mb-4 md:mt-24">
-        <div className="grid gap-6 md:grid-cols-3">
-          {/* HEATING & STORAGE */}
-          <div className="rounded-md border border-border bg-card p-8">
-            <h3 className="font-serif text-2xl text-primary">
-              Heating &amp; storage
-            </h3>
+      {/* PHOTO GALLERY */}
+      <section className="mt-16 mb-4 md:mt-24">
+        <div className="container-x mb-6">
+          <h3 className="font-serif text-2xl text-primary sm:text-3xl">
+            A peek behind the scenes
+          </h3>
+        </div>
 
-            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-              A quick 10–15 seconds in the microwave makes your brownie
-              perfectly warm and gooey. Store in an airtight container — up to
-              4 days at room temperature, or up to 7 days refrigerated (bring
-              to room temperature or microwave before eating).
-            </p>
-          </div>
-
-          {/* PRO TIP */}
-          <div className="rounded-md border border-border bg-card p-8">
-            <h3 className="font-serif text-2xl text-primary">
-              Pro tip
-            </h3>
-
-            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-              Pairs perfectly with a scoop of ice cream, whipped cream, or an
-              extra drizzle of our signature chocolate dip.
-            </p>
-          </div>
-
-          {/* ALLERGY WARNING */}
-          <div className="rounded-md border border-destructive/30 bg-card p-8">
-            <div className="flex items-center gap-2">
-              <TriangleAlert className="h-5 w-5 text-destructive" />
-
-              <h3 className="font-serif text-2xl text-primary">
-                Allergy warning
-              </h3>
-            </div>
-
-            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-              Contains {ALLERGENS.short}. {ALLERGENS.crossContamination} Please
-              check with us before ordering if you have a food allergy.
-            </p>
+        <div className="container-x">
+          <div className="flex gap-4 overflow-x-auto pb-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {GALLERY_IMAGES.map((img, i) => (
+              <div
+                key={i}
+                className="aspect-[4/5] w-56 flex-shrink-0 overflow-hidden rounded-[1rem] border border-border/70 shadow-soft sm:w-64"
+              >
+                <img
+                  src={img}
+                  alt={`Little Brownie Co. — behind the scenes photo ${i + 1}`}
+                  className="h-full w-full object-cover"
+                  loading="lazy"
+                />
+              </div>
+            ))}
           </div>
         </div>
       </section>
