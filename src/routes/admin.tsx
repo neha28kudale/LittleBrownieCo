@@ -1100,11 +1100,11 @@ function ProductModal({
             </Field>
             <Field label="Category">
               <select
-                value={d.category || "Signature"}
+                value={d.category || "Mini Bites"}
                 onChange={(e) => setD({ ...d, category: e.target.value as Product["category"] })}
                 className="input"
               >
-                {["Signature", "Bites", "Loaves", "Cakes", "Hampers"].map((c) => (
+                {["Mini Bites", "Cakes", "Hampers", "Add-ons", "Limited Editions"].map((c) => (
                   <option key={c}>{c}</option>
                 ))}
               </select>
