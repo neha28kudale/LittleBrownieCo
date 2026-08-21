@@ -35,12 +35,7 @@ export function Footer() {
             </li>
             <li>
               <Link to="/faqs" className="text-primary/80 hover:text-accent">
-                FAQs
-              </Link>
-            </li>
-            <li>
-              <Link to="/contact" className="text-primary/80 hover:text-accent">
-                Contact Us
+                FAQs & Contact
               </Link>
             </li>
             {/* "Updates" hidden for now per owner request — route still exists
