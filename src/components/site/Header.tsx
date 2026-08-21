@@ -8,8 +8,7 @@ import { useCart } from "@/lib/cart";
 const nav = [
   { to: "/", label: "Home" },
   { to: "/about", label: "About Us" },
-  { to: "/faqs", label: "FAQs" },
-  { to: "/contact", label: "Contact" },
+  { to: "/faqs", label: "FAQs & Contact" },
 ] as const;
 
 export function Header() {
