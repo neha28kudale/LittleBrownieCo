@@ -93,7 +93,7 @@ export function ProductCard({
         </select>
         <button
           onClick={handleAddToCart}
-          className="inline-flex shrink-0 items-center justify-center gap-1 rounded-full bg-primary px-4 py-2 text-xs uppercase tracking-wider text-primary-foreground transition hover:bg-primary/90"
+          className="inline-flex shrink-0 items-center justify-center gap-1 rounded-full bg-primary px-4 py-2 text-xs uppercase tracking-wider text-primary-foreground transition hover:bg-cocoa-dark active:scale-95 active:bg-cocoa-dark"
         >
           <Plus className="h-3 w-3" /> Add
         </button>
