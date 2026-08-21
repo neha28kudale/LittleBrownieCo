@@ -38,6 +38,9 @@ export type Order = {
   deliveryDate: string;
   deliverySlot: string;
   notes?: string;
+  isGift: boolean;
+  giftMessage?: string;
+  ribbonFee: number;
   paymentStatus: PaymentStatus;
   orderStatus: OrderStatus;
   cashfreeOrderId?: string;
@@ -59,10 +62,14 @@ export async function createOrder(input: {
   deliveryDate: string;
   deliverySlot: string;
   notes?: string;
+  isGift?: boolean;
+  giftMessage?: string;
+  ribbonFee?: number;
   items: DetailedItem[];
 }): Promise<{ ok: true; order: Order } | { ok: false; error: string }> {
   const subtotal = input.items.reduce((s, i) => s + i.lineTotal, 0);
-  const total = subtotal + input.deliveryFee;
+  const ribbonFee = input.isGift ? input.ribbonFee ?? 0 : 0;
+  const total = subtotal + input.deliveryFee + ribbonFee;
 
   const { data: orderRow, error: orderError } = await supabase
     .from("orders")
@@ -80,6 +87,9 @@ export async function createOrder(input: {
       delivery_date: input.deliveryDate,
       delivery_slot: input.deliverySlot,
       notes: input.notes || null,
+      is_gift: input.isGift ?? false,
+      gift_message: input.isGift ? input.giftMessage || null : null,
+      ribbon_fee: ribbonFee,
       payment_status: "pending",
       order_status: "order_placed",
     })
@@ -128,6 +138,9 @@ function fromRow(row: any, items: any[]): Order {
     deliveryDate: row.delivery_date,
     deliverySlot: row.delivery_slot,
     notes: row.notes ?? undefined,
+    isGift: row.is_gift ?? false,
+    giftMessage: row.gift_message ?? undefined,
+    ribbonFee: Number(row.ribbon_fee ?? 0),
     paymentStatus: row.payment_status,
     orderStatus: row.order_status,
     cashfreeOrderId: row.cashfree_order_id ?? undefined,
