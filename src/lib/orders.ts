@@ -13,7 +13,13 @@
 import { supabase } from "./supabase";
 import type { DetailedItem } from "./cart";
 
-export type OrderStatus = "order_placed" | "order_confirmed" | "rejected";
+export type OrderStatus =
+  | "order_placed"
+  | "order_confirmed"
+  | "baking"
+  | "out_for_delivery"
+  | "delivered"
+  | "rejected";
 export type PaymentStatus = "pending" | "paid" | "failed";
 
 export type OrderItemRow = {
