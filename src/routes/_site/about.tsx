@@ -1,9 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useRef } from "react";
+import { useState } from "react";
 import storyImg from "@/assets/About.jpg";
 import { BadgeCheck, MapPin, Sparkles } from "lucide-react";
 import { FSSAI_NUMBER } from "@/lib/products";
-
 
 import ab1 from "@/assets/real/ab1.jpg";
 import ab2 from "@/assets/real/ab2.jpg";
@@ -38,50 +37,15 @@ export const Route = createFileRoute("/_site/about")({
   component: About,
 });
 
-function useAutoSwipe(pixelsPerSecond = 40) {
-  const scrollerRef = useRef<HTMLDivElement>(null);
-  const pausedRef = useRef(false);
-
-  useEffect(() => {
-    const el = scrollerRef.current;
-    if (!el) return;
-
-    // Force instant scrolling so our per-frame updates aren't fighting
-    // any global "scroll-behavior: smooth" CSS, which causes stutter/jumps.
-    el.style.scrollBehavior = "auto";
-
-    let frame: number;
-    let lastTime: number | null = null;
-
-    const step = (time: number) => {
-      if (lastTime === null) lastTime = time;
-      const deltaSeconds = (time - lastTime) / 1000;
-      lastTime = time;
-
-      if (!pausedRef.current && el.scrollWidth > el.clientWidth) {
-        el.scrollLeft += pixelsPerSecond * deltaSeconds;
-
-        // Loop seamlessly once we've scrolled past the first copy of images
-        const halfway = el.scrollWidth / 2;
-        if (el.scrollLeft >= halfway) {
-          el.scrollLeft -= halfway;
-        }
-      }
-      frame = requestAnimationFrame(step);
-    };
-
-    frame = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(frame);
-  }, [pixelsPerSecond]);
-
-  const pause = () => (pausedRef.current = true);
-  const resume = () => (pausedRef.current = false);
-
-  return { scrollerRef, pause, resume };
+function useAutoSwipe() {
+  const [paused, setPaused] = useState(false);
+  const pause = () => setPaused(true);
+  const resume = () => setPaused(false);
+  return { paused, pause, resume };
 }
 
 function About() {
-  const { scrollerRef, pause, resume } = useAutoSwipe(40);
+  const { paused, pause, resume } = useAutoSwipe();
 
   return (
     <>
@@ -229,14 +193,17 @@ function About() {
           </h3>
         </div>
 
-        <div className="container-x">
+        <div className="container-x overflow-hidden">
           <div
-            ref={scrollerRef}
             onMouseEnter={pause}
             onMouseLeave={resume}
             onTouchStart={pause}
             onTouchEnd={resume}
-            className="flex gap-4 overflow-x-auto pb-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="flex w-max gap-4 pb-4"
+            style={{
+              animation: "lbc-marquee 28s linear infinite",
+              animationPlayState: paused ? "paused" : "running",
+            }}
           >
             {/* Render the images twice back-to-back for a seamless infinite loop */}
             {[...GALLERY_IMAGES, ...GALLERY_IMAGES].map((img, i) => (
@@ -254,7 +221,14 @@ function About() {
             ))}
           </div>
         </div>
+
+        <style>{`
+          @keyframes lbc-marquee {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50%); }
+          }
+        `}</style>
       </section>
     </>
   );
-          }
+}
