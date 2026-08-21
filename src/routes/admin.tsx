@@ -520,6 +520,27 @@ function StatusBadge({ order }: { order: Order }) {
       </span>
     );
   }
+  if (order.orderStatus === "baking") {
+    return (
+      <span className="rounded-full bg-[oklch(0.9_0.06_75)] px-3 py-1 text-[10px] uppercase tracking-[0.14em] text-[oklch(0.4_0.1_60)]">
+        Baking
+      </span>
+    );
+  }
+  if (order.orderStatus === "out_for_delivery") {
+    return (
+      <span className="rounded-full bg-[oklch(0.88_0.06_240)] px-3 py-1 text-[10px] uppercase tracking-[0.14em] text-[oklch(0.4_0.1_240)]">
+        Out for delivery
+      </span>
+    );
+  }
+  if (order.orderStatus === "delivered") {
+    return (
+      <span className="rounded-full bg-[oklch(0.88_0.06_140)] px-3 py-1 text-[10px] uppercase tracking-[0.14em] text-[oklch(0.35_0.08_140)]">
+        Delivered
+      </span>
+    );
+  }
   return (
     <span className="rounded-full bg-[oklch(0.92_0.06_75)] px-3 py-1 text-[10px] uppercase tracking-[0.14em] text-[oklch(0.4_0.1_60)]">
       Order placed
@@ -568,6 +589,23 @@ function Orders({
         >
           <Ban className="h-3.5 w-3.5" /> Reject
         </button>
+      )}
+      {o.orderStatus !== "rejected" && (
+        <select
+          value={
+            ["baking", "out_for_delivery", "delivered"].includes(o.orderStatus)
+              ? o.orderStatus
+              : ""
+          }
+          onChange={(e) => e.target.value && setStatus(o.id, e.target.value as OrderStatus)}
+          title="Update tracking stage — shown to the customer on their order page"
+          className="rounded-full border border-border bg-transparent px-2.5 py-1.5 text-[11px] text-primary"
+        >
+          <option value="">Tracking…</option>
+          <option value="baking">Baking</option>
+          <option value="out_for_delivery">Out for delivery</option>
+          <option value="delivered">Delivered</option>
+        </select>
       )}
     </div>
   );
