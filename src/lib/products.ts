@@ -114,7 +114,7 @@ export type Product = {
   slug: string;
   name: string;
   tagline: string;
-  category: "Signature" | "Bites" | "Loaves" | "Cakes" | "Hampers" | "Add-ons" | "Limited Editions";
+  category: "Mini Bites" | "Cakes" | "Hampers" | "Add-ons" | "Limited Editions";
   image: string;
   square: string;
   gallery: string[];
@@ -146,7 +146,7 @@ const FALLBACK_PRODUCTS: Product[] = [
     slug: "mini-brownie-tub",
     name: "Mini Brownie Tub",
     tagline: "Soft, fudgy mini brownie bites in a kraft tub.",
-    category: "Bites",
+    category: "Mini Bites",
     image: IMG.tub,
     square: IMG.tubSquare,
     gallery: [IMG.tub, IMG.assortedTub, IMG.biteSizedHand],
@@ -176,7 +176,7 @@ const FALLBACK_PRODUCTS: Product[] = [
     slug: "mini-brownie-loaf",
     name: "Mini Brownie Loaf",
     tagline: "A dense, gooey single-serve loaf.",
-    category: "Loaves",
+    category: "Mini Bites",
     image: IMG.loaf,
     square: IMG.loafSquare,
     gallery: [IMG.loaf],
@@ -223,7 +223,7 @@ const FALLBACK_PRODUCTS: Product[] = [
     slug: "the-little-brownie-box",
     name: "The Little Brownie Box",
     tagline: "Nine hand-cut squares of pure fudge.",
-    category: "Signature",
+    category: "Hampers",
     image: IMG.littleBox,
     square: IMG.littleBoxSquare,
     gallery: [IMG.littleBox],
@@ -246,7 +246,7 @@ const FALLBACK_PRODUCTS: Product[] = [
     slug: "brownie-slab",
     name: "Brownie Slab",
     tagline: "One big slab. Cut it your way.",
-    category: "Signature",
+    category: "Hampers",
     image: IMG.slab,
     square: IMG.slabSquare,
     gallery: [IMG.slab],
@@ -819,7 +819,7 @@ export const galleryImages = [
 //   slug: string;
 //   name: string;
 //   tagline: string;
-//   category: "Signature" | "Bites" | "Loaves" | "Cakes" | "Hampers" | "Add-ons" | "Limited Editions";
+//   category: "Mini Bites" | "Cakes" | "Hampers" | "Add-ons" | "Limited Editions";
 //   image: string;
 //   square: string;
 //   gallery: string[];
