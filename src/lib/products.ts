@@ -167,7 +167,7 @@ const FALLBACK_PRODUCTS: Product[] = [
     flavours: ["Dark Chocolate", "Walnut", "Nutella", "Assorted"],
     ingredients: ["Belgian dark chocolate", "Butter", "Eggs", "Cane sugar", "All-purpose flour"],
     description:
-      "Soft, fudgy mini brownie bites, ideal for casual snacking, sharing with friends, or enjoying a quick treat whenever a craving hits. Choose a single flavour, or go Assorted for all three (Dark Chocolate, Walnut, Nutella) in one tub — 2 pcs of each in the 6 pcs tub, 4 pcs of each in the 12 pcs tub, and 8 pcs of each in the 24 pcs tub.",
+      "It is filled with mini brownie bites that are soft, fudgy, and melt-in-your-mouth delicious. Designed for easy munching, this tub is ideal for casual snacking, sharing with friends, or enjoying a quick treat whenever a craving hits. Just the right size to satisfy your sweet tooth—one bite at a time! The assorted mini brownie tub consists of all 3 flavours (Dark Chocolate | Walnut | Nutella): 2 pcs of each flavour in the 6 pcs assorted tub, 4 pcs of each flavour in the 12 pcs assorted tub, and 8 pcs of each flavour in the 24 pcs assorted tub.",
     bestSeller: true,
     signature: true,
   },
@@ -194,7 +194,7 @@ const FALLBACK_PRODUCTS: Product[] = [
     flavours: ["Dark Chocolate", "Walnut", "Nutella"],
     ingredients: ["Belgian dark chocolate", "Butter", "Eggs", "Vanilla", "Flour"],
     description:
-      "A rich, fudgy brownie baked in the shape of a mini loaf. It is dense, gooey with a crinkle top, offering the perfect balance of indulgence in a cute, single-serve size. Ideal for gifting, snacking, or satisfying solo cravings without overdoing it! Choose 1–5 loaves per flavour.",
+      "It is a rich, fudgy brownie baked in the shape of a mini loaf. It is dense, gooey with a crinkle top, offering the perfect balance of indulgence in a cute, single-serve size. Ideal for gifting, snacking, or satisfying solo cravings without overdoing it!",
     bestSeller: true,
     signature: true,
   },
@@ -216,7 +216,7 @@ const FALLBACK_PRODUCTS: Product[] = [
     flavours: ["Dark Chocolate", "Walnut", "Nutella"],
     ingredients: ["Belgian dark chocolate", "Butter", "Eggs", "Walnuts", "Nutella", "Kraft gift box"],
     description:
-      "A curated mix of our best-loved flavours, packed into bite-sized square brownie pieces. Perfect for sharing, gifting, or sampling a little bit of everything!",
+      "A curated mix of our best-loved flavors, packed into bite-sized square brownie pieces. Perfect for sharing, gifting, or sampling a little bit of everything!",
   },
   {
     id: "p5",
@@ -238,7 +238,7 @@ const FALLBACK_PRODUCTS: Product[] = [
     flavours: ["Dark Chocolate", "Nutella"],
     ingredients: ["Belgian dark chocolate", "Butter", "Eggs", "Cane sugar", "Flour"],
     description:
-      "The Little Brownie Box is filled with bite-sized dark chocolate brownie pieces, rich, fudgy, and perfectly indulgent. Each piece delivers a deep cocoa flavour in a small, satisfying bite — perfect for sharing or treating yourself. Choose 1–5 boxes.",
+      "The Little Brownie Box is filled with bite-sized dark chocolate brownie pieces, rich, fudgy, and perfectly indulgent. Each piece delivers a deep cocoa flavor in a small, satisfying bite—perfect for sharing or treating yourself.",
     signature: true,
   },
   {
@@ -261,7 +261,7 @@ const FALLBACK_PRODUCTS: Product[] = [
     flavours: ["Dark Chocolate", "Nutella"],
     ingredients: ["Belgian dark chocolate", "Butter", "Eggs", "Cane sugar", "Flour"],
     description:
-      "Rich, fudgy, and irresistibly chocolatey, this soft brownie slab is packed with deep cocoa flavour and melts in your mouth with every bite. Uncut, so you can slice it however suits your party or platter. Choose 1–5 slabs.",
+      "Rich, fudgy, and irresistibly chocolatey, this soft brownie slab is packed with deep cocoa flavor and melts in your mouth with every bite.",
     signature: true,
   },
   {
@@ -281,7 +281,7 @@ const FALLBACK_PRODUCTS: Product[] = [
     flavours: ["Dark Chocolate"],
     ingredients: ["Belgian dark chocolate", "Butter", "Eggs", "Cocoa", "Flour"],
     description:
-      "A rich and moist chocolate cake with a warm, gooey molten chocolate centre that melts in every bite. A decadent dessert that's perfect for satisfying any chocolate craving, served in a heart-shaped, ready-to-heat-and-eat tin. Choose 1–5 tins.",
+      "A rich and moist chocolate cake with a warm, gooey molten chocolate center that melts in every bite. A decadent dessert that's perfect for satisfying any chocolate craving which is served in a heart shaped ready-to-heat and eat tin.",
   },
   {
     id: "p8",
@@ -299,7 +299,7 @@ const FALLBACK_PRODUCTS: Product[] = [
     flavours: ["Loaded Chocolate"],
     ingredients: ["Brownie sponge", "Chocolate ganache", "Chocolate truffles", "Chocolate bars"],
     description:
-      "A rich, fudgy brownie slab cake topped with smooth chocolate ganache — dense, moist, and loaded with deep chocolate flavour. Perfect for celebrations or a decadent treat! Add a \"Happy Birthday\" topper for ₹10.",
+      "A rich, fudgy brownie slab cake topped with smooth chocolate ganache — dense, moist, and loaded with deep chocolate flavour. Perfect for celebrations or a decadent treat!",
     bestSeller: true,
     signature: true,
   },
@@ -319,7 +319,7 @@ const FALLBACK_PRODUCTS: Product[] = [
     flavours: ["Dark Chocolate", "Nutella"],
     ingredients: ["Belgian couverture chocolate", "Fresh cream", "Nutella"],
     description:
-      "Take your brownies to the next level with our rich, creamy dips! From silky chocolate to nutty spreads, each dip is crafted to make every bite extra indulgent. Perfect for sharing… or not.",
+      "Take your brownies to the next level with our rich, creamy dips! From silky chocolate to nutty spreads, each dip is crafted to make every bite extra indulgent. Perfect for sharing… or not 😜🍫",
   },
 ];
 
