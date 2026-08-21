@@ -102,7 +102,7 @@ function Menu() {
             </p>
             <Link
               to="/menu"
-              className="mt-6 inline-flex rounded-full border border-primary px-5 py-2.5 text-xs uppercase tracking-[0.18em] text-primary hover:bg-primary hover:text-primary-foreground"
+              className="mt-6 inline-flex rounded-full border border-primary px-5 py-2.5 text-xs uppercase tracking-[0.18em] text-primary transition-colors hover:bg-primary hover:text-primary-foreground active:bg-cocoa-dark active:text-primary-foreground"
             >
               View all
             </Link>
