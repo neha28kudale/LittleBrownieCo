@@ -211,7 +211,7 @@ const FALLBACK_PRODUCTS: Product[] = [
       { id: "dark-nutella", label: "2 pcs Dark Chocolate + 2 pcs Nutella", price: 385 },
       { id: "dark-walnut", label: "2 pcs Dark Chocolate + 2 pcs Walnut", price: 415 },
       { id: "walnut-nutella", label: "2 pcs Walnut + 2 pcs Nutella", price: 435 },
-      { id: "all-three", label: "2 pcs each · All Three Flavours", price: 585 },
+      { id: "all-three", label: "2 pcs each · Dark Chocolate+Walnut+Nutella", price: 585 },
     ],
     flavours: ["Dark Chocolate", "Walnut", "Nutella"],
     ingredients: ["Belgian dark chocolate", "Butter", "Eggs", "Walnuts", "Nutella", "Kraft gift box"],
