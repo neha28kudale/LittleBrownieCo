@@ -29,6 +29,8 @@ export const Route = createFileRoute("/_site/checkout")({
 const CASHFREE_MODE =
   (import.meta.env.VITE_CASHFREE_MODE as string) || "sandbox";
 
+const RIBBON_FEE = 15;
+
 function Checkout() {
   const { detailed, subtotal, clear } = useCart();
   const navigate = useNavigate();
@@ -40,7 +42,12 @@ function Checkout() {
   const [slot, setSlot] = useState("");
   const [notes, setNotes] = useState("");
   const [deliveryAgreed, setDeliveryAgreed] = useState(false);
+  const [isGift, setIsGift] = useState(false);
+  const [giftMessage, setGiftMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  const ribbonFee = isGift ? RIBBON_FEE : 0;
+  const payableTotal = subtotal + ribbonFee;
 
   useEffect(() => {
     setDate(toISODate(earliestDeliveryDate()));
@@ -119,6 +126,9 @@ function Checkout() {
       deliveryDate: date,
       deliverySlot: slot,
       notes: notes.trim() || undefined,
+      isGift,
+      giftMessage: isGift ? giftMessage.trim() || undefined : undefined,
+      ribbonFee,
       items: detailed,
     });
 
@@ -401,6 +411,62 @@ function Checkout() {
               </Label>
             </div>
           </div>
+
+          {/* GIFT OPTION */}
+          <div className="rounded-lg border border-border bg-card p-5 sm:p-6">
+            <h2 className="font-serif text-2xl text-primary">
+              Is this a gift? 🎁
+            </h2>
+
+            <div className="mt-4 space-y-3">
+              <label className="flex cursor-pointer items-start gap-3">
+                <input
+                  type="radio"
+                  name="is-gift"
+                  checked={isGift}
+                  onChange={() => setIsGift(true)}
+                  className="mt-1 h-4 w-4 accent-primary"
+                />
+
+                <span className="text-sm leading-snug text-primary/90">
+                  Yes, add a ribbon (₹{RIBBON_FEE})
+                </span>
+              </label>
+
+              <label className="flex cursor-pointer items-start gap-3">
+                <input
+                  type="radio"
+                  name="is-gift"
+                  checked={!isGift}
+                  onChange={() => {
+                    setIsGift(false);
+                    setGiftMessage("");
+                  }}
+                  className="mt-1 h-4 w-4 accent-primary"
+                />
+
+                <span className="text-sm leading-snug text-primary/90">
+                  No
+                </span>
+              </label>
+            </div>
+
+            {isGift && (
+              <label className="mt-4 block">
+                <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                  Gift message
+                </span>
+
+                <textarea
+                  value={giftMessage}
+                  onChange={(e) => setGiftMessage(e.target.value)}
+                  rows={2}
+                  placeholder="Write a short note for the recipient…"
+                  className="mt-2 w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm text-primary outline-none focus:border-accent"
+                />
+              </label>
+            )}
+          </div>
         </div>
 
         {/* ORDER SUMMARY */}
@@ -445,10 +511,18 @@ function Checkout() {
               </dd>
             </div>
 
+            {/* GIFT RIBBON */}
+            {isGift && (
+              <div className="flex justify-between">
+                <dt className="text-muted-foreground">Gift ribbon</dt>
+                <dd>₹{RIBBON_FEE}</dd>
+              </div>
+            )}
+
             {/* PAY NOW */}
             <div className="flex justify-between border-t border-border pt-3 font-serif text-lg text-primary">
               <dt>Pay now</dt>
-              <dd>₹{subtotal}</dd>
+              <dd>₹{payableTotal}</dd>
             </div>
           </dl>
 
