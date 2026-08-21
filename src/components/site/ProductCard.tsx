@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Plus, Expand } from "lucide-react";
+import { Plus, Expand, Check } from "lucide-react";
 import { useState } from "react";
 import { fromPrice, type Product } from "@/lib/products";
 import { useCart } from "@/lib/cart";
@@ -15,6 +15,7 @@ export function ProductCard({
   const { add } = useCart();
   const [variantId, setVariantId] = useState(product.variants[0]!.id);
   const variant = product.variants.find((v) => v.id === variantId)!;
+  const [justAdded, setJustAdded] = useState(false);
 
   const handleAddToCart = () => {
     if (onAddToCart) {
@@ -23,6 +24,9 @@ export function ProductCard({
       add(product.id, variant.id);
       toast.success(`${product.name} (${variant.label}) added`);
     }
+
+    setJustAdded(true);
+    window.setTimeout(() => setJustAdded(false), 1200);
   };
 
   return (
@@ -83,7 +87,7 @@ export function ProductCard({
           value={variantId}
           onChange={(e) => setVariantId(e.target.value)}
           aria-label={`Choose an option for ${product.name}`}
-          className="min-w-0 flex-1 rounded-full border border-border bg-background px-3 py-2 text-xs text-primary"
+          className="min-w-0 flex-1 rounded-full border border-border bg-background px-3 py-2 text-xs text-primary transition-colors focus:border-accent focus:outline-none"
         >
           {product.variants.map((v) => (
             <option key={v.id} value={v.id}>
@@ -93,9 +97,22 @@ export function ProductCard({
         </select>
         <button
           onClick={handleAddToCart}
-          className="inline-flex shrink-0 items-center justify-center gap-1 rounded-full bg-primary px-4 py-2 text-xs uppercase tracking-wider text-primary-foreground transition hover:bg-cocoa-dark active:scale-95 active:bg-cocoa-dark"
+          disabled={justAdded}
+          className={`inline-flex shrink-0 items-center justify-center gap-1 rounded-full px-4 py-2 text-xs uppercase tracking-wider transition-all duration-300 active:scale-95 ${
+            justAdded
+              ? "w-[5.5rem] scale-105 bg-accent text-accent-foreground"
+              : "bg-primary text-primary-foreground hover:bg-cocoa-dark active:bg-cocoa-dark"
+          }`}
         >
-          <Plus className="h-3 w-3" /> Add
+          {justAdded ? (
+            <>
+              <Check className="h-3 w-3" /> Added
+            </>
+          ) : (
+            <>
+              <Plus className="h-3 w-3" /> Add
+            </>
+          )}
         </button>
       </div>
     </article>
