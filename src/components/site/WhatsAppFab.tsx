@@ -6,7 +6,7 @@ export function WhatsAppFab() {
       href={whatsappLink("Hi Little Brownie Co., I'd like to place an order.")}
       target="_blank"
       rel="noreferrer"
-      className="fixed bottom-6 right-6 z-50 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/25 transition hover:scale-105 hover:bg-primary/90"
+      className="fixed bottom-6 right-6 z-50 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/25 transition hover:scale-105 hover:bg-cocoa-dark active:scale-95 active:bg-cocoa-dark"
       aria-label="Order on WhatsApp"
     >
       <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current">
