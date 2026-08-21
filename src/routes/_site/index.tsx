@@ -383,7 +383,7 @@ function Home() {
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Link
                 to="/menu"
-                className="inline-flex items-center gap-2 rounded-full border border-primary/80 px-6 py-3 text-sm uppercase tracking-[0.18em] text-primary transition hover:bg-primary hover:text-primary-foreground"
+                className="inline-flex items-center gap-2 rounded-full border border-primary/80 px-6 py-3 text-sm uppercase tracking-[0.18em] text-primary transition hover:bg-primary hover:text-primary-foreground active:bg-cocoa-dark active:text-primary-foreground"
               >
                 View Menu
               </Link>
@@ -444,7 +444,7 @@ function Home() {
                       scrollHeroTo(heroSlide - 1);
                       resumeHeroAutoplay();
                     }}
-                    className="absolute left-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-background/80 text-primary shadow-soft transition hover:bg-background"
+                    className="absolute left-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-background/80 text-primary shadow-soft transition hover:bg-background active:bg-caramel"
                   >
                     ‹
                   </button>
@@ -456,7 +456,7 @@ function Home() {
                       scrollHeroTo(heroSlide + 1);
                       resumeHeroAutoplay();
                     }}
-                    className="absolute right-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-background/80 text-primary shadow-soft transition hover:bg-background"
+                    className="absolute right-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-background/80 text-primary shadow-soft transition hover:bg-background active:bg-caramel"
                   >
                     ›
                   </button>
