@@ -142,9 +142,25 @@ function Checkout() {
       );
 
       if (error || !data?.paymentSessionId) {
-        throw new Error(
-          error?.message || "Payment gateway isn't configured yet.",
-        );
+        // supabase.functions.invoke()'s `error.message` is just a generic
+        // "non-2xx status code" wrapper — it does NOT include the JSON body
+        // our function actually returned (e.g. "Cashfree order creation
+        // failed: <reason>"). Pull the real reason out of the response body
+        // so it shows up in the console/logs instead of being swallowed.
+        let detail = error?.message || "Payment gateway isn't configured yet.";
+
+        const ctx = (error as any)?.context;
+        if (ctx?.json) {
+          try {
+            const body = await ctx.json();
+            if (body?.error) detail = body.error;
+          } catch {
+            // ignore — fall back to generic message
+          }
+        }
+
+        console.error("[checkout] cashfree detail:", detail);
+        throw new Error(detail);
       }
 
       clear();
