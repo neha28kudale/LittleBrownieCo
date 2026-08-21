@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Printer, CheckCircle2, Clock, XCircle } from "lucide-react";
+import { Printer, CheckCircle2, Clock, XCircle, Check } from "lucide-react";
 import { getOrderById, type Order } from "@/lib/orders";
 import { formatDisplayDate } from "@/lib/delivery";
 import { IMG } from "@/lib/products";
@@ -34,6 +34,60 @@ function StatusPill({ order }: { order: Order }) {
     <span className="inline-flex items-center gap-1.5 rounded-full bg-accent/25 px-3 py-1.5 text-xs font-medium text-cocoa">
       <Clock className="h-3.5 w-3.5" /> Order placed
     </span>
+  );
+}
+
+const TRACKER_STEPS = [
+  { key: "confirmed", label: "Order confirmed" },
+  { key: "payment", label: "Payment received" },
+  { key: "baking", label: "Baking" },
+  { key: "out_for_delivery", label: "Out for delivery" },
+  { key: "delivered", label: "Delivered" },
+] as const;
+
+function getCompletedSteps(order: Order): Record<(typeof TRACKER_STEPS)[number]["key"], boolean> {
+  const stage = order.orderStatus;
+  return {
+    confirmed: stage !== "order_placed" && stage !== "rejected",
+    payment: order.paymentStatus === "paid",
+    baking: stage === "baking" || stage === "out_for_delivery" || stage === "delivered",
+    out_for_delivery: stage === "out_for_delivery" || stage === "delivered",
+    delivered: stage === "delivered",
+  };
+}
+
+function OrderTracker({ order }: { order: Order }) {
+  if (order.orderStatus === "rejected") return null;
+
+  const completed = getCompletedSteps(order);
+
+  return (
+    <div className="mx-auto mt-8 max-w-2xl rounded-lg border border-border bg-card p-6 shadow-soft sm:p-8" data-no-print>
+      <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+        Order #{order.orderNumber}
+      </div>
+      <ol className="mt-5 space-y-5">
+        {TRACKER_STEPS.map((step) => {
+          const done = completed[step.key];
+          return (
+            <li key={step.key} className="flex items-center gap-3">
+              <span
+                className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border ${
+                  done
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border bg-transparent text-transparent"
+                }`}
+              >
+                <Check className="h-3.5 w-3.5" />
+              </span>
+              <span className={`text-sm ${done ? "text-primary" : "text-muted-foreground"}`}>
+                {step.label}
+              </span>
+            </li>
+          );
+        })}
+      </ol>
+    </div>
   );
 }
 
@@ -181,6 +235,8 @@ function OrderConfirmation() {
           payment status.
         </div>
       </div>
+
+      <OrderTracker order={order} />
 
       <div className="mx-auto mt-8 max-w-2xl text-center" data-no-print>
         <Link to="/menu" className="text-sm text-accent hover:underline">
