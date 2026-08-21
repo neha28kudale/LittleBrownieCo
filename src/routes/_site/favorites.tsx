@@ -92,7 +92,7 @@ function Favorites() {
           </p>
           <Link
             to="/menu"
-            className="mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-xs uppercase tracking-[0.18em] text-primary-foreground hover:bg-cocoa-dark transition-colors"
+            className="mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-xs uppercase tracking-[0.18em] text-primary-foreground hover:bg-cocoa-dark active:bg-cocoa-dark transition-colors"
           >
             <ShoppingBag className="h-4 w-4" />
             Browse Menu
@@ -121,7 +121,7 @@ function Favorites() {
             </p>
             <Link
               to="/cart"
-              className="mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-xs uppercase tracking-[0.18em] text-primary-foreground hover:bg-cocoa-dark transition-colors"
+              className="mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-xs uppercase tracking-[0.18em] text-primary-foreground hover:bg-cocoa-dark active:bg-cocoa-dark transition-colors"
             >
               <ShoppingBag className="h-4 w-4" />
               Go to Cart
