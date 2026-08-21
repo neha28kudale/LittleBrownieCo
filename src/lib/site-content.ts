@@ -1,9 +1,7 @@
 /** Shared copy from the owner's policy & good-to-know documents (Aug 2026). */
 
 export const MENU_CATEGORIES = [
-  "Signature",
-  "Bites",
-  "Loaves",
+  "Mini Bites",
   "Cakes",
   "Hampers",
   "Add-ons",
