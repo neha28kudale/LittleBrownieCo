@@ -413,13 +413,13 @@ function Checkout() {
           </div>
 
           {/* GIFT OPTION */}
-          <div className="rounded-lg border border-border bg-card p-5 sm:p-6">
+          <div className="rounded-lg border border-border bg-card p-5 shadow-soft transition-shadow duration-300 hover:shadow-md sm:p-6">
             <h2 className="font-serif text-2xl text-primary">
               Is this a gift? 🎁
             </h2>
 
             <div className="mt-4 space-y-3">
-              <label className="flex cursor-pointer items-start gap-3">
+              <label className="flex cursor-pointer items-start gap-3 rounded-lg p-1.5 transition-colors hover:bg-secondary/40">
                 <input
                   type="radio"
                   name="is-gift"
@@ -433,7 +433,7 @@ function Checkout() {
                 </span>
               </label>
 
-              <label className="flex cursor-pointer items-start gap-3">
+              <label className="flex cursor-pointer items-start gap-3 rounded-lg p-1.5 transition-colors hover:bg-secondary/40">
                 <input
                   type="radio"
                   name="is-gift"
@@ -452,7 +452,7 @@ function Checkout() {
             </div>
 
             {isGift && (
-              <label className="mt-4 block">
+              <label className="mt-4 block animate-in fade-in slide-in-from-top-1 duration-300">
                 <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
                   Gift message
                 </span>
@@ -513,14 +513,14 @@ function Checkout() {
 
             {/* GIFT RIBBON */}
             {isGift && (
-              <div className="flex justify-between">
+              <div className="flex animate-in fade-in slide-in-from-top-1 justify-between duration-300">
                 <dt className="text-muted-foreground">Gift ribbon</dt>
                 <dd>₹{RIBBON_FEE}</dd>
               </div>
             )}
 
             {/* PAY NOW */}
-            <div className="flex justify-between border-t border-border pt-3 font-serif text-lg text-primary">
+            <div className="flex justify-between border-t border-border pt-3 font-serif text-lg text-primary transition-all duration-300">
               <dt>Pay now</dt>
               <dd>₹{payableTotal}</dd>
             </div>
