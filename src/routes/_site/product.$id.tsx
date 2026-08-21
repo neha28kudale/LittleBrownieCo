@@ -124,7 +124,7 @@ function ProductPage() {
               <div className="inline-flex items-center rounded-full border border-border">
                 <button
                   onClick={() => setQty(Math.max(1, qty - 1))}
-                  className="p-3 hover:text-accent"
+                  className="rounded-full p-3 transition-colors hover:bg-caramel hover:text-cocoa active:bg-caramel-dark active:text-parchment"
                   aria-label="Decrease"
                 >
                   <Minus className="h-4 w-4" />
@@ -132,7 +132,7 @@ function ProductPage() {
                 <span className="w-8 text-center">{qty}</span>
                 <button
                   onClick={() => setQty(qty + 1)}
-                  className="p-3 hover:text-accent"
+                  className="rounded-full p-3 transition-colors hover:bg-caramel hover:text-cocoa active:bg-caramel-dark active:text-parchment"
                   aria-label="Increase"
                 >
                   <Plus className="h-4 w-4" />
@@ -143,7 +143,7 @@ function ProductPage() {
                   add(product.id, variant.id, qty);
                   toast.success(`Added ${qty} × ${product.name}`);
                 }}
-                className="flex-1 rounded-full bg-primary px-6 py-3 text-xs uppercase tracking-[0.18em] text-primary-foreground hover:bg-primary/90 sm:flex-none"
+                className="flex-1 rounded-full bg-primary px-6 py-3 text-xs uppercase tracking-[0.18em] text-primary-foreground transition-colors hover:bg-cocoa-dark active:bg-cocoa-dark sm:flex-none"
               >
                 Add to Cart · ₹{variant.price * qty}
               </button>
@@ -153,7 +153,7 @@ function ProductPage() {
                 )}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex flex-1 items-center justify-center gap-1 rounded-full border border-primary px-6 py-3 text-xs uppercase tracking-[0.18em] text-primary hover:bg-primary hover:text-primary-foreground sm:flex-none"
+                className="inline-flex flex-1 items-center justify-center gap-1 rounded-full border border-primary px-6 py-3 text-xs uppercase tracking-[0.18em] text-primary transition-colors hover:bg-primary hover:text-primary-foreground active:bg-cocoa-dark active:text-primary-foreground sm:flex-none"
               >
                 Order on WhatsApp <ArrowUpRight className="h-4 w-4" />
               </a>
