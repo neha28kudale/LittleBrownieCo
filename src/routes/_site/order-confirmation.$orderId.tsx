@@ -90,7 +90,7 @@ function OrderConfirmation() {
 
         <button
           onClick={() => window.print()}
-          className="mx-auto mt-6 flex items-center gap-2 rounded-full border border-border px-5 py-2.5 text-xs uppercase tracking-[0.18em] text-primary hover:bg-caramel hover:text-cocoa"
+          className="mx-auto mt-6 flex items-center gap-2 rounded-full border border-border px-5 py-2.5 text-xs uppercase tracking-[0.18em] text-primary transition-colors hover:bg-caramel hover:text-cocoa active:bg-caramel-dark active:text-parchment"
         >
           <Printer className="h-4 w-4" /> Download / print receipt
         </button>
