@@ -35,7 +35,7 @@ export function AllergyBanner() {
         <button
           onClick={dismiss}
           aria-label="Dismiss allergy notice"
-          className="ml-2 shrink-0 rounded-full p-1 hover:bg-cocoa/10"
+          className="ml-2 shrink-0 rounded-full p-1 transition-colors hover:bg-cocoa/10 active:bg-cocoa/20"
         >
           <X className="h-3.5 w-3.5" />
         </button>
