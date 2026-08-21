@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useRef } from "react";
 import storyImg from "@/assets/About.jpg";
 import { BadgeCheck, MapPin, Sparkles } from "lucide-react";
 import { FSSAI_NUMBER } from "@/lib/products";
@@ -36,7 +37,41 @@ export const Route = createFileRoute("/_site/about")({
   component: About,
 });
 
+function useAutoSwipe(speed = 0.6) {
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  const pausedRef = useRef(false);
+
+  useEffect(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+
+    let frame: number;
+
+    const step = () => {
+      if (!pausedRef.current && el) {
+        el.scrollLeft += speed;
+        // Loop seamlessly once we've scrolled past the first copy of images
+        const halfway = el.scrollWidth / 2;
+        if (el.scrollLeft >= halfway) {
+          el.scrollLeft -= halfway;
+        }
+      }
+      frame = requestAnimationFrame(step);
+    };
+
+    frame = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(frame);
+  }, [speed]);
+
+  const pause = () => (pausedRef.current = true);
+  const resume = () => (pausedRef.current = false);
+
+  return { scrollerRef, pause, resume };
+}
+
 function About() {
+  const { scrollerRef, pause, resume } = useAutoSwipe(0.6);
+
   return (
     <>
       {/* OUR STORY */}
@@ -184,15 +219,23 @@ function About() {
         </div>
 
         <div className="container-x">
-          <div className="flex gap-4 overflow-x-auto pb-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {GALLERY_IMAGES.map((img, i) => (
+          <div
+            ref={scrollerRef}
+            onMouseEnter={pause}
+            onMouseLeave={resume}
+            onTouchStart={pause}
+            onTouchEnd={resume}
+            className="flex gap-4 overflow-x-auto pb-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          >
+            {/* Render the images twice back-to-back for a seamless infinite loop */}
+            {[...GALLERY_IMAGES, ...GALLERY_IMAGES].map((img, i) => (
               <div
                 key={i}
                 className="aspect-[4/5] w-56 flex-shrink-0 overflow-hidden rounded-[1rem] border border-border/70 shadow-soft sm:w-64"
               >
                 <img
                   src={img}
-                  alt={`Little Brownie Co. — behind the scenes photo ${i + 1}`}
+                  alt={`Little Brownie Co. — behind the scenes photo ${(i % GALLERY_IMAGES.length) + 1}`}
                   className="h-full w-full object-cover"
                   loading="lazy"
                 />
@@ -203,4 +246,4 @@ function About() {
       </section>
     </>
   );
-}
+      }
