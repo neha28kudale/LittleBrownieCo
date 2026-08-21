@@ -13,7 +13,7 @@ import ab6 from "@/assets/real/ab6.jpg";
 import ab7 from "@/assets/real/ab7.jpg";
 import ab8 from "@/assets/real/ab8.jpg";
 
-const GALLERY_IMAGES = [ab1, ab2, ab3, ab4, ab5, ab6, ab7, ab8];
+const GALLERY_IMAGES = [ab1, ab2, ab7, ab3, ab4, ab5, ab6, ab8];
 
 export const Route = createFileRoute("/_site/about")({
   head: () => ({
@@ -37,7 +37,7 @@ export const Route = createFileRoute("/_site/about")({
   component: About,
 });
 
-function useAutoSwipe(speed = 0.6) {
+function useAutoSwipe(pixelsPerSecond = 40) {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const pausedRef = useRef(false);
 
@@ -45,11 +45,21 @@ function useAutoSwipe(speed = 0.6) {
     const el = scrollerRef.current;
     if (!el) return;
 
-    let frame: number;
+    // Force instant scrolling so our per-frame updates aren't fighting
+    // any global "scroll-behavior: smooth" CSS, which causes stutter/jumps.
+    el.style.scrollBehavior = "auto";
 
-    const step = () => {
-      if (!pausedRef.current && el) {
-        el.scrollLeft += speed;
+    let frame: number;
+    let lastTime: number | null = null;
+
+    const step = (time: number) => {
+      if (lastTime === null) lastTime = time;
+      const deltaSeconds = (time - lastTime) / 1000;
+      lastTime = time;
+
+      if (!pausedRef.current && el.scrollWidth > el.clientWidth) {
+        el.scrollLeft += pixelsPerSecond * deltaSeconds;
+
         // Loop seamlessly once we've scrolled past the first copy of images
         const halfway = el.scrollWidth / 2;
         if (el.scrollLeft >= halfway) {
@@ -61,7 +71,7 @@ function useAutoSwipe(speed = 0.6) {
 
     frame = requestAnimationFrame(step);
     return () => cancelAnimationFrame(frame);
-  }, [speed]);
+  }, [pixelsPerSecond]);
 
   const pause = () => (pausedRef.current = true);
   const resume = () => (pausedRef.current = false);
@@ -70,7 +80,7 @@ function useAutoSwipe(speed = 0.6) {
 }
 
 function About() {
-  const { scrollerRef, pause, resume } = useAutoSwipe(0.6);
+  const { scrollerRef, pause, resume } = useAutoSwipe(40);
 
   return (
     <>
@@ -246,4 +256,4 @@ function About() {
       </section>
     </>
   );
-      }
+          }
