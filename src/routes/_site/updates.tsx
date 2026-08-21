@@ -110,7 +110,7 @@ function Updates() {
                   })}
                 </time>
               </div>
-              <button className="mt-4 flex shrink-0 items-center gap-2 rounded-full border border-border px-4 py-2 text-xs uppercase tracking-[0.18em] text-primary transition-colors hover:bg-secondary sm:mt-0">
+              <button className="mt-4 flex shrink-0 items-center gap-2 rounded-full border border-border px-4 py-2 text-xs uppercase tracking-[0.18em] text-primary transition-colors hover:bg-secondary active:bg-caramel active:text-cocoa sm:mt-0">
                 Read more
                 <ArrowRight className="h-3.5 w-3.5" />
               </button>
@@ -133,13 +133,13 @@ function Updates() {
                 href="https://www.instagram.com/littlebrownieco.blr?igsh=MXZjejM3YTNwOXczaA==&igsi=MXZjejM3YTNwOXczaA=="
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2 text-xs uppercase tracking-[0.18em] text-primary-foreground hover:bg-cocoa-dark transition-colors"
+                className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2 text-xs uppercase tracking-[0.18em] text-primary-foreground hover:bg-cocoa-dark active:bg-cocoa-dark transition-colors"
               >
                 Follow on Instagram
               </a>
               <Link
                 to="/contact"
-                className="inline-flex items-center gap-2 rounded-full border border-border px-6 py-2 text-xs uppercase tracking-[0.18em] text-primary hover:bg-secondary transition-colors"
+                className="inline-flex items-center gap-2 rounded-full border border-border px-6 py-2 text-xs uppercase tracking-[0.18em] text-primary hover:bg-secondary active:bg-caramel active:text-cocoa transition-colors"
               >
                 WhatsApp
               </Link>
