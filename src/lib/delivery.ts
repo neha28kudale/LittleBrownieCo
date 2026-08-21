@@ -53,7 +53,15 @@ export function isDateSelectable(dateStr: string, now: Date = new Date()): boole
 }
 
 export function toISODate(d: Date) {
-  return d.toISOString().slice(0, 10);
+  // IMPORTANT: do NOT use d.toISOString() here. toISOString() converts to
+  // UTC first, and since our dates are built from *local* midnight (IST is
+  // UTC+5:30), that conversion rolls the date back by one day — which was
+  // silently letting same-day delivery slip through checkout. Format the
+  // local calendar date directly instead.
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 export function formatDisplayDate(dateStr: string) {
