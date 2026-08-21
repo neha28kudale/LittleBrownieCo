@@ -169,7 +169,7 @@ function FaqsAndContact() {
             <h3 className="mt-3 font-serif text-xl text-primary group-hover:text-accent">
               Instagram
             </h3>
-            <p className="mt-3 text-primary">@littlebrownieco</p>
+            <p className="mt-3 text-primary">@littlebrownieco.blr</p>
           </a>
 
           <div className="rounded-lg border border-border bg-card p-5 md:col-span-2">
