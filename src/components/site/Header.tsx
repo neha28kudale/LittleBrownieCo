@@ -65,7 +65,7 @@ export function Header() {
                   <div className="rounded-lg border border-border bg-background py-2 shadow-soft">
                     <Link
                       to="/menu"
-                      className="block px-4 py-2 text-sm text-primary/80 hover:bg-secondary hover:text-primary"
+                      className="block px-4 py-2 text-sm text-primary/80 transition-colors hover:bg-secondary hover:text-primary active:bg-caramel active:text-cocoa"
                       onClick={() => setMenuOpen(false)}
                     >
                       View all
@@ -75,7 +75,7 @@ export function Header() {
                         key={cat}
                         to="/menu"
                         search={{ cat }}
-                        className="block px-4 py-2 text-sm text-primary/80 hover:bg-secondary hover:text-primary"
+                        className="block px-4 py-2 text-sm text-primary/80 transition-colors hover:bg-secondary hover:text-primary active:bg-caramel active:text-cocoa"
                         onClick={() => setMenuOpen(false)}
                       >
                         {cat}
@@ -102,14 +102,14 @@ export function Header() {
               href={whatsappLink("Hi Little Brownie Co., I'd like to place an order.")}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex h-9 items-center gap-2 rounded-full border border-border bg-card px-3.5 text-sm text-primary transition hover:border-accent/50 hover:bg-secondary"
+              className="inline-flex h-9 items-center gap-2 rounded-full border border-border bg-card px-3.5 text-sm text-primary transition hover:border-accent/50 hover:bg-secondary active:bg-caramel active:text-cocoa"
             >
               <Phone className="h-4 w-4 text-accent" />
               <span className="whitespace-nowrap">{phoneDisplay}</span>
             </a>
             <Link
               to="/cart"
-              className="relative inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card text-primary transition hover:bg-secondary"
+              className="relative inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card text-primary transition hover:bg-secondary active:bg-caramel"
               aria-label="Cart"
             >
               <ShoppingBag className="h-4.5 w-4.5" />
@@ -124,7 +124,7 @@ export function Header() {
           <div className="flex items-center justify-end gap-2 lg:hidden">
             <Link
               to="/cart"
-              className="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card text-primary transition-colors hover:bg-secondary"
+              className="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card text-primary transition-colors hover:bg-secondary active:bg-caramel"
               aria-label="Cart"
             >
               <ShoppingBag className="h-5 w-5" />
