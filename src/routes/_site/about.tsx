@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import storyImg from "@/assets/real/story-almond-brownie.jpg";
+import storyImg from "@/assets/real/About.jpg";
 import { BadgeCheck, MapPin, Sparkles, TriangleAlert } from "lucide-react";
 import { ALLERGENS, FSSAI_NUMBER } from "@/lib/products";
 
