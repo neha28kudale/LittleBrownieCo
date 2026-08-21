@@ -153,19 +153,19 @@ function About() {
       <section className="container-x mt-16 grid gap-6 md:mt-24 md:grid-cols-3">
         {[
           {
-            icon: MapPin,
-            title: "Bengaluru based",
-            body: "Baked and packed fresh, delivered across Bengaluru — next day onwards (no same-day delivery).",
+            icon: Sparkles,
+            title: "Made in small batches, just for you",
+            body: "Baked in small batches, giving every batch the time and attention it deserves.",
           },
           {
             icon: BadgeCheck,
-            title: "FSSAI Certified",
-            body: `Registration No. ${FSSAI_NUMBER}. Traceable ingredients, hygienic kitchen.`,
+            title: "FSSAI certified",
+            body: `FSSAI Registration No. ${FSSAI_NUMBER}. Made with carefully sourced ingredients in a clean, hygienic kitchen.`,
           },
           {
-            icon: Sparkles,
-            title: "Small-batch always",
-            body: "Never mass-produced. Every square hand-cut and inspected before it ships.",
+            icon: MapPin,
+            title: "Bengaluru based",
+            body: "Freshly baked and packed to order, with delivery across Bengaluru from the next day onwards.",
           },
         ].map(({ icon: Icon, title, body }) => (
           <div
