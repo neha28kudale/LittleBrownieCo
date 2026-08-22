@@ -494,6 +494,54 @@ function Home() {
         </div>
       </section>
 
+      {/* BROWNIE JOURNEY */}
+      <Reveal as="section" className="mt-14 md:mt-20">
+        <div className="container-x">
+          <div className="max-w-2xl">
+            <span className="text-[11px] uppercase tracking-[0.28em] text-toffee">
+              How it works
+            </span>
+            <h2 className="mt-4 font-serif text-4xl leading-tight text-primary md:text-5xl">
+              Your Brownie Journey.
+            </h2>
+          </div>
+          <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            <div>
+              <div className="font-serif text-3xl text-accent">01.</div>
+              <h3 className="mt-3 font-serif text-xl text-primary">Choose your brownies</h3>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Browse the menu and add your favourites to your cart.
+              </p>
+            </div>
+            <div>
+              <div className="font-serif text-3xl text-accent">02.</div>
+              <h3 className="mt-3 font-serif text-xl text-primary">Checkout & pay</h3>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Enter your details, choose your delivery date & time, and make the payment.
+              </p>
+            </div>
+            <div>
+              <div className="font-serif text-3xl text-accent">03.</div>
+              <h3 className="mt-3 font-serif text-xl text-primary">We get baking</h3>
+              <p className="mt-2 text-sm text-muted-foreground">
+                We'll verify your order, confirm it and start baking fresh.
+              </p>
+            </div>
+            <div>
+              <div className="font-serif text-3xl text-accent">04.</div>
+              <h3 className="mt-3 font-serif text-xl text-primary">Track & enjoy</h3>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Track your order anytime through{" "}
+                <Link to="/track-order" className="text-accent hover:underline">
+                  Track Order
+                </Link>
+                . Delivery tracking details will be shared on the day of dispatch.
+              </p>
+            </div>
+          </div>
+        </div>
+      </Reveal>
+
       {/* SIGNATURE */}
       <Reveal as="section" className="mt-14 md:mt-20">
         <div className="container-x">
