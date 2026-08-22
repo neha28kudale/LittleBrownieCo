@@ -29,6 +29,11 @@ import {
   type AdminSession,
 } from "@/lib/admin-auth";
 import {
+  getDeliverySlabs,
+  updateDeliverySlabFee,
+  type DeliverySlab,
+} from "@/lib/delivery";
+import {
   getAllReviews,
   setReviewStatus,
   subscribeReviews,
@@ -57,6 +62,7 @@ import {
   Mail,
   MapPin,
   Download,
+  Truck,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "sonner";
@@ -179,17 +185,23 @@ function AdminDashboard({
   onLogout: () => void;
 }) {
   const [tab, setTab] = useState<
-    "overview" | "orders" | "products" | "customers" | "reviews" | "analytics"
+    "overview" | "orders" | "products" | "customers" | "reviews" | "analytics" | "delivery"
   >("overview");
   const [orders, setOrders] = useState<Order[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [deliverySlabs, setDeliverySlabs] = useState<DeliverySlab[]>([]);
   const [exporting, setExporting] = useState(false);
 
   const refreshProducts = () => getAllProductsAdmin().then(setProducts);
+  const refreshDeliverySlabs = () => getDeliverySlabs().then(setDeliverySlabs);
 
   useEffect(() => {
     refreshProducts();
+  }, []);
+
+  useEffect(() => {
+    refreshDeliverySlabs();
   }, []);
 
   useEffect(() => {
@@ -288,6 +300,7 @@ function AdminDashboard({
     { id: "overview", label: "Overview", icon: LayoutDashboard },
     { id: "orders", label: "Orders", icon: ShoppingBag },
     { id: "products", label: "Products", icon: Package },
+    { id: "delivery", label: "Delivery Fees", icon: Truck },
     { id: "customers", label: "Customers", icon: Users },
     { id: "reviews", label: "Reviews", icon: MessageSquare, badge: pendingReviewCount },
     { id: "analytics", label: "Analytics", icon: LayoutDashboard },
@@ -400,6 +413,9 @@ function AdminDashboard({
           {tab === "overview" && <Overview stats={stats} orders={orders} />}
           {tab === "orders" && <Orders orders={orders} setStatus={setStatus} />}
           {tab === "products" && <ProductsAdmin products={products} refresh={refreshProducts} />}
+          {tab === "delivery" && (
+            <DeliveryFeesAdmin slabs={deliverySlabs} refresh={refreshDeliverySlabs} />
+          )}
           {tab === "customers" && <CustomersAdmin customers={customers} />}
           {tab === "reviews" && <ReviewsAdmin reviews={reviews} setStatus={reviewStatus} />}
           {tab === "analytics" && <Analytics orders={orders} products={products} />}
@@ -408,7 +424,7 @@ function AdminDashboard({
 
       {/* Mobile bottom tab bar */}
       <nav
-        className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-6 border-t border-border bg-background/95 backdrop-blur md:hidden"
+        className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-7 border-t border-border bg-background/95 backdrop-blur md:hidden"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
         {navItems.map(({ id, label, icon: Icon, badge }) => (
@@ -776,9 +792,90 @@ function Orders({
   );
 }
 
-/* Delivery is now "Calculated at dispatch" — the old distance-based
-   delivery-fee-slab admin screen has been removed. Delivery fees are no
-   longer managed here. */
+/* Delivery fees are distance-based (see src/lib/delivery.ts +
+   supabase/functions/calculate-delivery-fee). The km ranges themselves are
+   fixed to match what was agreed with the owner — only the fee per range
+   is editable here. */
+
+function DeliveryFeesAdmin({
+  slabs,
+  refresh,
+}: {
+  slabs: DeliverySlab[];
+  refresh: () => void;
+}) {
+  const [drafts, setDrafts] = useState<Record<string, string>>({});
+  const [savingId, setSavingId] = useState<string | null>(null);
+
+  const rangeLabel = (s: DeliverySlab) =>
+    s.maxKm === null ? `${s.minKm}+ km` : `${s.minKm}–${s.maxKm} km`;
+
+  const save = async (slab: DeliverySlab) => {
+    const raw = drafts[slab.id] ?? String(slab.fee);
+    const fee = Number(raw);
+    if (Number.isNaN(fee) || fee < 0) {
+      toast.error("Please enter a valid fee.");
+      return;
+    }
+    setSavingId(slab.id);
+    const ok = await updateDeliverySlabFee(slab.id, fee);
+    setSavingId(null);
+    if (ok) {
+      toast.success(`Updated ${rangeLabel(slab)} fee`);
+      refresh();
+    } else {
+      toast.error("Couldn't save — please try again.");
+    }
+  };
+
+  return (
+    <div className="max-w-2xl">
+      <div className="rounded-lg border border-border bg-card p-5 sm:p-6">
+        <h2 className="font-serif text-2xl text-primary">Delivery Fees</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          At checkout, the customer's delivery pincode is checked against our
+          dispatch pincode (560029) to work out the distance, which is
+          matched against the ranges below. Customers only ever see the
+          final fee, never these ranges.
+        </p>
+
+        <div className="mt-5 divide-y divide-border">
+          {slabs.map((s) => (
+            <div key={s.id} className="flex items-center justify-between gap-4 py-3">
+              <span className="text-sm text-primary/90">{rangeLabel(s)}</span>
+
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">₹</span>
+                <input
+                  type="number"
+                  min={0}
+                  value={drafts[s.id] ?? s.fee}
+                  onChange={(e) =>
+                    setDrafts((d) => ({ ...d, [s.id]: e.target.value }))
+                  }
+                  className="w-24 rounded-lg border border-border bg-background px-3 py-1.5 text-sm text-primary outline-none focus:border-accent"
+                />
+                <button
+                  onClick={() => save(s)}
+                  disabled={savingId === s.id}
+                  className="rounded-full bg-primary px-4 py-1.5 text-xs uppercase tracking-[0.14em] text-primary-foreground transition-colors hover:bg-cocoa-dark disabled:opacity-50"
+                >
+                  {savingId === s.id ? "Saving…" : "Save"}
+                </button>
+              </div>
+            </div>
+          ))}
+
+          {slabs.length === 0 && (
+            <p className="py-6 text-center text-sm text-muted-foreground">
+              No delivery fee ranges found.
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function ReviewsAdmin({
   reviews,
