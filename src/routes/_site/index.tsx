@@ -497,50 +497,68 @@ function Home() {
       {/* BROWNIE JOURNEY */}
       <Reveal as="section" className="mt-14 md:mt-20">
         <div className="container-x">
-          <div className="max-w-2xl">
-            <span className="text-[11px] uppercase tracking-[0.28em] text-toffee">
-              How it works
-            </span>
-            <h2 className="mt-4 font-serif text-4xl leading-tight text-primary md:text-5xl">
-              Your Brownie Journey.
-            </h2>
-          </div>
-          <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            <div>
-              <div className="font-serif text-3xl text-accent">01.</div>
-              <h3 className="mt-3 font-serif text-xl text-primary">Choose your brownies</h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Browse the{" "}
-                <Link to="/menu" className="text-accent hover:underline">
-                  menu
-                </Link>{" "}
-                and add your favourites to your cart.
-              </p>
+          <div className="rounded-[1.5rem] border border-border bg-[oklch(0.9_0.03_78)] px-5 py-10 sm:px-8 md:py-14">
+            <div className="max-w-2xl">
+              <span className="text-[11px] uppercase tracking-[0.28em] text-toffee">
+                How it works
+              </span>
+              <h2 className="mt-4 font-serif text-4xl leading-tight text-primary md:text-5xl">
+                Your Brownie Journey.
+              </h2>
             </div>
-            <div>
-              <div className="font-serif text-3xl text-accent">02.</div>
-              <h3 className="mt-3 font-serif text-xl text-primary">Checkout & pay</h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Enter your details, choose your delivery date & time, and make the payment.
-              </p>
-            </div>
-            <div>
-              <div className="font-serif text-3xl text-accent">03.</div>
-              <h3 className="mt-3 font-serif text-xl text-primary">We get baking</h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                We'll verify your order, confirm it and start baking fresh.
-              </p>
-            </div>
-            <div>
-              <div className="font-serif text-3xl text-accent">04.</div>
-              <h3 className="mt-3 font-serif text-xl text-primary">Track & enjoy</h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Track your order anytime through{" "}
-                <Link to="/track-order" className="text-accent hover:underline">
-                  Track Order
-                </Link>
-                . Delivery tracking details will be shared on the day of dispatch.
-              </p>
+            <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+              <div>
+                <div className="flex items-center gap-3">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary font-serif text-sm text-primary-foreground">
+                    01
+                  </span>
+                  <h3 className="font-serif text-xl text-primary">🍫 Choose your brownies</h3>
+                </div>
+                <p className="mt-3 text-sm text-muted-foreground">
+                  Browse the{" "}
+                  <Link to="/menu" className="text-accent hover:underline">
+                    menu
+                  </Link>{" "}
+                  and add your favourites to your cart.
+                </p>
+              </div>
+              <div>
+                <div className="flex items-center gap-3">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary font-serif text-sm text-primary-foreground">
+                    02
+                  </span>
+                  <h3 className="font-serif text-xl text-primary">💳 Checkout & pay</h3>
+                </div>
+                <p className="mt-3 text-sm text-muted-foreground">
+                  Enter your details, choose your delivery date & time, and make the payment.
+                </p>
+              </div>
+              <div>
+                <div className="flex items-center gap-3">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary font-serif text-sm text-primary-foreground">
+                    03
+                  </span>
+                  <h3 className="font-serif text-xl text-primary">🔥 We get baking</h3>
+                </div>
+                <p className="mt-3 text-sm text-muted-foreground">
+                  We'll verify your order, confirm it and start baking fresh.
+                </p>
+              </div>
+              <div>
+                <div className="flex items-center gap-3">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary font-serif text-sm text-primary-foreground">
+                    04
+                  </span>
+                  <h3 className="font-serif text-xl text-primary">📦 Track & enjoy</h3>
+                </div>
+                <p className="mt-3 text-sm text-muted-foreground">
+                  Track your order anytime through{" "}
+                  <Link to="/track-order" className="text-accent hover:underline">
+                    Track Order
+                  </Link>
+                  . Delivery tracking details will be shared on the day of dispatch.
+                </p>
+              </div>
             </div>
           </div>
         </div>
