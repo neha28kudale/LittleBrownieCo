@@ -39,7 +39,6 @@ function StatusPill({ order }: { order: Order }) {
 
 const TRACKER_STEPS = [
   { key: "confirmed", label: "Order confirmed" },
-  { key: "payment", label: "Payment received" },
   { key: "baking", label: "Baking" },
   { key: "out_for_delivery", label: "Out for delivery" },
   { key: "delivered", label: "Delivered" },
@@ -49,7 +48,6 @@ function getCompletedSteps(order: Order): Record<(typeof TRACKER_STEPS)[number][
   const stage = order.orderStatus;
   return {
     confirmed: stage !== "order_placed" && stage !== "rejected",
-    payment: order.paymentStatus === "paid",
     baking: stage === "baking" || stage === "out_for_delivery" || stage === "delivered",
     out_for_delivery: stage === "out_for_delivery" || stage === "delivered",
     delivered: stage === "delivered",
