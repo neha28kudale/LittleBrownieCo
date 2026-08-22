@@ -538,7 +538,7 @@ function Home() {
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary font-serif text-sm text-primary-foreground">
                     03
                   </span>
-                  <h3 className="font-serif text-xl text-primary">🔥 We get baking</h3>
+                  <h3 className="font-serif text-xl text-primary">🧈 We get baking</h3>
                 </div>
                 <p className="mt-3 text-sm text-muted-foreground">
                   We'll verify your order, confirm it and start baking fresh.
