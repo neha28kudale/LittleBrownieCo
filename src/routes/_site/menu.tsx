@@ -55,7 +55,7 @@ function Menu() {
     <>
       <section className="container-x pt-10 pb-6 text-center md:pt-20 md:pb-8">
         <span className="text-base uppercase tracking-[0.28em] text-toffee md:text-lg">The Menu</span>
-        <h1 className="mx-auto mt-3 max-w-3xl font-serif text-5xl leading-[1.05] text-primary sm:text-6xl md:text-8xl">
+        <h1 className="mx-auto mt-3 max-w-4xl font-serif text-5xl leading-[1.05] text-primary sm:text-6xl md:text-7xl">
           For cravings, celebrations and everything in between.
         </h1>
         <p className="mx-auto mt-4 max-w-xl text-sm text-muted-foreground md:text-base">
