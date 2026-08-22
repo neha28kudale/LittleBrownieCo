@@ -10,6 +10,7 @@ import {
   maxDeliveryDate,
   formatDisplayDate,
   toISODate,
+  getDeliveryFeeForPincode,
 } from "@/lib/delivery";
 import { DELIVERY_AGREEMENT_TEXT } from "@/lib/site-content";
 import { supabase } from "@/lib/supabase";
@@ -38,6 +39,12 @@ function Checkout() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
+  const [pincode, setPincode] = useState("");
+  const [deliveryFee, setDeliveryFee] = useState<number | null>(null);
+  const [distanceKm, setDistanceKm] = useState<number | undefined>(undefined);
+  const [deliveryFeeError, setDeliveryFeeError] = useState("");
+  const [checkingPincode, setCheckingPincode] = useState(false);
+  const [deliveryPricingConfigured, setDeliveryPricingConfigured] = useState(true);
   const [date, setDate] = useState("");
   const [slot, setSlot] = useState("");
   const [notes, setNotes] = useState("");
@@ -47,7 +54,47 @@ function Checkout() {
   const [submitting, setSubmitting] = useState(false);
 
   const ribbonFee = isGift ? RIBBON_FEE : 0;
-  const payableTotal = subtotal + ribbonFee;
+  const payableTotal = subtotal + (deliveryFee ?? 0) + ribbonFee;
+
+  // Debounced pincode -> delivery fee lookup.
+  useEffect(() => {
+    if (!/^\d{6}$/.test(pincode)) {
+      setDeliveryFee(null);
+      setDistanceKm(undefined);
+      setDeliveryFeeError("");
+      return;
+    }
+
+    let cancelled = false;
+    setCheckingPincode(true);
+    setDeliveryFeeError("");
+
+    const timer = setTimeout(async () => {
+      const result = await getDeliveryFeeForPincode(pincode);
+      if (cancelled) return;
+
+      if (result.ok) {
+        setDeliveryFee(result.fee);
+        setDistanceKm(result.distanceKm);
+        setDeliveryPricingConfigured(true);
+      } else if (!result.configured) {
+        // Pincode-based pricing isn't set up yet — fall back gracefully.
+        setDeliveryFee(null);
+        setDistanceKm(undefined);
+        setDeliveryPricingConfigured(false);
+      } else {
+        setDeliveryFee(null);
+        setDistanceKm(undefined);
+        setDeliveryFeeError(result.error);
+      }
+      setCheckingPincode(false);
+    }, 500);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [pincode]);
 
   useEffect(() => {
     setDate(toISODate(earliestDeliveryDate()));
@@ -78,6 +125,18 @@ function Checkout() {
     if (!name.trim() || !phone.trim() || !address.trim()) {
       toast.error(
         "Please fill in your name, active WhatsApp number and delivery address.",
+      );
+      return;
+    }
+
+    if (deliveryPricingConfigured && !/^\d{6}$/.test(pincode)) {
+      toast.error("Please enter your delivery pincode.");
+      return;
+    }
+
+    if (deliveryPricingConfigured && deliveryFee === null) {
+      toast.error(
+        deliveryFeeError || "Please wait while we calculate your delivery charge.",
       );
       return;
     }
@@ -119,9 +178,10 @@ function Checkout() {
       phone: cleanPhone,
       address: address.trim(),
 
-      // Delivery charge is calculated at dispatch.
-      // Do not charge it through Cashfree.
-      deliveryFee: 0,
+      // Calculated from the customer's pincode (falls back to 0 / "at
+      // dispatch" if pincode-based pricing isn't configured yet).
+      distanceKm,
+      deliveryFee: deliveryFee ?? 0,
 
       deliveryDate: date,
       deliverySlot: slot,
@@ -286,6 +346,47 @@ function Checkout() {
                   required
                   className="mt-2 w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm text-primary outline-none focus:border-accent"
                 />
+              </label>
+
+              {/* PINCODE */}
+              <label className="block sm:col-span-2">
+                <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                  Delivery pincode *
+                </span>
+
+                <input
+                  value={pincode}
+                  onChange={(e) => setPincode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={6}
+                  placeholder="6-digit pincode"
+                  className="mt-2 w-full max-w-xs rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm text-primary outline-none focus:border-accent"
+                />
+
+                <span className="mt-1 block text-[11px] text-muted-foreground">
+                  Delivery charges are calculated based on the distance from our
+                  kitchen to your delivery location.
+                </span>
+
+                {checkingPincode && (
+                  <span className="mt-1 flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                    Calculating delivery charge…
+                  </span>
+                )}
+
+                {!checkingPincode && deliveryFee !== null && (
+                  <span className="mt-1 block text-[11px] text-accent">
+                    Delivery charge for this address: ₹{deliveryFee}
+                  </span>
+                )}
+
+                {!checkingPincode && deliveryFeeError && (
+                  <span className="mt-1 block text-[11px] text-destructive">
+                    {deliveryFeeError}
+                  </span>
+                )}
               </label>
             </div>
           </div>
@@ -507,7 +608,11 @@ function Checkout() {
               </dt>
 
               <dd className="shrink-0 text-right">
-                Calculated at dispatch
+                {deliveryFee !== null
+                  ? `₹${deliveryFee}`
+                  : deliveryPricingConfigured
+                    ? "Enter pincode"
+                    : "Calculated at dispatch"}
               </dd>
             </div>
 
@@ -527,9 +632,9 @@ function Checkout() {
           </dl>
 
           <p className="mt-4 text-[11px] leading-relaxed text-muted-foreground">
-            Delivery charges are calculated at dispatch based on your delivery
-            location. The final delivery charge will be shared with you before
-            dispatch.
+            {deliveryPricingConfigured
+              ? "Delivery charges are calculated based on the distance from our kitchen to your delivery location."
+              : "Delivery charges are calculated at dispatch based on your delivery location. The final delivery charge will be shared with you before dispatch."}
           </p>
 
           <button
