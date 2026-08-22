@@ -495,9 +495,9 @@ function Home() {
       </section>
 
       {/* BROWNIE JOURNEY */}
-      <Reveal as="section" className="mt-14 md:mt-20">
+      <Reveal as="section" className="mt-8 md:mt-14">
         <div className="container-x">
-          <div className="rounded-[1.5rem] border border-border bg-[oklch(0.9_0.03_78)] px-5 py-10 sm:px-8 md:py-14">
+          <div className="rounded-[1.5rem] border border-border bg-[oklch(0.9_0.03_78)] px-5 py-8 sm:px-8 md:py-10">
             <div className="max-w-2xl">
               <span className="text-[11px] uppercase tracking-[0.28em] text-toffee">
                 How it works
@@ -512,7 +512,7 @@ function Home() {
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary font-serif text-sm text-primary-foreground">
                     01
                   </span>
-                  <h3 className="font-serif text-xl text-primary">🍫 Choose your brownies</h3>
+                  <h3 className="font-serif text-2xl text-primary">🍫 Choose your brownies</h3>
                 </div>
                 <p className="mt-3 text-sm text-muted-foreground">
                   Browse the{" "}
@@ -527,7 +527,7 @@ function Home() {
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary font-serif text-sm text-primary-foreground">
                     02
                   </span>
-                  <h3 className="font-serif text-xl text-primary">💳 Checkout & pay</h3>
+                  <h3 className="font-serif text-2xl text-primary">💳 Checkout & pay</h3>
                 </div>
                 <p className="mt-3 text-sm text-muted-foreground">
                   Enter your details, choose your delivery date & time, and make the payment.
@@ -538,7 +538,7 @@ function Home() {
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary font-serif text-sm text-primary-foreground">
                     03
                   </span>
-                  <h3 className="font-serif text-xl text-primary">👩‍🍳 We get baking</h3>
+                  <h3 className="font-serif text-2xl text-primary">👩‍🍳 We get baking</h3>
                 </div>
                 <p className="mt-3 text-sm text-muted-foreground">
                   We'll verify your order, confirm it and start baking fresh.
@@ -549,7 +549,7 @@ function Home() {
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary font-serif text-sm text-primary-foreground">
                     04
                   </span>
-                  <h3 className="font-serif text-xl text-primary">📦 Track & enjoy</h3>
+                  <h3 className="font-serif text-2xl text-primary">📦 Track & enjoy</h3>
                 </div>
                 <p className="mt-3 text-sm text-muted-foreground">
                   Track your order anytime through{" "}
@@ -565,7 +565,7 @@ function Home() {
       </Reveal>
 
       {/* SIGNATURE */}
-      <Reveal as="section" className="mt-14 md:mt-20">
+      <Reveal as="section" className="mt-8 md:mt-14">
         <div className="container-x">
           <div className="max-w-2xl">
             <span className="text-[11px] uppercase tracking-[0.28em] text-toffee">
