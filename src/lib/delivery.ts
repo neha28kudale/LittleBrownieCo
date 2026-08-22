@@ -1,10 +1,91 @@
 /**
- * Delivery is now charged as "Calculated at dispatch" (see checkout /
- * order-confirmation / admin order details) rather than via a distance-based
- * fee slab table, so the old getDeliverySlabs/updateDeliverySlab/
- * feeForDistance helpers have been removed along with the admin "Delivery
- * Fees" tab. This file now only handles delivery date & time scheduling.
+ * Delivery date & time scheduling, plus the pincode-based delivery fee
+ * lookup (calls the `calculate-delivery-fee` Edge Function — see
+ * supabase/functions/calculate-delivery-fee/index.ts). The distance-based
+ * fee slab table (`delivery_slabs`, admin-editable) is what actually
+ * decides the price; this file just calls out to it.
  */
+
+import { supabase } from "./supabase";
+
+export type DeliveryFeeResult =
+  | { ok: true; distanceKm: number; fee: number }
+  | { ok: false; configured: false }
+  | { ok: false; configured: true; error: string };
+
+/** Looks up the delivery fee for a 6-digit delivery pincode, based on
+ * driving distance from our fixed dispatch pincode (560029). Never exposes
+ * the underlying distance slabs to the caller beyond the final fee. */
+export async function getDeliveryFeeForPincode(pincode: string): Promise<DeliveryFeeResult> {
+  const clean = pincode.trim();
+  if (!/^\d{6}$/.test(clean)) {
+    return { ok: false, configured: true, error: "Please enter a valid 6-digit pincode." };
+  }
+
+  try {
+    const { data, error } = await supabase.functions.invoke("calculate-delivery-fee", {
+      body: { pincode: clean },
+    });
+
+    if (error) {
+      return { ok: false, configured: true, error: "Couldn't calculate delivery charges right now." };
+    }
+
+    if (!data?.configured) {
+      return { ok: false, configured: false };
+    }
+
+    if (!data.ok) {
+      return { ok: false, configured: true, error: data.error ?? "Couldn't calculate delivery charges." };
+    }
+
+    return { ok: true, distanceKm: data.distanceKm, fee: data.fee };
+  } catch {
+    return { ok: false, configured: true, error: "Couldn't calculate delivery charges right now." };
+  }
+}
+
+/* ---------------- Admin: delivery fee slabs ---------------- */
+
+export type DeliverySlab = {
+  id: string;
+  minKm: number;
+  maxKm: number | null;
+  fee: number;
+  sortOrder: number;
+};
+
+function slabFromRow(row: any): DeliverySlab {
+  return {
+    id: row.id,
+    minKm: Number(row.min_km),
+    maxKm: row.max_km === null ? null : Number(row.max_km),
+    fee: Number(row.fee),
+    sortOrder: row.sort_order,
+  };
+}
+
+/** Admin-only (RLS-gated): all delivery slabs, in display order. */
+export async function getDeliverySlabs(): Promise<DeliverySlab[]> {
+  const { data, error } = await supabase
+    .from("delivery_slabs")
+    .select("*")
+    .order("sort_order", { ascending: true });
+  if (error || !data) {
+    if (error) console.error("[delivery] getDeliverySlabs", error);
+    return [];
+  }
+  return data.map(slabFromRow);
+}
+
+/** Admin-only: update the fee for a single slab. The km ranges themselves
+ * are fixed (they match the 11 ranges agreed with the owner) — only the
+ * price per range is meant to be edited from the dashboard. */
+export async function updateDeliverySlabFee(id: string, fee: number) {
+  const { error } = await supabase.from("delivery_slabs").update({ fee }).eq("id", id);
+  if (error) console.error("[delivery] updateDeliverySlabFee", error);
+  return !error;
+}
 
 /* ---------------- Delivery date & time scheduling ---------------- */
 
