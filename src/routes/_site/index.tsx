@@ -510,7 +510,11 @@ function Home() {
               <div className="font-serif text-3xl text-accent">01.</div>
               <h3 className="mt-3 font-serif text-xl text-primary">Choose your brownies</h3>
               <p className="mt-2 text-sm text-muted-foreground">
-                Browse the menu and add your favourites to your cart.
+                Browse the{" "}
+                <Link to="/menu" className="text-accent hover:underline">
+                  menu
+                </Link>{" "}
+                and add your favourites to your cart.
               </p>
             </div>
             <div>
