@@ -22,10 +22,7 @@ export function Footer() {
               Little Brownie Co.
             </div>
           </div>
-          <h4 className="hidden text-xs uppercase tracking-[0.24em] text-transparent md:block" aria-hidden="true">
-            Order Online
-          </h4>
-          <ul className="mt-6 space-y-2.5 text-sm md:mt-5">
+          <ul className="mt-6 space-y-2.5 text-sm">
             <li>
               <Link to="/menu" className="text-primary/80 hover:text-accent">
                 Order Online
@@ -52,7 +49,11 @@ export function Footer() {
         </div>
 
         <div>
-          <h4 className="text-xs uppercase tracking-[0.24em] text-muted-foreground">
+          <div className="hidden items-center gap-3 opacity-0 md:flex" aria-hidden="true">
+            <div className="h-12 w-12 shrink-0 rounded-full" />
+            <div className="font-serif text-[1.4rem] leading-none sm:text-[1.6rem]">.</div>
+          </div>
+          <h4 className="mt-6 text-xs uppercase tracking-[0.24em] text-muted-foreground md:mt-6">
             Good to Know
           </h4>
           <ul className="mt-5 space-y-2.5 text-sm">
@@ -70,7 +71,11 @@ export function Footer() {
         </div>
 
         <div>
-          <h4 className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Policies</h4>
+          <div className="hidden items-center gap-3 opacity-0 md:flex" aria-hidden="true">
+            <div className="h-12 w-12 shrink-0 rounded-full" />
+            <div className="font-serif text-[1.4rem] leading-none sm:text-[1.6rem]">.</div>
+          </div>
+          <h4 className="mt-6 text-xs uppercase tracking-[0.24em] text-muted-foreground md:mt-6">Policies</h4>
           <ul className="mt-5 space-y-2.5 text-sm">
             <li>
               <Link to="/policies" className="text-primary/80 hover:text-accent">
@@ -81,7 +86,11 @@ export function Footer() {
         </div>
 
         <div>
-          <h4 className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Follow Us</h4>
+          <div className="hidden items-center gap-3 opacity-0 md:flex" aria-hidden="true">
+            <div className="h-12 w-12 shrink-0 rounded-full" />
+            <div className="font-serif text-[1.4rem] leading-none sm:text-[1.6rem]">.</div>
+          </div>
+          <h4 className="mt-6 text-xs uppercase tracking-[0.24em] text-muted-foreground md:mt-6">Follow Us</h4>
           <ul className="mt-5 space-y-2.5 text-sm">
             <li>
               <a
