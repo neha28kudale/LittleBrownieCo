@@ -213,7 +213,7 @@ function OrderConfirmation() {
           <div className="flex justify-between">
             <dt className="text-muted-foreground">Delivery charges</dt>
             <dd className="text-primary">
-              {order.deliveryFee > 0 ? `₹${order.deliveryFee}` : "At dispatch"}
+              {order.deliveryFee > 0 ? `₹${order.deliveryFee}` : "To be shared via WhatsApp"}
             </dd>
           </div>
           <div className="flex justify-between border-t border-border pt-3 font-serif text-xl text-primary">
