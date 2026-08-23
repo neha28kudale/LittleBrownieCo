@@ -44,7 +44,7 @@ export function Header() {
             <Link
               to="/"
               activeOptions={{ exact: true }}
-              className="relative text-[0.95rem] text-primary/80 transition-colors hover:text-primary [&.active]:text-primary [&.active]:after:absolute [&.active]:after:-bottom-2 [&.active]:after:left-0 [&.active]:after:h-px [&.active]:after:w-full [&.active]:after:bg-accent"
+              className="nav-underline text-[0.95rem] text-primary/80 transition-colors hover:text-primary [&.active]:text-primary"
             >
               Home
             </Link>
@@ -91,7 +91,7 @@ export function Header() {
               <Link
                 key={n.to}
                 to={n.to}
-                className="relative text-[0.95rem] text-primary/80 transition-colors hover:text-primary [&.active]:text-primary [&.active]:after:absolute [&.active]:after:-bottom-2 [&.active]:after:left-0 [&.active]:after:h-px [&.active]:after:w-full [&.active]:after:bg-accent"
+                className="nav-underline text-[0.95rem] text-primary/80 transition-colors hover:text-primary [&.active]:text-primary"
               >
                 {n.label}
               </Link>
