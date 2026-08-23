@@ -59,7 +59,7 @@
 //       <section className="relative overflow-hidden">
 //         <div className="container-x grid gap-10 pb-12 pt-10 md:grid-cols-12 md:items-center md:gap-8 md:pb-24 md:pt-20">
 //           <div className="md:col-span-6 flex flex-col justify-center">
-//             <div className="overflow-hidden rounded-[1.2rem] border border-border/80 shadow-soft">
+//            
 //               <img
 //                 src={IMG.headerBanner}
 //                 alt="Little Brownie Co. — where every bite earns you brownie points"
@@ -263,7 +263,8 @@ import {
 import { getApprovedReviews, getGoogleReviews, type Review } from "@/lib/reviews";
 import { ProductCard } from "@/components/site/ProductCard";
 import { Reveal } from "@/components/site/Reveal";
-import { InstagramFeed } from "@/components/site/InstagramFeed";
+import { InstagramFeed } from "@/components/site/InstagramFeed"; 
+import { AnimatedWords } from "@/components/site/AnimatedWords";
 
 export const Route = createFileRoute("/_site/")({
   loader: async () => ({ products: await getProducts() }),
@@ -366,7 +367,7 @@ function Home() {
       <section className="relative overflow-hidden">
         <div className="container-x grid gap-10 pb-10 pt-8 md:grid-cols-12 md:items-start md:gap-8 md:pb-16 md:pt-14">
           <div className="md:col-span-6 flex flex-col justify-center">
-                        <div className="img-zoom overflow-hidden rounded-[1.2rem] border border-border/80 shadow-soft">
+              <div className="img-zoom overflow-hidden rounded-[1.2rem] border border-border/80 shadow-soft">
               <img
                 src={IMG.headerBanner}
                 alt="Little Brownie Co. — where every bite earns you brownie points"
@@ -374,7 +375,7 @@ function Home() {
               />
             </div>
             <h1 className="mt-6 max-w-2xl font-serif text-[2.6rem] leading-[0.98] text-primary sm:text-[3.35rem] sm:leading-[0.94] md:text-[6rem]">
-              Brownies made for the little moments that matter.
+              <AnimatedWords text="Brownies made for the little moments that matter." />
             </h1>
             <p className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg">
               Crafted with premium ingredients
@@ -388,9 +389,9 @@ function Home() {
               >
                 View Menu
               </Link>
-              <Link
+                <Link
                 to="/menu"
-                className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm uppercase tracking-[0.18em] text-primary-foreground transition-colors hover:bg-cocoa-dark active:bg-cocoa-dark"
+                className="shine-sweep relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-primary px-6 py-3 text-sm uppercase tracking-[0.18em] text-primary-foreground transition-colors hover:bg-cocoa-dark active:bg-cocoa-dark"
               >
                 Order <ArrowRight className="h-4 w-4" />
               </Link>
