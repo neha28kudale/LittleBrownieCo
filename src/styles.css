@@ -173,3 +173,27 @@
 @utility shadow-display {
   box-shadow: 0 30px 60px -28px color-mix(in oklab, var(--cocoa) 38%, transparent);
 }
+
+/* Growing-underline hover effect for plain nav links — a subtle bit of
+   interactive polish, off by default and animates in only on hover. */
+@utility nav-underline {
+  position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -0.5rem;
+    height: 1px;
+    width: 100%;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+  }
+  &:hover::after {
+    transform: scaleX(1);
+  }
+  &.active::after {
+    transform: scaleX(1);
+  }
+}
