@@ -4,6 +4,7 @@ import { Printer, CheckCircle2, Clock, XCircle, Check } from "lucide-react";
 import { getOrderById, type Order } from "@/lib/orders";
 import { formatDisplayDate } from "@/lib/delivery";
 import { IMG } from "@/lib/products";
+import { ConfettiBurst } from "@/components/site/ConfettiBurst";
 
 export const Route = createFileRoute("/_site/order-confirmation/$orderId")({
   head: () => ({
@@ -121,12 +122,14 @@ function OrderConfirmation() {
         }
       `}</style>
 
+      {order.orderStatus !== "rejected" && <ConfettiBurst />}
+
       <div className="mx-auto max-w-2xl" data-no-print>
         <div className="text-center">
           <img
             src={IMG.logo}
             alt="Little Brownie Co."
-            className="mx-auto h-16 w-16 rounded-full border border-border object-cover"
+            className="mx-auto h-16 w-16 animate-float rounded-full border border-border object-cover"
           />
           <h1 className="mt-4 font-serif text-3xl text-primary sm:text-4xl">
             {order.orderStatus === "rejected" ? "Payment couldn't be verified" : "Thank you for your order!"}
