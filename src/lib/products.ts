@@ -116,8 +116,10 @@ export type Product = {
   tagline: string;
   category: "Mini Bites" | "Cakes" | "Hampers" | "Add-ons" | "Limited Editions";
   image: string;
+  imagePosition?: string;
   square: string;
   gallery: string[];
+  galleryPositions?: string[];
   variants: Variant[];
   flavours: string[];
   ingredients: string[];
@@ -346,8 +348,10 @@ function rowToProduct(row: any, variantRows: any[]): Product {
     tagline: row.tagline ?? "",
     category: row.category,
     image: row.image_url ?? IMG.littleBox,
+    imagePosition: row.image_position ?? "center",
     square: row.square_image_url ?? row.image_url ?? IMG.littleBox,
     gallery: row.gallery?.length ? row.gallery : [row.image_url].filter(Boolean),
+    galleryPositions: row.gallery_positions ?? [],
     variants: variants.length ? variants : [{ id: "default", label: "Standard", price: 0 }],
     flavours: row.flavours ?? [],
     ingredients: row.ingredients ?? [],
@@ -409,6 +413,7 @@ export type ProductDraft = {
   tagline?: string;
   category: Product["category"];
   image: string;
+  imagePosition?: string;
   description?: string;
   price: number;
   isActive?: boolean;
@@ -419,6 +424,7 @@ export type ProductDraft = {
   /** Extra photos shown in the product page image strip. If omitted, falls
    * back to just `image`. */
   gallery?: string[];
+  galleryPositions?: string[];
   flavours?: string[];
   ingredients?: string[];
 };
@@ -450,8 +456,10 @@ export async function createProductRow(
       category: draft.category,
       description: draft.description || null,
       image_url: draft.image,
+      image_position: draft.imagePosition || "center",
       square_image_url: draft.image,
       gallery,
+      gallery_positions: draft.galleryPositions ?? [],
       flavours: draft.flavours ?? [],
       ingredients: draft.ingredients ?? [],
       is_active: true,
@@ -493,7 +501,9 @@ export async function updateProductRow(
       ...(draft.category !== undefined ? { category: draft.category } : {}),
       ...(draft.description !== undefined ? { description: draft.description } : {}),
       ...(draft.image !== undefined ? { image_url: draft.image, square_image_url: draft.image } : {}),
+      ...(draft.imagePosition !== undefined ? { image_position: draft.imagePosition } : {}),
       ...(draft.gallery !== undefined ? { gallery: draft.gallery } : {}),
+      ...(draft.galleryPositions !== undefined ? { gallery_positions: draft.galleryPositions } : {}),
       ...(draft.flavours !== undefined ? { flavours: draft.flavours } : {}),
       ...(draft.ingredients !== undefined ? { ingredients: draft.ingredients } : {}),
       ...(draft.isActive !== undefined ? { is_active: draft.isActive } : {}),
