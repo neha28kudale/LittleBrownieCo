@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { ChevronDown, Menu, Phone, ShoppingBag, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { IMG, PHONE_DISPLAY, WHATSAPP_NUMBER, whatsappLink } from "@/lib/products";
 import { MENU_CATEGORIES } from "@/lib/site-content";
 import { useCart } from "@/lib/cart";
@@ -17,6 +17,17 @@ export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { count } = useCart();
   const phoneDisplay = PHONE_DISPLAY;
+
+  const [badgeBump, setBadgeBump] = useState(false);
+  const prevCount = useRef(count);
+  useEffect(() => {
+    if (count !== prevCount.current) {
+      setBadgeBump(true);
+      prevCount.current = count;
+      const t = setTimeout(() => setBadgeBump(false), 400);
+      return () => clearTimeout(t);
+    }
+  }, [count]);
 
   const closeMobile = () => {
     setOpen(false);
@@ -59,10 +70,10 @@ export function Header() {
                 className="relative inline-flex items-center gap-1 text-[1.05rem] font-medium text-primary/80 transition-colors hover:text-primary [&.active]:text-primary"
               >
                 Menu
-                <ChevronDown className="h-4 w-4" />
+                <ChevronDown className={`h-4 w-4 transition-transform duration-300 ${menuOpen ? "rotate-180" : ""}`} />
               </Link>
               {menuOpen && (
-                <div className="absolute left-1/2 top-full z-50 w-52 -translate-x-1/2 pt-2">
+                <div className="absolute left-1/2 top-full z-50 w-52 -translate-x-1/2 pt-2 origin-top animate-dropdown-in">
                   <div className="rounded-lg border border-border bg-background py-2 shadow-soft">
                     <Link
                       to="/menu"
@@ -99,7 +110,7 @@ export function Header() {
           </nav>
 
           <div className="hidden items-center gap-2 lg:flex xl:gap-3">
-            <a
+            
               href={whatsappLink("Hi Little Brownie Co., I'd like to place an order.")}
               target="_blank"
               rel="noreferrer"
@@ -115,7 +126,11 @@ export function Header() {
             >
               <ShoppingBag className="h-4.5 w-4.5" />
               {count > 0 && (
-                <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-medium text-accent-foreground">
+                <span
+                  className={`absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-medium text-accent-foreground ${
+                    badgeBump ? "animate-badge-pop" : ""
+                  }`}
+                >
                   {count}
                 </span>
               )}
@@ -130,30 +145,38 @@ export function Header() {
             >
               <ShoppingBag className="h-5 w-5" />
               {count > 0 && (
-                <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-medium text-accent-foreground">
+                <span
+                  className={`absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-medium text-accent-foreground ${
+                    badgeBump ? "animate-badge-pop" : ""
+                  }`}
+                >
                   {count}
                 </span>
               )}
             </Link>
             <button
               onClick={() => setOpen((v) => !v)}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card text-primary"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card text-primary transition-transform active:scale-90"
               aria-label="Menu"
             >
-              {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              <span className="relative block h-5 w-5">
+                <Menu className={`absolute inset-0 h-5 w-5 transition-all duration-200 ${open ? "rotate-90 opacity-0" : "rotate-0 opacity-100"}`} />
+                <X className={`absolute inset-0 h-5 w-5 transition-all duration-200 ${open ? "rotate-0 opacity-100" : "-rotate-90 opacity-0"}`} />
+              </span>
             </button>
           </div>
         </div>
       </div>
 
       {open && (
-        <div className="border-t border-border/60 bg-background lg:hidden">
+        <div className="border-t border-border/60 bg-background lg:hidden animate-mobile-panel">
           <div className="container-x py-4">
-            <a
+            
               href={whatsappLink("Hi Little Brownie Co., I'd like to place an order.")}
               target="_blank"
               rel="noreferrer"
-              className="mb-4 inline-flex h-9 items-center rounded-full border border-border bg-card px-4 text-sm text-primary"
+              className="mb-4 inline-flex h-9 items-center rounded-full border border-border bg-card px-4 text-sm text-primary transition-transform active:scale-95 animate-stagger-in"
+              style={{ animationDelay: "20ms" }}
             >
               {phoneDisplay}
             </a>
@@ -162,7 +185,8 @@ export function Header() {
                 to="/"
                 onClick={closeMobile}
                 activeOptions={{ exact: true }}
-                className="border-b border-border/60 py-3 font-serif text-[1.5rem] text-primary [&.active]:text-accent"
+                className="border-b border-border/60 py-3 font-serif text-[1.5rem] text-primary [&.active]:text-accent animate-stagger-in"
+                style={{ animationDelay: "60ms" }}
               >
                 Home
               </Link>
@@ -170,15 +194,16 @@ export function Header() {
               <button
                 type="button"
                 onClick={() => setMenuOpen((v) => !v)}
-                className="flex items-center justify-between border-b border-border/60 py-3 font-serif text-[1.5rem] text-primary"
+                className="flex items-center justify-between border-b border-border/60 py-3 font-serif text-[1.5rem] text-primary animate-stagger-in"
+                style={{ animationDelay: "100ms" }}
               >
                 Menu
                 <ChevronDown
-                  className={`h-5 w-5 transition-transform ${menuOpen ? "rotate-180" : ""}`}
+                  className={`h-5 w-5 transition-transform duration-300 ${menuOpen ? "rotate-180" : ""}`}
                 />
               </button>
               {menuOpen && (
-                <div className="border-b border-border/60 pb-2 pl-4">
+                <div className="border-b border-border/60 pb-2 pl-4 animate-mobile-panel">
                   <Link
                     to="/menu"
                     onClick={closeMobile}
@@ -200,12 +225,13 @@ export function Header() {
                 </div>
               )}
 
-              {nav.slice(1).map((n) => (
+              {nav.slice(1).map((n, i) => (
                 <Link
                   key={n.to}
                   to={n.to}
                   onClick={closeMobile}
-                  className="border-b border-border/60 py-3 font-serif text-[1.5rem] text-primary last:border-b-0 [&.active]:text-accent"
+                  className="border-b border-border/60 py-3 font-serif text-[1.5rem] text-primary last:border-b-0 [&.active]:text-accent animate-stagger-in"
+                  style={{ animationDelay: `${140 + i * 40}ms` }}
                 >
                   {n.label}
                 </Link>
