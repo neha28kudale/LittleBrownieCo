@@ -367,11 +367,14 @@ function Home() {
       <section className="relative overflow-hidden">
         <div className="container-x grid gap-10 pb-10 pt-8 md:grid-cols-12 md:items-start md:gap-8 md:pb-16 md:pt-14">
           <div className="md:col-span-6 flex flex-col justify-center">
-              <div className="img-zoom overflow-hidden rounded-[1.2rem] border border-border/80 shadow-soft">
+                         <div className="img-zoom aspect-[16/9] overflow-hidden rounded-[1.2rem] border border-border/80 bg-secondary shadow-soft">
               <img
                 src={IMG.headerBanner}
                 alt="Little Brownie Co. — where every bite earns you brownie points"
-                className="h-auto w-full object-cover"
+                width={1600}
+                height={900}
+                fetchPriority="high"
+                className="h-full w-full object-cover"
               />
             </div>
             <h1 className="mt-6 max-w-2xl font-serif text-[2.6rem] leading-[0.98] text-primary sm:text-[3.35rem] sm:leading-[0.94] md:text-[6rem]">
