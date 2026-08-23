@@ -62,7 +62,7 @@ function About() {
 
       <section className="container-x grid gap-8 md:grid-cols-12 md:items-start md:gap-12">
         {/* STORY CONTENT */}
-        <div className="md:col-span-7 space-y-6 text-sm leading-relaxed text-primary/80">
+        <div className="md:col-span-7 space-y-6 text-base leading-relaxed text-primary/80">
           <p>
             What began as a little tradition at home eventually became the
             beginning of Little Brownie Co.
