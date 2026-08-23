@@ -16,6 +16,7 @@ import { DELIVERY_AGREEMENT_TEXT } from "@/lib/site-content";
 import { supabase } from "@/lib/supabase";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { LandmarkAutocomplete, type LandmarkValue } from "@/components/LandmarkAutocomplete";
 
 export const Route = createFileRoute("/_site/checkout")({
   head: () => ({
@@ -40,7 +41,7 @@ function Checkout() {
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [pincode, setPincode] = useState("");
-  const [landmark, setLandmark] = useState("");
+  const [landmark, setLandmark] = useState<LandmarkValue>({ text: "" });
   const [deliveryFee, setDeliveryFee] = useState<number | null>(null);
   const [distanceKm, setDistanceKm] = useState<number | undefined>(undefined);
   const [deliveryFeeError, setDeliveryFeeError] = useState("");
@@ -60,7 +61,7 @@ function Checkout() {
 
   // Debounced address + pincode + landmark -> delivery fee lookup.
   useEffect(() => {
-    if (!/^\d{6}$/.test(pincode) || !landmark.trim()) {
+    if (!/^\d{6}$/.test(pincode) || !landmark.text.trim()) {
       setDeliveryFee(null);
       setDistanceKm(undefined);
       setDeliveryFeeError("");
@@ -74,7 +75,12 @@ function Checkout() {
     setNeedsManualConfirm(false);
 
     const timer = setTimeout(async () => {
-      const result = await getDeliveryFee({ address, pincode, landmark });
+      const result = await getDeliveryFee({
+        address,
+        pincode,
+        landmark: landmark.text,
+        landmarkPlaceId: landmark.placeId,
+      });
       if (cancelled) return;
 
       if (result.ok) {
@@ -99,7 +105,7 @@ function Checkout() {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [address, pincode, landmark]);
+  }, [address, pincode, landmark.text, landmark.placeId]);
 
   useEffect(() => {
     setDate(toISODate(earliestDeliveryDate()));
@@ -139,7 +145,7 @@ function Checkout() {
       return;
     }
 
-    if (deliveryPricingConfigured && !landmark.trim()) {
+    if (deliveryPricingConfigured && !landmark.text.trim()) {
       toast.error("Please enter a nearby landmark.");
       return;
     }
@@ -197,7 +203,7 @@ function Checkout() {
     const result = await createOrder({
       customerName: name.trim(),
       phone: cleanPhone,
-      address: `${address.trim()} (Landmark: ${landmark.trim()})`,
+      address: `${address.trim()} (Landmark: ${landmark.text.trim()})`,
 
       // Calculated from the customer's address/landmark (falls back to 0 /
       // "at dispatch" if pricing isn't configured yet, or if we couldn't
@@ -401,10 +407,9 @@ function Checkout() {
                   Nearby landmark *
                 </span>
 
-                <input
+                <LandmarkAutocomplete
                   value={landmark}
-                  onChange={(e) => setLandmark(e.target.value)}
-                  type="text"
+                  onChange={setLandmark}
                   placeholder="e.g. Near Forum Mall"
                   className="mt-2 w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm text-primary outline-none focus:border-accent"
                 />
