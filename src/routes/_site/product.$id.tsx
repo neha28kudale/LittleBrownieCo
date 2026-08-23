@@ -66,6 +66,12 @@ function ProductPage() {
               <img
                 src={product.gallery[active] || product.image}
                 alt={product.name}
+                style={{
+                  objectPosition:
+                    (product.gallery.length ? product.galleryPositions?.[active] : undefined) ||
+                    product.imagePosition ||
+                    "center",
+                }}
                 className="h-full w-full object-cover"
               />
             </div>
@@ -78,7 +84,12 @@ function ProductPage() {
                     className={`h-16 w-16 shrink-0 overflow-hidden rounded-sm border-2 sm:h-20 sm:w-20 ${active === i ? "border-accent" : "border-transparent"}`}
                     aria-label={`View image ${i + 1}`}
                   >
-                    <img src={g} alt="" className="h-full w-full object-cover" />
+                    <img
+                      src={g}
+                      alt=""
+                      style={{ objectPosition: product.galleryPositions?.[i] || "center" }}
+                      className="h-full w-full object-cover"
+                    />
                   </button>
                 ))}
               </div>
