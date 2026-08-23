@@ -263,6 +263,7 @@ import {
 import { getApprovedReviews, getGoogleReviews, type Review } from "@/lib/reviews";
 import { ProductCard } from "@/components/site/ProductCard";
 import { Reveal } from "@/components/site/Reveal";
+import { InstagramFeed } from "@/components/site/InstagramFeed";
 
 export const Route = createFileRoute("/_site/")({
   loader: async () => ({ products: await getProducts() }),
@@ -607,6 +608,9 @@ function Home() {
           </div>
         </div>
       </Reveal>
+
+      {/* FROM OUR KITCHEN (Instagram) */}
+      <InstagramFeed />
 
       {/* REVIEWS */}
       <Reveal as="section" className="mt-14 bg-[oklch(0.9_0.03_78)] py-16">
