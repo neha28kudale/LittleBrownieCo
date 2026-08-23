@@ -22,7 +22,10 @@ export function Footer() {
               Little Brownie Co.
             </div>
           </div>
-          <ul className="mt-6 space-y-2.5 text-sm">
+          <h4 className="hidden text-xs uppercase tracking-[0.24em] text-transparent md:block" aria-hidden="true">
+            Order Online
+          </h4>
+          <ul className="mt-6 space-y-2.5 text-sm md:mt-5">
             <li>
               <Link to="/menu" className="text-primary/80 hover:text-accent">
                 Order Online
