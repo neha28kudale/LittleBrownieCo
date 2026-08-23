@@ -25,7 +25,7 @@ export function AllergyBanner() {
   };
 
   return (
-    <div className="relative z-40 border-b border-border/60 bg-caramel/25 text-cocoa">
+    <div className="relative z-30 border-b border-border/60 bg-caramel/25 text-cocoa">
       <div className="container-x flex items-center justify-center gap-2 py-2 text-center text-[11px] leading-snug sm:text-xs">
         <TriangleAlert className="h-3.5 w-3.5 shrink-0 text-cocoa" />
         <span>
