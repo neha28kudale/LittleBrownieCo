@@ -363,7 +363,7 @@ function Home() {
     <>
       {/* HERO */}
       <section className="relative overflow-hidden">
-        <div className="container-x grid gap-10 pb-10 pt-8 md:grid-cols-12 md:items-center md:gap-8 md:pb-16 md:pt-14">
+        <div className="container-x grid gap-10 pb-10 pt-8 md:grid-cols-12 md:items-start md:gap-8 md:pb-16 md:pt-14">
           <div className="md:col-span-6 flex flex-col justify-center">
             <div className="overflow-hidden rounded-[1.2rem] border border-border/80 shadow-soft">
               <img
@@ -488,7 +488,7 @@ function Home() {
               </p>
             </div>
             <div className="absolute -right-6 top-8 hidden h-34 w-34 items-center justify-center rounded-full border-4 border-background bg-surface-soft p-5 text-center font-serif text-base leading-tight text-primary shadow-display md:flex">
-              Where every bite earns brownie points.
+              Where every bite earns you brownie points.
             </div>
           </div>
         </div>
@@ -512,7 +512,7 @@ function Home() {
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary font-serif text-sm text-primary-foreground">
                     01
                   </span>
-                  <h3 className="font-serif text-2xl text-primary">🍫 Choose your brownies</h3>
+                  <h3 className="font-serif text-2xl text-primary md:whitespace-nowrap">🍫 Choose your brownies</h3>
                 </div>
                 <p className="mt-3 text-sm text-muted-foreground">
                   Browse the{" "}
