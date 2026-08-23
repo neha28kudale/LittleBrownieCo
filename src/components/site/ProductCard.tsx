@@ -30,11 +30,11 @@ export function ProductCard({
   };
 
   return (
-    <article className="group flex h-full flex-col rounded-[0.45rem] border border-border/70 bg-card p-2.5 shadow-soft transition-transform duration-300 hover:-translate-y-0.5 sm:p-3">
+    <article className="lift-hover group flex h-full flex-col rounded-[0.45rem] border border-border/70 bg-card p-2.5 shadow-soft sm:p-3">
       <Link
         to="/product/$id"
         params={{ id: product.slug }}
-        className="relative block aspect-square cursor-pointer overflow-hidden rounded-[0.4rem] bg-secondary sm:aspect-[4/5]"
+        className="img-zoom relative block aspect-square cursor-pointer overflow-hidden rounded-[0.4rem] bg-secondary sm:aspect-[4/5]"
       >
         <img
           src={product.image}
