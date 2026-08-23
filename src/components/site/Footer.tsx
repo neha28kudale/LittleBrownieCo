@@ -70,23 +70,8 @@ export function Footer() {
           <h4 className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Policies</h4>
           <ul className="mt-5 space-y-2.5 text-sm">
             <li>
-              <Link to="/policies" hash="cancellation" className="text-primary/80 hover:text-accent">
-                Cancellation Policy
-              </Link>
-            </li>
-            <li>
-              <Link to="/policies" hash="refund" className="text-primary/80 hover:text-accent">
-                Refund Policy
-              </Link>
-            </li>
-            <li>
-              <Link to="/policies" hash="modification" className="text-primary/80 hover:text-accent">
-                Order Modification Policy
-              </Link>
-            </li>
-            <li>
-              <Link to="/policies" hash="delivery" className="text-primary/80 hover:text-accent">
-                Delivery Policy
+              <Link to="/policies" className="text-primary/80 hover:text-accent">
+                Policies
               </Link>
             </li>
           </ul>
