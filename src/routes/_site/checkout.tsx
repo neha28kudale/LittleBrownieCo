@@ -10,7 +10,7 @@ import {
   maxDeliveryDate,
   formatDisplayDate,
   toISODate,
-  getDeliveryFeeForPincode,
+  getDeliveryFee,
 } from "@/lib/delivery";
 import { DELIVERY_AGREEMENT_TEXT } from "@/lib/site-content";
 import { supabase } from "@/lib/supabase";
@@ -40,9 +40,11 @@ function Checkout() {
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [pincode, setPincode] = useState("");
+  const [landmark, setLandmark] = useState("");
   const [deliveryFee, setDeliveryFee] = useState<number | null>(null);
   const [distanceKm, setDistanceKm] = useState<number | undefined>(undefined);
   const [deliveryFeeError, setDeliveryFeeError] = useState("");
+  const [needsManualConfirm, setNeedsManualConfirm] = useState(false);
   const [checkingPincode, setCheckingPincode] = useState(false);
   const [deliveryPricingConfigured, setDeliveryPricingConfigured] = useState(true);
   const [date, setDate] = useState("");
@@ -56,21 +58,23 @@ function Checkout() {
   const ribbonFee = isGift ? RIBBON_FEE : 0;
   const payableTotal = subtotal + (deliveryFee ?? 0) + ribbonFee;
 
-  // Debounced pincode -> delivery fee lookup.
+  // Debounced address + pincode + landmark -> delivery fee lookup.
   useEffect(() => {
-    if (!/^\d{6}$/.test(pincode)) {
+    if (!/^\d{6}$/.test(pincode) || !landmark.trim()) {
       setDeliveryFee(null);
       setDistanceKm(undefined);
       setDeliveryFeeError("");
+      setNeedsManualConfirm(false);
       return;
     }
 
     let cancelled = false;
     setCheckingPincode(true);
     setDeliveryFeeError("");
+    setNeedsManualConfirm(false);
 
     const timer = setTimeout(async () => {
-      const result = await getDeliveryFeeForPincode(pincode);
+      const result = await getDeliveryFee({ address, pincode, landmark });
       if (cancelled) return;
 
       if (result.ok) {
@@ -86,6 +90,7 @@ function Checkout() {
         setDeliveryFee(null);
         setDistanceKm(undefined);
         setDeliveryFeeError(result.error);
+        setNeedsManualConfirm(Boolean(result.needsManualConfirm));
       }
       setCheckingPincode(false);
     }, 500);
@@ -94,7 +99,7 @@ function Checkout() {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [pincode]);
+  }, [address, pincode, landmark]);
 
   useEffect(() => {
     setDate(toISODate(earliestDeliveryDate()));
@@ -134,10 +139,26 @@ function Checkout() {
       return;
     }
 
-    if (deliveryPricingConfigured && deliveryFee === null) {
-      toast.error(
-        deliveryFeeError || "Please wait while we calculate your delivery charge.",
-      );
+    if (deliveryPricingConfigured && !landmark.trim()) {
+      toast.error("Please enter a nearby landmark.");
+      return;
+    }
+
+    // Block only while we're still waiting on the lookup, or a fee
+    // couldn't be worked out for a reason OTHER than "we'll confirm it
+    // manually" (that case is allowed through — see needsManualConfirm).
+    if (
+      deliveryPricingConfigured &&
+      deliveryFee === null &&
+      !needsManualConfirm &&
+      !checkingPincode
+    ) {
+      toast.error(deliveryFeeError || "Please wait while we calculate your delivery charge.");
+      return;
+    }
+
+    if (deliveryPricingConfigured && deliveryFee === null && checkingPincode) {
+      toast.error("Please wait while we calculate your delivery charge.");
       return;
     }
 
@@ -176,16 +197,25 @@ function Checkout() {
     const result = await createOrder({
       customerName: name.trim(),
       phone: cleanPhone,
-      address: address.trim(),
+      address: `${address.trim()} (Landmark: ${landmark.trim()})`,
 
-      // Calculated from the customer's pincode (falls back to 0 / "at
-      // dispatch" if pincode-based pricing isn't configured yet).
+      // Calculated from the customer's address/landmark (falls back to 0 /
+      // "at dispatch" if pricing isn't configured yet, or if we couldn't
+      // confidently locate the address — in which case the fee is
+      // confirmed manually over WhatsApp before baking).
       distanceKm,
       deliveryFee: deliveryFee ?? 0,
 
       deliveryDate: date,
       deliverySlot: slot,
-      notes: notes.trim() || undefined,
+      notes: [
+        notes.trim(),
+        needsManualConfirm && deliveryFee === null
+          ? "⚠️ Delivery charge not auto-calculated — confirm manually with customer before baking."
+          : "",
+      ]
+        .filter(Boolean)
+        .join(" | ") || undefined,
       isGift,
       giftMessage: isGift ? giftMessage.trim() || undefined : undefined,
       ribbonFee,
@@ -349,7 +379,7 @@ function Checkout() {
               </label>
 
               {/* PINCODE */}
-              <label className="block sm:col-span-2">
+              <label className="block">
                 <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
                   Delivery pincode *
                 </span>
@@ -361,12 +391,31 @@ function Checkout() {
                   inputMode="numeric"
                   maxLength={6}
                   placeholder="6-digit pincode"
-                  className="mt-2 w-full max-w-xs rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm text-primary outline-none focus:border-accent"
+                  className="mt-2 w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm text-primary outline-none focus:border-accent"
                 />
+              </label>
 
-                <span className="mt-1 block text-[11px] text-muted-foreground">
-                  Delivery charges are calculated based on the distance from our
-                  kitchen to your delivery location.
+              {/* LANDMARK */}
+              <label className="block">
+                <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                  Nearby landmark *
+                </span>
+
+                <input
+                  value={landmark}
+                  onChange={(e) => setLandmark(e.target.value)}
+                  type="text"
+                  placeholder="e.g. Near Forum Mall"
+                  className="mt-2 w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm text-primary outline-none focus:border-accent"
+                />
+              </label>
+
+              <div className="sm:col-span-2">
+                <span className="block text-[11px] text-muted-foreground">
+                  Delivery charges are calculated based on the driving distance from our
+                  kitchen to your delivery location. A landmark helps us pinpoint your
+                  location accurately — please name something well-known nearby (a mall,
+                  metro station, temple, school, etc).
                 </span>
 
                 {checkingPincode && (
@@ -383,11 +432,15 @@ function Checkout() {
                 )}
 
                 {!checkingPincode && deliveryFeeError && (
-                  <span className="mt-1 block text-[11px] text-destructive">
+                  <span
+                    className={`mt-1 block text-[11px] ${
+                      needsManualConfirm ? "text-toffee" : "text-destructive"
+                    }`}
+                  >
                     {deliveryFeeError}
                   </span>
                 )}
-              </label>
+              </div>
             </div>
           </div>
 
@@ -610,9 +663,11 @@ function Checkout() {
               <dd className="shrink-0 text-right">
                 {deliveryFee !== null
                   ? `₹${deliveryFee}`
-                  : deliveryPricingConfigured
-                    ? "Enter pincode"
-                    : "Calculated at dispatch"}
+                  : needsManualConfirm
+                    ? "Confirmed on WhatsApp"
+                    : deliveryPricingConfigured
+                      ? "Enter pincode & landmark"
+                      : "Calculated at dispatch"}
               </dd>
             </div>
 
