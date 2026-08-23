@@ -366,7 +366,7 @@ function Home() {
       <section className="relative overflow-hidden">
         <div className="container-x grid gap-10 pb-10 pt-8 md:grid-cols-12 md:items-start md:gap-8 md:pb-16 md:pt-14">
           <div className="md:col-span-6 flex flex-col justify-center">
-            <div className="overflow-hidden rounded-[1.2rem] border border-border/80 shadow-soft">
+                        <div className="img-zoom overflow-hidden rounded-[1.2rem] border border-border/80 shadow-soft">
               <img
                 src={IMG.headerBanner}
                 alt="Little Brownie Co. — where every bite earns you brownie points"
