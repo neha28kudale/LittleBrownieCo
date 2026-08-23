@@ -997,6 +997,7 @@ function ProductsAdmin({
       .filter((v) => v.label.trim() && v.price > 0)
       .map((v) => ({ id: v.id, label: v.label.trim(), price: Number(v.price) }));
     const cleanGallery = (draft.gallery || []).filter(Boolean);
+    const cleanGalleryPositions = cleanGallery.map((_, i) => (draft.galleryPositions || [])[i] || "center");
     const cleanFlavours = (draft.flavours || []).map((f) => f.trim()).filter(Boolean);
     const cleanIngredients = (draft.ingredients || []).map((i) => i.trim()).filter(Boolean);
 
@@ -1008,9 +1009,11 @@ function ProductsAdmin({
         category: draft.category as Product["category"],
         description: draft.description,
         image: draft.image,
+        imagePosition: draft.imagePosition,
         price: Number(draft.price),
         variants: cleanVariants.length ? cleanVariants : undefined,
         gallery: cleanGallery.length ? cleanGallery : draft.image ? [draft.image] : undefined,
+        galleryPositions: cleanGallery.length ? cleanGalleryPositions : undefined,
         flavours: cleanFlavours,
         ingredients: cleanIngredients,
       });
@@ -1027,9 +1030,11 @@ function ProductsAdmin({
         category: (draft.category as Product["category"]) || "Signature",
         description: draft.description,
         image: draft.image || IMG.littleBox,
+        imagePosition: draft.imagePosition,
         price: Number(draft.price),
         variants: cleanVariants.length ? cleanVariants : undefined,
         gallery: cleanGallery.length ? cleanGallery : undefined,
+        galleryPositions: cleanGallery.length ? cleanGalleryPositions : undefined,
         flavours: cleanFlavours,
         ingredients: cleanIngredients,
       });
@@ -1252,7 +1257,12 @@ function ProductModal({
                 {uploading ? (
                   <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
                 ) : d.image ? (
-                  <img src={d.image} alt="" className="h-full w-full object-cover" />
+                  <img
+                    src={d.image}
+                    alt=""
+                    style={{ objectPosition: d.imagePosition || "center" }}
+                    className="h-full w-full object-cover"
+                  />
                 ) : (
                   <ImagePlus className="h-6 w-6 text-muted-foreground" />
                 )}
@@ -1292,6 +1302,42 @@ function ProductModal({
               </div>
             </div>
           </Field>
+
+          {d.image && (
+            <Field label="Image alignment">
+              <p className="mb-2 text-[11px] text-muted-foreground">
+                Choose which part of the photo stays in frame when it's cropped into the square/portrait
+                card on the site.
+              </p>
+              <div className="grid w-24 grid-cols-3 gap-1 rounded-lg border border-dashed border-border bg-secondary/40 p-1.5">
+                {(
+                  [
+                    "left top",
+                    "center top",
+                    "right top",
+                    "left center",
+                    "center",
+                    "right center",
+                    "left bottom",
+                    "center bottom",
+                    "right bottom",
+                  ] as const
+                ).map((pos) => (
+                  <button
+                    key={pos}
+                    type="button"
+                    onClick={() => setD({ ...d, imagePosition: pos })}
+                    aria-label={pos}
+                    className={`h-6 w-6 rounded-sm border transition-colors ${
+                      (d.imagePosition || "center") === pos
+                        ? "border-accent bg-accent"
+                        : "border-border bg-card hover:border-accent"
+                    }`}
+                  />
+                ))}
+              </div>
+            </Field>
+          )}
 
           <Field label="Description">
             <textarea
@@ -1386,21 +1432,64 @@ function ProductModal({
             <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
               Gallery photos
             </span>
-            <div className="mt-2 flex flex-wrap gap-3">
+            <p className="mb-2 mt-1 text-[11px] text-muted-foreground">
+              Tap the dots under a photo to choose which part of it stays in frame.
+            </p>
+            <div className="mt-2 flex flex-wrap gap-4">
               {(d.gallery || []).map((g, i) => (
-                <div key={i} className="relative h-20 w-20 shrink-0">
-                  <img src={g} alt="" className="h-full w-full rounded-md object-cover" />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const next = (d.gallery || []).filter((_, idx) => idx !== i);
-                      setD({ ...d, gallery: next });
-                    }}
-                    className="absolute -right-2 -top-2 grid h-6 w-6 place-items-center rounded-full border border-border bg-card text-muted-foreground hover:border-destructive hover:text-destructive"
-                    aria-label="Remove photo"
-                  >
-                    <X className="h-3.5 w-3.5" />
-                  </button>
+                <div key={i} className="w-20 shrink-0">
+                  <div className="relative h-20 w-20">
+                    <img
+                      src={g}
+                      alt=""
+                      style={{ objectPosition: (d.galleryPositions || [])[i] || "center" }}
+                      className="h-full w-full rounded-md object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const nextGallery = (d.gallery || []).filter((_, idx) => idx !== i);
+                        const nextPositions = (d.galleryPositions || []).filter((_, idx) => idx !== i);
+                        setD({ ...d, gallery: nextGallery, galleryPositions: nextPositions });
+                      }}
+                      className="absolute -right-2 -top-2 grid h-6 w-6 place-items-center rounded-full border border-border bg-card text-muted-foreground hover:border-destructive hover:text-destructive"
+                      aria-label="Remove photo"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                  <div className="mt-1.5 grid w-20 grid-cols-3 gap-0.5 rounded-md border border-dashed border-border bg-secondary/40 p-1">
+                    {(
+                      [
+                        "left top",
+                        "center top",
+                        "right top",
+                        "left center",
+                        "center",
+                        "right center",
+                        "left bottom",
+                        "center bottom",
+                        "right bottom",
+                      ] as const
+                    ).map((pos) => (
+                      <button
+                        key={pos}
+                        type="button"
+                        onClick={() => {
+                          const next = [...(d.galleryPositions || [])];
+                          while (next.length <= i) next.push("center");
+                          next[i] = pos;
+                          setD({ ...d, galleryPositions: next });
+                        }}
+                        aria-label={pos}
+                        className={`h-4 w-full rounded-sm border transition-colors ${
+                          ((d.galleryPositions || [])[i] || "center") === pos
+                            ? "border-accent bg-accent"
+                            : "border-border bg-card hover:border-accent"
+                        }`}
+                      />
+                    ))}
+                  </div>
                 </div>
               ))}
               <label className="grid h-20 w-20 shrink-0 cursor-pointer place-items-center rounded-md border border-dashed border-border text-muted-foreground hover:border-accent hover:text-accent">
@@ -1425,7 +1514,11 @@ function ProductModal({
                       toast.error(result.error);
                       return;
                     }
-                    setD((prev) => ({ ...prev, gallery: [...(prev.gallery || []), result.url] }));
+                    setD((prev) => ({
+                      ...prev,
+                      gallery: [...(prev.gallery || []), result.url],
+                      galleryPositions: [...(prev.galleryPositions || []), "center"],
+                    }));
                   }}
                 />
               </label>
