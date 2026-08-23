@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Instagram, MapPin } from "lucide-react";
+import { Instagram, MapPin, MessageCircle } from "lucide-react";
 import {
   FSSAI_NUMBER,
   IMG,
@@ -49,11 +49,7 @@ export function Footer() {
         </div>
 
         <div>
-          <div className="hidden items-center gap-3 opacity-0 md:flex" aria-hidden="true">
-            <div className="h-12 w-12 shrink-0 rounded-full" />
-            <div className="font-serif text-[1.4rem] leading-none sm:text-[1.6rem]">.</div>
-          </div>
-          <h4 className="mt-6 text-xs uppercase tracking-[0.24em] text-muted-foreground md:mt-6">
+          <h4 className="text-xs uppercase tracking-[0.24em] text-muted-foreground">
             Good to Know
           </h4>
           <ul className="mt-5 space-y-2.5 text-sm">
@@ -71,26 +67,33 @@ export function Footer() {
         </div>
 
         <div>
-          <div className="hidden items-center gap-3 opacity-0 md:flex" aria-hidden="true">
-            <div className="h-12 w-12 shrink-0 rounded-full" />
-            <div className="font-serif text-[1.4rem] leading-none sm:text-[1.6rem]">.</div>
-          </div>
-          <h4 className="mt-6 text-xs uppercase tracking-[0.24em] text-muted-foreground md:mt-6">Policies</h4>
+          <h4 className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Policies</h4>
           <ul className="mt-5 space-y-2.5 text-sm">
             <li>
-              <Link to="/policies" className="text-primary/80 hover:text-accent">
-                Policies
+              <Link to="/policies" hash="cancellation" className="text-primary/80 hover:text-accent">
+                Cancellation Policy
+              </Link>
+            </li>
+            <li>
+              <Link to="/policies" hash="refund" className="text-primary/80 hover:text-accent">
+                Refund Policy
+              </Link>
+            </li>
+            <li>
+              <Link to="/policies" hash="modification" className="text-primary/80 hover:text-accent">
+                Order Modification Policy
+              </Link>
+            </li>
+            <li>
+              <Link to="/policies" hash="delivery" className="text-primary/80 hover:text-accent">
+                Delivery Policy
               </Link>
             </li>
           </ul>
         </div>
 
         <div>
-          <div className="hidden items-center gap-3 opacity-0 md:flex" aria-hidden="true">
-            <div className="h-12 w-12 shrink-0 rounded-full" />
-            <div className="font-serif text-[1.4rem] leading-none sm:text-[1.6rem]">.</div>
-          </div>
-          <h4 className="mt-6 text-xs uppercase tracking-[0.24em] text-muted-foreground md:mt-6">Follow Us</h4>
+          <h4 className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Follow Us</h4>
           <ul className="mt-5 space-y-2.5 text-sm">
             <li>
               <a
@@ -108,8 +111,9 @@ export function Footer() {
                 href={whatsappLink("Hi Little Brownie Co.!")}
                 target="_blank"
                 rel="noreferrer"
-                className="text-primary/80 hover:text-accent"
+                className="inline-flex items-center gap-2 text-primary/80 hover:text-accent"
               >
+                <MessageCircle className="h-4 w-4 text-accent" />
                 WhatsApp
               </a>
             </li>
