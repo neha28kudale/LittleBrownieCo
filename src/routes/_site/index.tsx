@@ -512,7 +512,7 @@ function Home() {
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary font-serif text-sm text-primary-foreground">
                     01
                   </span>
-                  <h3 className="font-serif text-2xl text-primary md:whitespace-nowrap">🍫 Choose your brownies</h3>
+                  <h3 className="font-serif text-2xl text-primary md:whitespace-nowrap">🍫Choose your brownies</h3>
                 </div>
                 <p className="mt-3 text-sm text-muted-foreground">
                   Browse the{" "}
@@ -527,7 +527,7 @@ function Home() {
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary font-serif text-sm text-primary-foreground">
                     02
                   </span>
-                  <h3 className="font-serif text-2xl text-primary">💳 Checkout & pay</h3>
+                  <h3 className="font-serif text-2xl text-primary">💳Checkout & pay</h3>
                 </div>
                 <p className="mt-3 text-sm text-muted-foreground">
                   Enter your details, choose your delivery date & time, and make the payment.
@@ -538,7 +538,7 @@ function Home() {
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary font-serif text-sm text-primary-foreground">
                     03
                   </span>
-                  <h3 className="font-serif text-2xl text-primary">👩‍🍳 We get baking</h3>
+                  <h3 className="font-serif text-2xl text-primary">👩‍🍳We get baking</h3>
                 </div>
                 <p className="mt-3 text-sm text-muted-foreground">
                   We'll verify your order, confirm it and start baking fresh.
@@ -549,7 +549,7 @@ function Home() {
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary font-serif text-sm text-primary-foreground">
                     04
                   </span>
-                  <h3 className="font-serif text-2xl text-primary">📦 Track & enjoy</h3>
+                  <h3 className="font-serif text-2xl text-primary">📦Track & enjoy</h3>
                 </div>
                 <p className="mt-3 text-sm text-muted-foreground">
                   Track your order anytime through{" "}
