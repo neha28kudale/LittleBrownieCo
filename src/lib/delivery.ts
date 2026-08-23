@@ -25,6 +25,11 @@ export async function getDeliveryFee(input: {
   address: string;
   pincode: string;
   landmark: string;
+  /** Set when the customer picked a suggestion from the landmark
+   * autocomplete dropdown rather than typing free text — see
+   * LandmarkAutocomplete.tsx. Lets the backend skip fuzzy text matching
+   * entirely and resolve the exact place instead. */
+  landmarkPlaceId?: string;
 }): Promise<DeliveryFeeResult> {
   const pincode = input.pincode.trim();
   if (!/^\d{6}$/.test(pincode)) {
@@ -37,7 +42,12 @@ export async function getDeliveryFee(input: {
 
   try {
     const { data, error } = await supabase.functions.invoke("calculate-delivery-fee", {
-      body: { address: input.address.trim(), pincode, landmark: input.landmark.trim() },
+      body: {
+        address: input.address.trim(),
+        pincode,
+        landmark: input.landmark.trim(),
+        landmarkPlaceId: input.landmarkPlaceId || undefined,
+      },
     });
 
     if (error) {
