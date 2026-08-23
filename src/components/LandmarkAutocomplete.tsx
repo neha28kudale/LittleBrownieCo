@@ -48,6 +48,16 @@ export function LandmarkAutocomplete({
   const [configured, setConfigured] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Guards against out-of-order responses: with a short debounce and
+  // real network latency to the Edge Function, multiple requests can be
+  // in flight at once (e.g. one for "Tenet D" fired while still typing,
+  // another for the final "Tenet Diagnostics Centre"). Without this, a
+  // slower EARLIER request can arrive AFTER the final one and overwrite
+  // good results with stale/empty ones. Each fetch is tagged with a
+  // request id; a response is only applied if it's still the latest one
+  // requested by the time it comes back.
+  const latestRequestId = useRef(0);
+
   // Debounced fetch of suggestions as the customer types.
   useEffect(() => {
     if (!configured || value.placeId || value.text.trim().length < 3) {
@@ -59,24 +69,29 @@ export function LandmarkAutocomplete({
     setLoading(true);
 
     const timer = setTimeout(async () => {
+      const requestId = ++latestRequestId.current;
+      const queryText = value.text.trim();
+
       try {
         const { data, error } = await supabase.functions.invoke("places-autocomplete", {
-          body: { type: "autocomplete", input: value.text.trim() },
+          body: { type: "autocomplete", input: queryText },
         });
 
-        if (cancelled) return;
+        // Drop this response if the component unmounted, or a newer
+        // request has since been fired (this one is now stale).
+        if (cancelled || requestId !== latestRequestId.current) return;
 
         if (error || !data?.configured) {
           setConfigured(Boolean(data?.configured ?? false));
           setPredictions([]);
         } else {
           setPredictions(data.predictions ?? []);
-          setOpen(true);
+          setOpen((data.predictions ?? []).length > 0);
         }
       } catch {
-        if (!cancelled) setPredictions([]);
+        if (!cancelled && requestId === latestRequestId.current) setPredictions([]);
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancelled && requestId === latestRequestId.current) setLoading(false);
       }
     }, 300);
 
