@@ -86,7 +86,10 @@ export const GOOD_TO_KNOW = {
 } as const;
 
 export const DELIVERY_AGREEMENT_TEXT =
-  "Delivery charges are calculated separately based on distance. We use Uber, Porter or Rapido and will book the cheapest available option. The delivery charges and tracking details will be shared once your order is dispatched. Delivery charges are payable directly to the delivery partner upon receiving your order.";
+  "Delivery charges are calculated based on the distance entered by you from our location. We use Uber, Rapido/Porter to deliver your order. Your delivery tracking details will be shared with you via WhatsApp on the delivery date, using the number provided at checkout.";
+
+export const ALLERGEN_AGREEMENT_TEXT =
+  "I have read and understood the ingredients and allergen information provided for the products I am ordering.";
 
 export const FAQ_ITEMS = [
   {
