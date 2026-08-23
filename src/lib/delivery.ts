@@ -9,22 +9,35 @@
 import { supabase } from "./supabase";
 
 export type DeliveryFeeResult =
-  | { ok: true; distanceKm: number; fee: number }
+  | { ok: true; distanceKm: number; fee: number; locatedVia: "address" | "landmark" }
   | { ok: false; configured: false }
-  | { ok: false; configured: true; error: string };
+  | { ok: false; configured: true; needsManualConfirm?: boolean; error: string };
 
-/** Looks up the delivery fee for a 6-digit delivery pincode, based on
- * driving distance from our fixed dispatch pincode (560029). Never exposes
- * the underlying distance slabs to the caller beyond the final fee. */
-export async function getDeliveryFeeForPincode(pincode: string): Promise<DeliveryFeeResult> {
-  const clean = pincode.trim();
-  if (!/^\d{6}$/.test(clean)) {
+/** Looks up the delivery fee for a delivery address, based on driving
+ * distance from our fixed dispatch location (560029). Geocodes the address
+ * first; if that doesn't resolve with high confidence, falls back to
+ * geocoding the (mandatory) landmark instead. If neither resolves
+ * confidently, returns `needsManualConfirm: true` rather than blocking the
+ * order — the caller should let checkout proceed with a note that the fee
+ * will be confirmed manually. Never exposes the underlying distance slabs
+ * to the caller beyond the final fee. */
+export async function getDeliveryFee(input: {
+  address: string;
+  pincode: string;
+  landmark: string;
+}): Promise<DeliveryFeeResult> {
+  const pincode = input.pincode.trim();
+  if (!/^\d{6}$/.test(pincode)) {
     return { ok: false, configured: true, error: "Please enter a valid 6-digit pincode." };
+  }
+
+  if (!input.landmark.trim()) {
+    return { ok: false, configured: true, error: "Please enter a nearby landmark." };
   }
 
   try {
     const { data, error } = await supabase.functions.invoke("calculate-delivery-fee", {
-      body: { pincode: clean },
+      body: { address: input.address.trim(), pincode, landmark: input.landmark.trim() },
     });
 
     if (error) {
@@ -36,13 +49,24 @@ export async function getDeliveryFeeForPincode(pincode: string): Promise<Deliver
     }
 
     if (!data.ok) {
-      return { ok: false, configured: true, error: data.error ?? "Couldn't calculate delivery charges." };
+      return {
+        ok: false,
+        configured: true,
+        needsManualConfirm: Boolean(data.needsManualConfirm),
+        error: data.error ?? "Couldn't calculate delivery charges.",
+      };
     }
 
-    return { ok: true, distanceKm: data.distanceKm, fee: data.fee };
+    return { ok: true, distanceKm: data.distanceKm, fee: data.fee, locatedVia: data.locatedVia };
   } catch {
     return { ok: false, configured: true, error: "Couldn't calculate delivery charges right now." };
   }
+}
+
+/** @deprecated Use {@link getDeliveryFee} — kept only in case other code
+ * still imports the old pincode-only signature. */
+export async function getDeliveryFeeForPincode(pincode: string): Promise<DeliveryFeeResult> {
+  return getDeliveryFee({ address: "", pincode, landmark: pincode });
 }
 
 /* ---------------- Admin: delivery fee slabs ---------------- */
