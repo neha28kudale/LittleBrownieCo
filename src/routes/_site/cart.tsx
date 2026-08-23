@@ -4,7 +4,7 @@ import { useCart } from "@/lib/cart";
 import { ArrowRight, Minus, Plus, Trash2 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { DELIVERY_AGREEMENT_TEXT } from "@/lib/site-content";
+import { DELIVERY_AGREEMENT_TEXT, ALLERGEN_AGREEMENT_TEXT } from "@/lib/site-content";
 
 export const Route = createFileRoute("/_site/cart")({
   head: () => ({
@@ -26,6 +26,7 @@ export const Route = createFileRoute("/_site/cart")({
 function CartPage() {
   const { detailed, subtotal, update, remove, clear } = useCart();
   const [deliveryAgreed, setDeliveryAgreed] = useState(false);
+  const [allergenAgreed, setAllergenAgreed] = useState(false);
 
   if (detailed.length === 0) {
     return (
@@ -119,7 +120,7 @@ function CartPage() {
               </div>
               <div className="flex justify-between">
                 <dt className="text-muted-foreground">Delivery charges</dt>
-                <dd className="text-muted-foreground">Calculated at dispatch</dd>
+                <dd className="text-muted-foreground">Calculated at checkout</dd>
               </div>
               <div className="flex justify-between border-t border-border pt-3 font-serif text-lg text-primary">
                 <dt>Pay now</dt>
@@ -150,7 +151,26 @@ function CartPage() {
             </div>
           </div>
 
-          {deliveryAgreed ? (
+          <div className="rounded-lg border border-accent/30 bg-card p-5 shadow-soft lg:p-6">
+            <div className="flex items-start gap-3">
+              <Checkbox
+                id="allergen-agreement"
+                checked={allergenAgreed}
+                onCheckedChange={(checked) => setAllergenAgreed(checked === true)}
+              />
+              <Label
+                htmlFor="allergen-agreement"
+                className="cursor-pointer text-sm leading-snug text-primary/90"
+              >
+                {ALLERGEN_AGREEMENT_TEXT}{" "}
+                <Link to="/good-to-know" className="text-accent hover:underline">
+                  View Ingredients &amp; Allergens
+                </Link>
+              </Label>
+            </div>
+          </div>
+
+          {deliveryAgreed && allergenAgreed ? (
             <Link
               to="/checkout"
               className="flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-xs uppercase tracking-[0.18em] text-primary-foreground transition-colors hover:bg-cocoa-dark active:bg-cocoa-dark"
