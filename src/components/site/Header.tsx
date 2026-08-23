@@ -39,16 +39,19 @@ export function Header() {
       <div className="container-x h-20 md:h-24">
         <div className="grid h-full grid-cols-[minmax(0,1fr)_auto] items-center gap-2 sm:gap-3 lg:grid-cols-[minmax(0,1.4fr)_auto_auto] lg:gap-6">
           <Link to="/" className="flex min-w-0 items-center gap-2 md:gap-3" onClick={closeMobile}>
-            <img src={IMG.logo} alt="Little Brownie Co."
-  className="h-14 w-14 shrink-0 rounded-full border border-border/80 object-cover shadow-soft md:h-20 md:w-20" />
-<div className="min-w-0">
-  <div className="whitespace-nowrap font-serif text-[1.55rem] leading-none text-primary sm:text-[1.9rem] lg:text-[2.4rem]">
-    Little Brownie Co.
-  </div>
-  <div className="truncate pt-1 text-[9px] uppercase tracking-[0.14em] text-muted-foreground sm:text-[11px] sm:tracking-[0.22em]">
-    Handcrafted since 2025
-  </div>
-</div>
+            <img
+              src={IMG.logo}
+              alt="Little Brownie Co."
+              className="h-14 w-14 shrink-0 rounded-full border border-border/80 object-cover shadow-soft md:h-20 md:w-20"
+            />
+            <div className="min-w-0">
+              <div className="whitespace-nowrap font-serif text-[1.55rem] leading-none text-primary sm:text-[1.9rem] lg:text-[2.4rem]">
+                Little Brownie Co.
+              </div>
+              <div className="truncate pt-1 text-[9px] uppercase tracking-[0.14em] text-muted-foreground sm:text-[11px] sm:tracking-[0.22em]">
+                Handcrafted since 2025
+              </div>
+            </div>
           </Link>
 
           <nav className="hidden items-center justify-center gap-5 xl:gap-8 lg:flex">
@@ -110,7 +113,7 @@ export function Header() {
           </nav>
 
           <div className="hidden items-center gap-2 lg:flex xl:gap-3">
-            
+            <a
               href={whatsappLink("Hi Little Brownie Co., I'd like to place an order.")}
               target="_blank"
               rel="noreferrer"
@@ -171,7 +174,7 @@ export function Header() {
       {open && (
         <div className="border-t border-border/60 bg-background lg:hidden animate-mobile-panel">
           <div className="container-x py-4">
-            
+            <a
               href={whatsappLink("Hi Little Brownie Co., I'd like to place an order.")}
               target="_blank"
               rel="noreferrer"
