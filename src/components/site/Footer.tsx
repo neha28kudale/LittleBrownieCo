@@ -10,7 +10,7 @@ import {
 export function Footer() {
   return (
     <footer className="mt-20 border-t border-border/60 bg-surface-soft md:mt-28">
-      <div className="container-x grid gap-10 py-12 md:grid-cols-2 md:gap-12 md:py-16 lg:grid-cols-4">
+      <div className="container-x grid gap-6 py-12 md:grid-cols-2 md:gap-12 md:py-16 lg:grid-cols-4">
         <div>
           <div className="flex items-center gap-3">
             <img
@@ -53,7 +53,7 @@ export function Footer() {
             <div className="h-12 w-12 shrink-0 rounded-full" />
             <div className="font-serif text-[1.4rem] leading-none sm:text-[1.6rem]">.</div>
           </div>
-          <h4 className="mt-6 text-xs uppercase tracking-[0.24em] text-muted-foreground md:mt-6">
+          <h4 className="mt-0 text-xs uppercase tracking-[0.24em] text-muted-foreground md:mt-6">
             Good to Know
           </h4>
           <ul className="mt-5 space-y-2.5 text-sm">
@@ -75,11 +75,11 @@ export function Footer() {
             <div className="h-12 w-12 shrink-0 rounded-full" />
             <div className="font-serif text-[1.4rem] leading-none sm:text-[1.6rem]">.</div>
           </div>
-          <h4 className="mt-6 text-xs uppercase tracking-[0.24em] text-muted-foreground md:mt-6">Policies</h4>
+          <h4 className="mt-0 text-xs uppercase tracking-[0.24em] text-muted-foreground md:mt-6">Policies</h4>
           <ul className="mt-5 space-y-2.5 text-sm">
             <li>
               <Link to="/policies" className="text-primary/80 hover:text-accent">
-                Policies
+                Order and Delivery Policies
               </Link>
             </li>
           </ul>
@@ -90,7 +90,7 @@ export function Footer() {
             <div className="h-12 w-12 shrink-0 rounded-full" />
             <div className="font-serif text-[1.4rem] leading-none sm:text-[1.6rem]">.</div>
           </div>
-          <h4 className="mt-6 text-xs uppercase tracking-[0.24em] text-muted-foreground md:mt-6">Follow Us</h4>
+          <h4 className="mt-0 text-xs uppercase tracking-[0.24em] text-muted-foreground md:mt-6">Follow Us</h4>
           <ul className="mt-5 space-y-2.5 text-sm">
             <li>
               <a
