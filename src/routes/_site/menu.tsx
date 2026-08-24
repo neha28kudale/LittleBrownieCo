@@ -4,6 +4,7 @@ import { getProducts, type Product } from "@/lib/products";
 import { ProductCard } from "@/components/site/ProductCard";
 import { Reveal } from "@/components/site/Reveal";
 import { MENU_CATEGORIES, type MenuCategory } from "@/lib/site-content";
+import { getCategoryLabels, type CategoryLabels } from "@/lib/categories";
 
 type MenuSearch = {
   cat?: MenuCategory;
@@ -20,9 +21,10 @@ export const Route = createFileRoute("/_site/menu")({
     return {};
   },
 
-  loader: async () => ({
-    products: await getProducts(),
-  }),
+  loader: async () => {
+    const [products, categoryLabels] = await Promise.all([getProducts(), getCategoryLabels()]);
+    return { products, categoryLabels };
+  },
 
   head: () => ({
     meta: [
@@ -57,8 +59,9 @@ export const Route = createFileRoute("/_site/menu")({
 const categories = ["All", ...MENU_CATEGORIES] as const;
 
 function Menu() {
-  const { products } = Route.useLoaderData() as {
+  const { products, categoryLabels } = Route.useLoaderData() as {
     products: Product[];
+    categoryLabels: CategoryLabels;
   };
 
   const { cat: searchCat } = Route.useSearch();
@@ -122,7 +125,7 @@ function Menu() {
                     : "border-border bg-background text-primary/70 hover:border-primary/50 hover:text-primary"
                 }`}
               >
-                {category}
+                {category === "All" ? "All" : categoryLabels[category]}
               </Link>
             ))}
           </div>
@@ -138,7 +141,7 @@ function Menu() {
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 lg:gap-8">
             {filtered.map((product, index) => (
               <Reveal key={product.id} delay={(index % 6) * 60}>
-                <ProductCard product={product} />
+                <ProductCard product={product} categoryLabel={categoryLabels[product.category]} />
               </Reveal>
             ))}
           </div>
