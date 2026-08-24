@@ -2,9 +2,10 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { getProducts, findProduct, whatsappLink, type Product } from "@/lib/products";
 import { useCart } from "@/lib/cart";
-import { Minus, Plus, ArrowUpRight } from "lucide-react";
+import { Minus, Plus, ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { ProductCard } from "@/components/site/ProductCard";
+import { getCategoryLabels, type CategoryLabels } from "@/lib/categories";
 
 export const Route = createFileRoute("/_site/product/$id")({
   loader: async ({ params }) => {
@@ -12,7 +13,8 @@ export const Route = createFileRoute("/_site/product/$id")({
     const product = findProduct(all, params.id);
     if (!product) throw notFound();
     const related = all.filter((p) => p.id !== product.id).slice(0, 3);
-    return { product, related };
+    const categoryLabels = await getCategoryLabels();
+    return { product, related, categoryLabels };
   },
   head: ({ loaderData }) => {
     const p = loaderData?.product;
@@ -39,7 +41,11 @@ export const Route = createFileRoute("/_site/product/$id")({
 });
 
 function ProductPage() {
-  const { product, related } = Route.useLoaderData() as { product: Product; related: Product[] };
+  const { product, related, categoryLabels } = Route.useLoaderData() as {
+    product: Product;
+    related: Product[];
+    categoryLabels: CategoryLabels;
+  };
   const [qty, setQty] = useState(1);
   const [active, setActive] = useState(0);
   const { add } = useCart();
@@ -86,7 +92,7 @@ function ProductPage() {
 
         <div className="mt-6 grid gap-8 md:mt-8 md:grid-cols-2 md:gap-12">
           <div>
-            <div className="aspect-square overflow-hidden rounded-md border border-border/70 bg-secondary sm:aspect-[4/5]">
+            <div className="group relative aspect-square overflow-hidden rounded-md border border-border/70 bg-secondary sm:aspect-[4/5]">
               <img
                 src={product.gallery[active] || product.image}
                 alt={product.name}
@@ -98,6 +104,38 @@ function ProductPage() {
                 }}
                 className="h-full w-full object-cover"
               />
+              {product.gallery.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setActive((i) => (i - 1 + product.gallery.length) % product.gallery.length)
+                    }
+                    aria-label="Previous image"
+                    className="absolute left-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-background/80 text-primary opacity-100 shadow-sm backdrop-blur transition-opacity duration-200 hover:bg-background sm:h-10 sm:w-10 sm:opacity-0 sm:group-hover:opacity-100 sm:focus-visible:opacity-100"
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActive((i) => (i + 1) % product.gallery.length)}
+                    aria-label="Next image"
+                    className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-background/80 text-primary opacity-100 shadow-sm backdrop-blur transition-opacity duration-200 hover:bg-background sm:h-10 sm:w-10 sm:opacity-0 sm:group-hover:opacity-100 sm:focus-visible:opacity-100"
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                  </button>
+                  <div className="absolute bottom-2 left-1/2 flex -translate-x-1/2 gap-1.5">
+                    {product.gallery.map((_, i) => (
+                      <span
+                        key={i}
+                        className={`h-1.5 w-1.5 rounded-full transition-colors ${
+                          i === active ? "bg-primary" : "bg-primary/30"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
             {product.gallery.length > 1 && (
               <div className="mt-3 flex gap-3 overflow-x-auto pb-1">
@@ -122,7 +160,7 @@ function ProductPage() {
 
           <div className="flex flex-col">
             <span className="text-[11px] uppercase tracking-[0.28em] text-toffee">
-              {product.category}
+              {categoryLabels[product.category]}
             </span>
             <h1 className="mt-3 font-serif text-4xl leading-tight text-primary sm:text-5xl md:text-6xl">
               {product.name}
