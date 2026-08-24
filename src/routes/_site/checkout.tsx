@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
-import { useCart } from "@/lib/cart";
+import { useCart, RIBBON_FEE } from "@/lib/cart";
 import { createOrder } from "@/lib/orders";
 import {
   DELIVERY_TIME_SLOTS,
@@ -12,7 +12,7 @@ import {
   toISODate,
   getDeliveryFee,
 } from "@/lib/delivery";
-import { DELIVERY_AGREEMENT_TEXT } from "@/lib/site-content";
+import { DELIVERY_AGREEMENT_TEXT, ALLERGEN_AGREEMENT_TEXT } from "@/lib/site-content";
 import { supabase } from "@/lib/supabase";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
@@ -31,10 +31,9 @@ export const Route = createFileRoute("/_site/checkout")({
 const CASHFREE_MODE =
   (import.meta.env.VITE_CASHFREE_MODE as string) || "sandbox";
 
-const RIBBON_FEE = 15;
 
 function Checkout() {
-  const { detailed, subtotal, clear } = useCart();
+  const { detailed, subtotal, clear, isGift, giftMessage, ribbonFee } = useCart();
   const navigate = useNavigate();
 
   const [name, setName] = useState("");
@@ -52,11 +51,9 @@ function Checkout() {
   const [slot, setSlot] = useState("");
   const [notes, setNotes] = useState("");
   const [deliveryAgreed, setDeliveryAgreed] = useState(false);
-  const [isGift, setIsGift] = useState(false);
-  const [giftMessage, setGiftMessage] = useState("");
+  const [allergenAgreed, setAllergenAgreed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  const ribbonFee = isGift ? RIBBON_FEE : 0;
   const payableTotal = subtotal + (deliveryFee ?? 0) + ribbonFee;
 
   // Debounced address + pincode + landmark -> delivery fee lookup.
@@ -175,6 +172,11 @@ function Checkout() {
 
     if (!deliveryAgreed) {
       toast.error("Please agree to the delivery policy to proceed.");
+      return;
+    }
+
+    if (!allergenAgreed) {
+      toast.error("Please confirm you've read the ingredients & allergen info to proceed.");
       return;
     }
 
@@ -571,60 +573,24 @@ function Checkout() {
             </div>
           </div>
 
-          {/* GIFT OPTION */}
-          <div className="rounded-lg border border-border bg-card p-5 shadow-soft transition-shadow duration-300 hover:shadow-md sm:p-6">
-            <h2 className="font-serif text-2xl text-primary">
-              Is this a gift? 🎁
-            </h2>
-
-            <div className="mt-4 space-y-3">
-              <label className="flex cursor-pointer items-start gap-3 rounded-lg p-1.5 transition-colors hover:bg-secondary/40">
-                <input
-                  type="radio"
-                  name="is-gift"
-                  checked={isGift}
-                  onChange={() => setIsGift(true)}
-                  className="mt-1 h-4 w-4 accent-primary"
-                />
-
-                <span className="text-sm leading-snug text-primary/90">
-                  Yes, add a ribbon (₹{RIBBON_FEE})
-                </span>
-              </label>
-
-              <label className="flex cursor-pointer items-start gap-3 rounded-lg p-1.5 transition-colors hover:bg-secondary/40">
-                <input
-                  type="radio"
-                  name="is-gift"
-                  checked={!isGift}
-                  onChange={() => {
-                    setIsGift(false);
-                    setGiftMessage("");
-                  }}
-                  className="mt-1 h-4 w-4 accent-primary"
-                />
-
-                <span className="text-sm leading-snug text-primary/90">
-                  No
-                </span>
-              </label>
+          {/* ALLERGEN AGREEMENT */}
+          <div className="rounded-lg border border-accent/30 bg-card p-5 shadow-soft sm:p-6">
+            <div className="flex items-start gap-3">
+              <Checkbox
+                id="allergen-agreement"
+                checked={allergenAgreed}
+                onCheckedChange={(checked) => setAllergenAgreed(checked === true)}
+              />
+              <Label
+                htmlFor="allergen-agreement"
+                className="cursor-pointer text-sm leading-snug text-primary/90"
+              >
+                {ALLERGEN_AGREEMENT_TEXT}{" "}
+                <Link to="/good-to-know" className="text-accent hover:underline">
+                  View Ingredients &amp; Allergens
+                </Link>
+              </Label>
             </div>
-
-            {isGift && (
-              <label className="mt-4 block animate-in fade-in slide-in-from-top-1 duration-300">
-                <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-                  Gift message
-                </span>
-
-                <textarea
-                  value={giftMessage}
-                  onChange={(e) => setGiftMessage(e.target.value)}
-                  rows={2}
-                  placeholder="Write a short note for the recipient…"
-                  className="mt-2 w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm text-primary outline-none focus:border-accent"
-                />
-              </label>
-            )}
           </div>
         </div>
 
