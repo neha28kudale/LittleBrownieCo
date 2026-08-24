@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { getProducts, findProduct, whatsappLink, type Product } from "@/lib/products";
 import { useCart } from "@/lib/cart";
 import { Minus, Plus, ArrowUpRight } from "lucide-react";
@@ -42,9 +42,33 @@ function ProductPage() {
   const { product, related } = Route.useLoaderData() as { product: Product; related: Product[] };
   const [qty, setQty] = useState(1);
   const [active, setActive] = useState(0);
-  const [variantId, setVariantId] = useState(product.variants[0]!.id);
-  const variant = product.variants.find((v) => v.id === variantId)!;
   const { add } = useCart();
+
+  // Flavours that actually have a priced size tied to them (rows where the
+  // admin picked a flavour for that size). Sizes left as "All flavours" are
+  // shown no matter which flavour (or none) is selected.
+  const flavoursWithVariants = Array.from(
+    new Set(product.variants.map((v) => v.flavour).filter((f): f is string => !!f)),
+  );
+  const [flavour, setFlavour] = useState<string | null>(flavoursWithVariants[0] ?? null);
+
+  const visibleVariants = flavoursWithVariants.length
+    ? product.variants.filter((v) => !v.flavour || v.flavour === flavour)
+    : product.variants;
+
+  const [variantId, setVariantId] = useState(visibleVariants[0]!.id);
+  const variant =
+    visibleVariants.find((v) => v.id === variantId) ?? visibleVariants[0] ?? product.variants[0]!;
+
+  // Switching flavour can make the previously-picked size no longer apply
+  // (e.g. it was priced only for the old flavour) — snap to the first
+  // size that's valid for the newly selected flavour.
+  useEffect(() => {
+    if (!visibleVariants.some((v) => v.id === variantId) && visibleVariants[0]) {
+      setVariantId(visibleVariants[0].id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [flavour]);
 
   return (
     <>
@@ -110,12 +134,35 @@ function ProductPage() {
 
             <p className="mt-6 leading-relaxed text-primary/80">{product.description}</p>
 
+            {flavoursWithVariants.length > 0 && (
+              <div className="mt-8">
+                <div className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
+                  Choose your flavour
+                </div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {flavoursWithVariants.map((f) => (
+                    <button
+                      key={f}
+                      onClick={() => setFlavour(f)}
+                      className={`rounded-full border px-4 py-2 text-xs transition ${
+                        f === flavour
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-border text-primary/80 hover:border-primary/50"
+                      }`}
+                    >
+                      {f}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div className="mt-8">
               <div className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
                 Choose your option
               </div>
               <div className="mt-3 flex flex-wrap gap-2">
-                {product.variants.map((v) => (
+                {visibleVariants.map((v) => (
                   <button
                     key={v.id}
                     onClick={() => setVariantId(v.id)}
@@ -160,7 +207,9 @@ function ProductPage() {
               </button>
               <a
                 href={whatsappLink(
-                  `Hi, I'd like to order ${qty} × ${product.name} (${variant.label}) — ₹${variant.price * qty}.`,
+                  `Hi, I'd like to order ${qty} × ${product.name} (${variant.label}${
+                    variant.flavour ? `, ${variant.flavour}` : ""
+                  }) — ₹${variant.price * qty}.`,
                 )}
                 target="_blank"
                 rel="noreferrer"
