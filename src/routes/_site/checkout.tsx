@@ -643,7 +643,7 @@ function Checkout() {
                 <span className="min-w-0 truncate">
                   {d.qty} × {d.product.name}{" "}
                   <span className="text-muted-foreground">
-                    ({d.variant.label})
+                    ({d.variant.label}{d.variant.flavour ? `, ${d.variant.flavour}` : ""})
                   </span>
                 </span>
 
