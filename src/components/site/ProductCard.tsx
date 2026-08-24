@@ -8,9 +8,13 @@ import { toast } from "sonner";
 export function ProductCard({
   product,
   onAddToCart,
+  categoryLabel,
 }: {
   product: Product;
   onAddToCart?: (product: Product, variant: Product["variants"][number], qty: number) => void;
+  /** Display name for product.category, in case an admin has renamed it
+   * from the dashboard. Falls back to the raw category if not passed. */
+  categoryLabel?: string;
 }) {
   const { add } = useCart();
   const [variantId, setVariantId] = useState(product.variants[0]!.id);
@@ -43,7 +47,7 @@ export function ProductCard({
           className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
         />
         <span className="absolute left-3 top-3 rounded-full border border-border/60 bg-background/92 px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-primary backdrop-blur sm:left-4 sm:top-4 sm:px-3">
-          {product.category}
+          {categoryLabel || product.category}
         </span>
         {/* Hover/tap affordance so it's clear the card opens a detail view */}
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-primary/0 opacity-0 transition-all duration-300 group-hover:bg-primary/25 group-hover:opacity-100">
