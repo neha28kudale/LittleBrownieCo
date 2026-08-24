@@ -1,440 +1,124 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import {
-  getProducts,
-  findProduct,
-  whatsappLink,
-  type Product,
-} from "@/lib/products";
+import { Link } from "@tanstack/react-router";
+import { Plus, Expand, Check } from "lucide-react";
+import { useState } from "react";
+import { fromPrice, type Product } from "@/lib/products";
 import { useCart } from "@/lib/cart";
-import {
-  Minus,
-  Plus,
-  ArrowUpRight,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
 import { toast } from "sonner";
-import { ProductCard } from "@/components/site/ProductCard";
-import { getCategoryLabels, type CategoryLabels } from "@/lib/categories";
 
-export const Route = createFileRoute("/_site/product/$id")({
-  loader: async ({ params }) => {
-    const all = await getProducts();
-    const product = findProduct(all, params.id);
+export function ProductCard({
+  product,
+  onAddToCart,
+  categoryLabel,
+}: {
+  product: Product;
+  onAddToCart?: (product: Product, variant: Product["variants"][number], qty: number) => void;
+  /** Display name for product.category, in case an admin has renamed it
+   * from the dashboard. Falls back to the raw category if not passed. */
+  categoryLabel?: string;
+}) {
+  const { add } = useCart();
+  const [variantId, setVariantId] = useState(product.variants[0]!.id);
+  const variant = product.variants.find((v) => v.id === variantId)!;
+  const [justAdded, setJustAdded] = useState(false);
 
-    if (!product) throw notFound();
+  const handleAddToCart = () => {
+    if (onAddToCart) {
+      onAddToCart(product, variant, 1);
+    } else {
+      add(product.id, variant.id);
+      toast.success(`${product.name} (${variant.label}) added`);
+    }
 
-    const related = all.filter((p) => p.id !== product.id).slice(0, 3);
-    const categoryLabels = await getCategoryLabels();
-
-    return {
-      product,
-      related,
-      categoryLabels,
-    };
-  },
-
-  head: ({ loaderData }) => {
-    const p = loaderData?.product;
-
-    return {
-      meta: [
-        {
-          title: p
-            ? `${p.name} — Little Brownie Co.`
-            : "Little Brownie Co.",
-        },
-        {
-          name: "description",
-          content: p?.description ?? "",
-        },
-        {
-          property: "og:title",
-          content: p?.name ?? "",
-        },
-        {
-          property: "og:description",
-          content: p?.tagline ?? "",
-        },
-        {
-          property: "og:type",
-          content: "product",
-        },
-        {
-          name: "twitter:card",
-          content: "summary_large_image",
-        },
-      ],
-    };
-  },
-
-  notFoundComponent: () => (
-    <div className="container-x py-32 text-center">
-      <h1 className="font-serif text-4xl text-primary">
-        Not baked yet.
-      </h1>
-
-      <Link
-        to="/menu"
-        className="mt-4 inline-block text-accent"
-      >
-        Back to menu
-      </Link>
-    </div>
-  ),
-
-  component: ProductPage,
-});
-
-function ProductPage() {
-  const {
-    product,
-    related,
-    categoryLabels,
-  } = Route.useLoaderData() as {
-    product: Product;
-    related: Product[];
-    categoryLabels: CategoryLabels;
+    setJustAdded(true);
+    window.setTimeout(() => setJustAdded(false), 1200);
   };
 
-  const [qty, setQty] = useState(1);
-  const [active, setActive] = useState(0);
-
-  const { add } = useCart();
-
-  const flavoursWithVariants = Array.from(
-    new Set(
-      product.variants
-        .map((v) => v.flavour)
-        .filter((f): f is string => !!f),
-    ),
-  );
-
-  const [flavour, setFlavour] = useState<string | null>(
-    flavoursWithVariants[0] ?? null,
-  );
-
-  const visibleVariants = flavoursWithVariants.length
-    ? product.variants.filter(
-        (v) => !v.flavour || v.flavour === flavour,
-      )
-    : product.variants;
-
-  const [variantId, setVariantId] = useState(
-    visibleVariants[0]!.id,
-  );
-
-  const variant =
-    visibleVariants.find((v) => v.id === variantId) ??
-    visibleVariants[0] ??
-    product.variants[0]!;
-
-  useEffect(() => {
-    if (
-      !visibleVariants.some((v) => v.id === variantId) &&
-      visibleVariants[0]
-    ) {
-      setVariantId(visibleVariants[0].id);
-    }
-  }, [flavour]);
-
   return (
-    <>
-      {/* PRODUCT DETAILS */}
-      <section className="container-x min-w-0 overflow-x-hidden pt-6 pb-12 md:pt-16 md:pb-16">
-        <nav className="min-w-0 overflow-hidden text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-          <Link
-            to="/"
-            className="hover:text-primary"
-          >
-            Home
-          </Link>{" "}
-          ·{" "}
-          <Link
-            to="/menu"
-            className="hover:text-primary"
-          >
-            Menu
-          </Link>{" "}
-          ·{" "}
-          <span className="text-primary">
-            {product.name}
+    <article className="lift-hover group flex h-full flex-col rounded-[0.45rem] border border-border/70 bg-card p-2.5 shadow-soft sm:p-3">
+      <Link
+        to="/product/$id"
+        params={{ id: product.slug }}
+        className="img-zoom relative block aspect-square cursor-pointer overflow-hidden rounded-[0.4rem] bg-secondary sm:aspect-[4/5]"
+      >
+        <img
+          src={product.image}
+          alt={product.name}
+          loading="lazy"
+          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+        />
+        <span className="absolute left-3 top-3 rounded-full border border-border/60 bg-background/92 px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-primary backdrop-blur sm:left-4 sm:top-4 sm:px-3">
+          {categoryLabel || product.category}
+        </span>
+        {/* Hover/tap affordance so it's clear the card opens a detail view */}
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-primary/0 opacity-0 transition-all duration-300 group-hover:bg-primary/25 group-hover:opacity-100">
+          <span className="inline-flex translate-y-1 items-center gap-1.5 rounded-full bg-background/95 px-3.5 py-1.5 text-[11px] font-medium uppercase tracking-wider text-primary shadow-soft transition-transform duration-300 group-hover:translate-y-0">
+            <Expand className="h-3 w-3" /> View details
           </span>
-        </nav>
-
-        <div className="mt-6 grid min-w-0 max-w-full gap-8 md:mt-8 md:grid-cols-2 md:gap-12">
-          {/* PRODUCT IMAGE */}
-          <div className="min-w-0 max-w-full">
-            <div className="group relative aspect-square w-full max-w-full overflow-hidden rounded-md border border-border/70 bg-secondary sm:aspect-[4/5]">
-              <img
-                src={
-                  product.gallery[active] ||
-                  product.image
-                }
-                alt={product.name}
-                style={{
-                  objectPosition:
-                    (product.gallery.length
-                      ? product.galleryPositions?.[active]
-                      : undefined) ||
-                    product.imagePosition ||
-                    "center",
-                }}
-                className="block h-full w-full max-w-full object-cover"
-              />
-
-              {product.gallery.length > 1 && (
-                <>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setActive(
-                        (i) =>
-                          (i -
-                            1 +
-                            product.gallery.length) %
-                          product.gallery.length,
-                      )
-                    }
-                    aria-label="Previous image"
-                    className="absolute left-2 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-background/80 text-primary shadow-sm backdrop-blur sm:h-10 sm:w-10"
-                  >
-                    <ChevronLeft className="h-5 w-5" />
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setActive(
-                        (i) =>
-                          (i + 1) %
-                          product.gallery.length,
-                      )
-                    }
-                    aria-label="Next image"
-                    className="absolute right-2 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-background/80 text-primary shadow-sm backdrop-blur sm:h-10 sm:w-10"
-                  >
-                    <ChevronRight className="h-5 w-5" />
-                  </button>
-
-                  <div className="absolute bottom-2 left-1/2 z-10 flex -translate-x-1/2 gap-1.5">
-                    {product.gallery.map((_, i) => (
-                      <span
-                        key={i}
-                        className={`h-1.5 w-1.5 rounded-full transition-colors ${
-                          i === active
-                            ? "bg-primary"
-                            : "bg-primary/30"
-                        }`}
-                      />
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
-
-            {/* THUMBNAILS */}
-            {product.gallery.length > 1 && (
-              <div className="mt-3 flex max-w-full gap-3 overflow-x-auto pb-1">
-                {product.gallery.map((g, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setActive(i)}
-                    className={`h-16 w-16 shrink-0 overflow-hidden rounded-sm border-2 sm:h-20 sm:w-20 ${
-                      active === i
-                        ? "border-accent"
-                        : "border-transparent"
-                    }`}
-                    aria-label={`View image ${i + 1}`}
-                  >
-                    <img
-                      src={g}
-                      alt=""
-                      style={{
-                        objectPosition:
-                          product.galleryPositions?.[i] ||
-                          "center",
-                      }}
-                      className="h-full w-full max-w-full object-cover"
-                    />
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* PRODUCT INFORMATION */}
-          <div className="min-w-0 flex flex-col">
-            <span className="text-[11px] uppercase tracking-[0.28em] text-toffee">
-              {categoryLabels[product.category]}
-            </span>
-
-            <h1 className="mt-3 break-words font-serif text-4xl leading-tight text-primary sm:text-5xl md:text-6xl">
-              {product.name}
-            </h1>
-
-            <p className="mt-3 font-serif text-lg text-muted-foreground sm:text-xl">
-              {product.tagline}
-            </p>
-
-            <div className="mt-5 font-serif text-3xl text-primary">
-              ₹{variant.price}
-            </div>
-
-            <p className="mt-6 break-words leading-relaxed text-primary/80">
-              {product.description}
-            </p>
-
-            {/* FLAVOUR */}
-            {flavoursWithVariants.length > 0 && (
-              <div className="mt-8 min-w-0">
-                <div className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
-                  Choose your flavour
-                </div>
-
-                <div className="mt-3 flex max-w-full flex-wrap gap-2">
-                  {flavoursWithVariants.map((f) => (
-                    <button
-                      key={f}
-                      onClick={() => setFlavour(f)}
-                      className={`rounded-full border px-4 py-2 text-xs transition ${
-                        f === flavour
-                          ? "border-primary bg-primary text-primary-foreground"
-                          : "border-border text-primary/80 hover:border-primary/50"
-                      }`}
-                    >
-                      {f}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* OPTIONS */}
-            <div className="mt-8 min-w-0">
-              <div className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
-                Choose your option
-              </div>
-
-              <div className="mt-3 flex max-w-full flex-wrap gap-2">
-                {visibleVariants.map((v) => (
-                  <button
-                    key={v.id}
-                    onClick={() => setVariantId(v.id)}
-                    className={`rounded-full border px-4 py-2 text-xs transition ${
-                      v.id === variantId
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-border text-primary/80 hover:border-primary/50"
-                    }`}
-                  >
-                    {v.label} · ₹{v.price}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* CART ACTIONS */}
-            <div className="mt-8 flex min-w-0 max-w-full flex-wrap items-center gap-3 md:mt-10 md:gap-4">
-              <div className="inline-flex shrink-0 items-center rounded-full border border-border">
-                <button
-                  onClick={() =>
-                    setQty(Math.max(1, qty - 1))
-                  }
-                  className="rounded-full p-3 transition-colors hover:bg-caramel hover:text-cocoa active:bg-caramel-dark active:text-parchment"
-                  aria-label="Decrease"
-                >
-                  <Minus className="h-4 w-4" />
-                </button>
-
-                <span className="w-8 text-center">
-                  {qty}
-                </span>
-
-                <button
-                  onClick={() => setQty(qty + 1)}
-                  className="rounded-full p-3 transition-colors hover:bg-caramel hover:text-cocoa active:bg-caramel-dark active:text-parchment"
-                  aria-label="Increase"
-                >
-                  <Plus className="h-4 w-4" />
-                </button>
-              </div>
-
-              <button
-                onClick={() => {
-                  add(
-                    product.id,
-                    variant.id,
-                    qty,
-                  );
-
-                  toast.success(
-                    `Added ${qty} × ${product.name}`,
-                  );
-                }}
-                className="min-w-0 flex-1 rounded-full bg-primary px-6 py-3 text-xs uppercase tracking-[0.18em] text-primary-foreground transition-colors hover:bg-cocoa-dark active:bg-cocoa-dark sm:flex-none"
-              >
-                Add to Cart · ₹
-                {variant.price * qty}
-              </button>
-
-              <a
-                href={whatsappLink(
-                  `Hi, I'd like to order ${qty} × ${
-                    product.name
-                  } (${variant.label}${
-                    variant.flavour
-                      ? `, ${variant.flavour}`
-                      : ""
-                  }) — ₹${
-                    variant.price * qty
-                  }.`,
-                )}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex min-w-0 flex-1 items-center justify-center gap-1 rounded-full border border-primary px-6 py-3 text-xs uppercase tracking-[0.18em] text-primary transition-colors hover:bg-primary hover:text-primary-foreground active:bg-cocoa-dark active:text-primary-foreground sm:flex-none"
-              >
-                Order on WhatsApp
-                <ArrowUpRight className="h-4 w-4 shrink-0" />
-              </a>
-            </div>
-          </div>
         </div>
-      </section>
-
-      {/* RELATED PRODUCTS */}
-      <section className="container-x min-w-0 max-w-full overflow-x-hidden mt-16 md:mt-24">
-        <div className="mb-8 flex min-w-0 max-w-full items-end justify-between gap-4 border-b border-border pb-5 md:mb-10">
-          <h2 className="min-w-0 font-serif text-2xl text-primary sm:text-3xl md:text-4xl">
-            You might also love
-          </h2>
-
+        <span className="absolute bottom-3 right-3 flex h-7 w-7 items-center justify-center rounded-full bg-background/90 text-primary shadow-soft backdrop-blur transition-opacity duration-300 sm:opacity-0 sm:group-hover:opacity-100">
+          <Expand className="h-3.5 w-3.5" />
+        </span>
+      </Link>
+      <div className="mt-3 flex items-start justify-between gap-3 px-1 sm:mt-4">
+        <div className="min-w-0">
+          <h3 className="font-serif text-[1.05rem] leading-tight text-primary sm:text-xl">
+            <Link
+              to="/product/$id"
+              params={{ id: product.slug }}
+              className="cursor-pointer underline decoration-transparent underline-offset-4 transition-colors hover:text-accent hover:decoration-accent"
+            >
+              {product.name}
+            </Link>
+          </h3>
+          <p className="mt-1 text-xs text-muted-foreground sm:text-sm">{product.tagline}</p>
           <Link
-            to="/menu"
-            className="shrink-0 whitespace-nowrap text-[11px] uppercase tracking-[0.18em] text-accent"
+            to="/product/$id"
+            params={{ id: product.slug }}
+            className="mt-1 inline-block text-[11px] font-medium text-accent underline underline-offset-2 hover:text-accent/80"
           >
-            See full menu
+            View details →
           </Link>
         </div>
-
-        {/* IMPORTANT:
-            min-w-0 prevents grid children from forcing the
-            section wider than the mobile viewport.
-        */}
-        <div className="grid w-full min-w-0 max-w-full grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
-          {related.map((p) => (
-            <div
-              key={p.id}
-              className="min-w-0 w-full max-w-full overflow-hidden"
-            >
-              <ProductCard
-                product={p}
-                categoryLabel={categoryLabels[p.category]}
-              />
-            </div>
-          ))}
+        <div className="shrink-0 text-right">
+          <div className="text-[9px] uppercase tracking-wider text-muted-foreground sm:text-[10px]">
+            from
+          </div>
+          <div className="font-serif text-base text-primary sm:text-lg">₹{fromPrice(product)}</div>
         </div>
-      </section>
-    </>
+      </div>
+      <div className="mt-3 flex flex-col gap-2 px-1 pb-1 sm:mt-4 sm:flex-row sm:items-center">
+        <select
+          value={variantId}
+          onChange={(e) => setVariantId(e.target.value)}
+          aria-label={`Choose an option for ${product.name}`}
+          className="min-w-0 flex-1 rounded-full border border-border bg-background px-3 py-2 text-xs text-primary transition-colors focus:border-accent focus:outline-none"
+        >
+          {product.variants.map((v) => (
+            <option key={v.id} value={v.id}>
+              {v.label} · ₹{v.price}
+            </option>
+          ))}
+        </select>
+        <button
+          onClick={handleAddToCart}
+          disabled={justAdded}
+          className={`inline-flex shrink-0 items-center justify-center gap-1 rounded-full px-4 py-2 text-xs uppercase tracking-wider transition-all duration-300 active:scale-95 ${
+            justAdded
+              ? "w-[5.5rem] scale-105 bg-accent text-accent-foreground"
+              : "bg-primary text-primary-foreground hover:bg-cocoa-dark active:bg-cocoa-dark"
+          }`}
+        >
+          {justAdded ? (
+            <>
+              <Check className="h-3 w-3" /> Added
+            </>
+          ) : (
+            <>
+              <Plus className="h-3 w-3" /> Add
+            </>
+          )}
+        </button>
+      </div>
+    </article>
   );
 }
