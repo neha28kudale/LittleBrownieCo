@@ -95,6 +95,12 @@ function ProductPage() {
             <div className="group relative aspect-[4/5] w-full max-w-full overflow-hidden rounded-md border border-border/70 bg-secondary">
               <img
                 src={product.gallery[active] || product.image}
+                alt=""
+                aria-hidden="true"
+                className="absolute inset-0 h-full w-full scale-110 object-cover opacity-60 blur-2xl"
+              />
+              <img
+                src={product.gallery[active] || product.image}
                 alt={product.name}
                 style={{
                   objectPosition:
@@ -102,7 +108,7 @@ function ProductPage() {
                     product.imagePosition ||
                     "center",
                 }}
-                className="h-full w-full object-contain"
+                className="relative h-full w-full object-contain"
               />
               {product.gallery.length > 1 && (
                 <>
