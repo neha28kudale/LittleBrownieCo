@@ -45,7 +45,7 @@ export function Header() {
               className="h-14 w-14 shrink-0 rounded-full border border-border/80 object-cover shadow-soft md:h-20 md:w-20"
             />
             <div className="min-w-0">
-              <div className="whitespace-nowrap font-serif text-[1.55rem] leading-none text-primary sm:text-[1.9rem] lg:text-[2.4rem]">
+              <div className="truncate font-serif text-[1.55rem] leading-none text-primary sm:text-[1.9rem] lg:text-[2.4rem]">
                 Little Brownie Co.
               </div>
               <div className="truncate pt-1 text-[9px] uppercase tracking-[0.14em] text-muted-foreground sm:text-[11px] sm:tracking-[0.22em]">
