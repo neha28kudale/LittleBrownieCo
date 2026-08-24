@@ -125,7 +125,7 @@ function CartPage() {
               </div>
               <div className="flex justify-between border-t border-border pt-3 font-serif text-lg text-primary">
                 <dt>Pay now</dt>
-                <dd>₹{subtotal}</dd>
+                <dd className="text-sm font-sans text-muted-foreground">Calculated at checkout</dd>
               </div>
             </dl>
           </div>
