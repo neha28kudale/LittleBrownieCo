@@ -307,7 +307,6 @@ function Home() {
     null,
   );
   const [heroSlide, setHeroSlide] = useState(0);
-  const heroScrollRef = useRef<HTMLDivElement>(null);
   const heroPausedRef = useRef(false);
 
   useEffect(() => {
@@ -319,19 +318,9 @@ function Home() {
     });
   }, []);
 
-  const scrollHeroTo = (index: number) => {
-    const el = heroScrollRef.current;
-    if (!el) return;
+  const goToHeroSlide = (index: number) => {
     const clamped = (index + HERO_GALLERY.length) % HERO_GALLERY.length;
-    el.scrollTo({ left: clamped * el.clientWidth, behavior: "smooth" });
     setHeroSlide(clamped);
-  };
-
-  const handleHeroScroll = () => {
-    const el = heroScrollRef.current;
-    if (!el) return;
-    const index = Math.round(el.scrollLeft / el.clientWidth);
-    setHeroSlide(index);
   };
 
   // Auto-advance the hero gallery every 4s; pause while the user is
@@ -340,12 +329,7 @@ function Home() {
     if (HERO_GALLERY.length <= 1) return;
     const interval = setInterval(() => {
       if (heroPausedRef.current) return;
-      setHeroSlide((prev) => {
-        const next = (prev + 1) % HERO_GALLERY.length;
-        const el = heroScrollRef.current;
-        if (el) el.scrollTo({ left: next * el.clientWidth, behavior: "smooth" });
-        return next;
-      });
+      setHeroSlide((prev) => (prev + 1) % HERO_GALLERY.length);
     }, 2800);
     return () => clearInterval(interval);
   }, []);
@@ -422,17 +406,15 @@ function Home() {
               onTouchStart={pauseHeroAutoplay}
               onTouchEnd={resumeHeroAutoplay}
             >
-              <div
-                ref={heroScrollRef}
-                onScroll={handleHeroScroll}
-                className="flex h-full w-full snap-x snap-mandatory overflow-x-auto scroll-smooth [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-              >
+              <div className="relative h-full w-full">
                 {HERO_GALLERY.map((src, i) => (
                   <img
                     key={i}
                     src={src}
                     alt="Little Brownie Co. brownies"
-                    className="h-full w-full flex-shrink-0 snap-center object-cover"
+                    className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-[1400ms] ease-in-out ${
+                      i === heroSlide ? "opacity-100" : "opacity-0"
+                    }`}
                   />
                 ))}
               </div>
@@ -443,7 +425,7 @@ function Home() {
                     aria-label="Previous photo"
                     onClick={() => {
                       pauseHeroAutoplay();
-                      scrollHeroTo(heroSlide - 1);
+                      goToHeroSlide(heroSlide - 1);
                       resumeHeroAutoplay();
                     }}
                     className="absolute left-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-background/80 text-primary shadow-soft transition hover:bg-background active:bg-caramel"
@@ -455,7 +437,7 @@ function Home() {
                     aria-label="Next photo"
                     onClick={() => {
                       pauseHeroAutoplay();
-                      scrollHeroTo(heroSlide + 1);
+                      goToHeroSlide(heroSlide + 1);
                       resumeHeroAutoplay();
                     }}
                     className="absolute right-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-background/80 text-primary shadow-soft transition hover:bg-background active:bg-caramel"
@@ -470,7 +452,7 @@ function Home() {
                         aria-label={`Go to photo ${i + 1}`}
                         onClick={() => {
                           pauseHeroAutoplay();
-                          scrollHeroTo(i);
+                          goToHeroSlide(i);
                           resumeHeroAutoplay();
                         }}
                         className={`h-1.5 rounded-full transition-all ${
