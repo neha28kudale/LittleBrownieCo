@@ -38,13 +38,14 @@ export function ProductCard({
       <Link
         to="/product/$id"
         params={{ id: product.slug }}
-        className="img-zoom relative block aspect-square cursor-pointer overflow-hidden rounded-[0.4rem] bg-secondary sm:aspect-[4/5]"
+        className="img-zoom relative block aspect-[4/5] w-full cursor-pointer overflow-hidden rounded-[0.4rem] bg-secondary"
       >
         <img
           src={product.image}
           alt={product.name}
           loading="lazy"
-          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+          style={{ objectPosition: product.imagePosition || "center" }}
+          className="h-full w-full object-contain transition-transform duration-700 group-hover:scale-105"
         />
         <span className="absolute left-3 top-3 rounded-full border border-border/60 bg-background/92 px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-primary backdrop-blur sm:left-4 sm:top-4 sm:px-3">
           {categoryLabel || product.category}
