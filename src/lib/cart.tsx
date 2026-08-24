@@ -1,7 +1,12 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { getProducts, type Product, type Variant } from "./products";
 
-export type CartItem = { key: string; productId: string; variantId: string; qty: number };
+export type CartItem = {
+  key: string;
+  productId: string;
+  variantId: string;
+  qty: number;
+};
 
 export type DetailedItem = {
   key: string;
@@ -25,8 +30,6 @@ type CartCtx = {
   drawerOpen: boolean;
   openDrawer: () => void;
   closeDrawer: () => void;
-  /** Gift/ribbon choice — set on the cart page, carried through to checkout
-   * so it isn't asked twice. */
   isGift: boolean;
   setIsGift: (v: boolean) => void;
   giftMessage: string;
@@ -35,8 +38,56 @@ type CartCtx = {
 };
 
 const Ctx = createContext<CartCtx | null>(null);
-const KEY = "lbc_cart_v2";
+
+/*
+ * v3 intentionally replaces the old cart storage.
+ * This prevents old test data from lbc_cart_v2 appearing
+ * in the new live cart.
+ */
+const KEY = "lbc_cart_v3";
 const GIFT_KEY = "lbc_gift_v1";
+
+function normalizeCartItems(value: unknown): CartItem[] {
+  if (!Array.isArray(value)) return [];
+
+  const merged = new Map<string, CartItem>();
+
+  for (const item of value) {
+    if (
+      !item ||
+      typeof item !== "object" ||
+      typeof (item as CartItem).productId !== "string" ||
+      typeof (item as CartItem).variantId !== "string"
+    ) {
+      continue;
+    }
+
+    const productId = (item as CartItem).productId;
+    const variantId = (item as CartItem).variantId;
+    const qty = Number((item as CartItem).qty);
+
+    if (!Number.isFinite(qty) || qty <= 0) continue;
+
+    const key = `${productId}:${variantId}`;
+    const existing = merged.get(key);
+
+    if (existing) {
+      merged.set(key, {
+        ...existing,
+        qty: existing.qty + Math.floor(qty),
+      });
+    } else {
+      merged.set(key, {
+        key,
+        productId,
+        variantId,
+        qty: Math.floor(qty),
+      });
+    }
+  }
+
+  return Array.from(merged.values());
+}
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
@@ -45,17 +96,36 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [isGift, setIsGift] = useState(false);
   const [giftMessage, setGiftMessage] = useState("");
 
+  // Important: don't write the initial [] to localStorage
+  // before the existing cart has finished loading.
+  const [storageLoaded, setStorageLoaded] = useState(false);
+
   useEffect(() => {
     try {
       const raw = localStorage.getItem(KEY);
-      if (raw) setItems(JSON.parse(raw));
-      const rawGift = localStorage.getItem(GIFT_KEY);
-      if (rawGift) {
-        const g = JSON.parse(rawGift);
-        setIsGift(!!g.isGift);
-        setGiftMessage(g.giftMessage || "");
+
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        setItems(normalizeCartItems(parsed));
       }
-    } catch {}
+
+      const rawGift = localStorage.getItem(GIFT_KEY);
+
+      if (rawGift) {
+        const gift = JSON.parse(rawGift);
+
+        setIsGift(!!gift.isGift);
+        setGiftMessage(
+          typeof gift.giftMessage === "string" ? gift.giftMessage : "",
+        );
+      }
+    } catch {
+      setItems([]);
+      setIsGift(false);
+      setGiftMessage("");
+    } finally {
+      setStorageLoaded(true);
+    }
   }, []);
 
   useEffect(() => {
@@ -63,34 +133,83 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
+    if (!storageLoaded) return;
+
     try {
       localStorage.setItem(KEY, JSON.stringify(items));
     } catch {}
-  }, [items]);
+  }, [items, storageLoaded]);
 
   useEffect(() => {
-    try {
-      localStorage.setItem(GIFT_KEY, JSON.stringify({ isGift, giftMessage }));
-    } catch {}
-  }, [isGift, giftMessage]);
+    if (!storageLoaded) return;
 
-  const add: CartCtx["add"] = (productId, variantId, qty = 1) => {
+    try {
+      localStorage.setItem(
+        GIFT_KEY,
+        JSON.stringify({
+          isGift,
+          giftMessage,
+        }),
+      );
+    } catch {}
+  }, [isGift, giftMessage, storageLoaded]);
+
+  const add: CartCtx["add"] = (
+    productId,
+    variantId,
+    qty = 1,
+  ) => {
+    const safeQty = Math.max(1, Math.floor(qty));
+
     setItems((prev) => {
       const key = `${productId}:${variantId}`;
-      const existing = prev.find((i) => i.key === key);
-      if (existing) return prev.map((i) => (i.key === key ? { ...i, qty: i.qty + qty } : i));
-      return [...prev, { key, productId, variantId, qty }];
+      const existing = prev.find((item) => item.key === key);
+
+      if (existing) {
+        return prev.map((item) =>
+          item.key === key
+            ? {
+                ...item,
+                qty: item.qty + safeQty,
+              }
+            : item,
+        );
+      }
+
+      return [
+        ...prev,
+        {
+          key,
+          productId,
+          variantId,
+          qty: safeQty,
+        },
+      ];
     });
   };
 
-  const remove: CartCtx["remove"] = (key) => setItems((prev) => prev.filter((i) => i.key !== key));
-
-  const update: CartCtx["update"] = (key, qty) =>
+  const remove: CartCtx["remove"] = (key) => {
     setItems((prev) =>
-      qty <= 0
-        ? prev.filter((i) => i.key !== key)
-        : prev.map((i) => (i.key === key ? { ...i, qty } : i)),
+      prev.filter((item) => item.key !== key),
     );
+  };
+
+  const update: CartCtx["update"] = (key, qty) => {
+    const safeQty = Math.floor(qty);
+
+    setItems((prev) =>
+      safeQty <= 0
+        ? prev.filter((item) => item.key !== key)
+        : prev.map((item) =>
+            item.key === key
+              ? {
+                  ...item,
+                  qty: safeQty,
+                }
+              : item,
+          ),
+    );
+  };
 
   const clear = () => {
     setItems([]);
@@ -99,16 +218,37 @@ export function CartProvider({ children }: { children: ReactNode }) {
   };
 
   const detailed = items
-    .map((i) => {
-      const product = catalog.find((p) => p.id === i.productId);
-      const variant = product?.variants.find((v) => v.id === i.variantId);
+    .map((item) => {
+      const product = catalog.find(
+        (p) => p.id === item.productId,
+      );
+
+      const variant = product?.variants.find(
+        (v) => v.id === item.variantId,
+      );
+
       if (!product || !variant) return null;
-      return { key: i.key, product, variant, qty: i.qty, lineTotal: variant.price * i.qty };
+
+      return {
+        key: item.key,
+        product,
+        variant,
+        qty: item.qty,
+        lineTotal: variant.price * item.qty,
+      };
     })
     .filter(Boolean) as DetailedItem[];
 
-  const count = items.reduce((s, i) => s + i.qty, 0);
-  const subtotal = detailed.reduce((s, i) => s + i.lineTotal, 0);
+  const count = items.reduce(
+    (total, item) => total + item.qty,
+    0,
+  );
+
+  const subtotal = detailed.reduce(
+    (total, item) => total + item.lineTotal,
+    0,
+  );
+
   const ribbonFee = isGift ? RIBBON_FEE : 0;
 
   return (
@@ -139,6 +279,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
 export function useCart() {
   const ctx = useContext(Ctx);
-  if (!ctx) throw new Error("useCart must be used inside <CartProvider>");
+
+  if (!ctx) {
+    throw new Error(
+      "useCart must be used inside <CartProvider>",
+    );
+  }
+
   return ctx;
 }
