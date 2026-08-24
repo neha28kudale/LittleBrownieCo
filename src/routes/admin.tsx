@@ -975,7 +975,7 @@ function ReviewsAdmin({
 type Draft = Partial<Product> & { price?: number };
 
 function emptyVariant(): Variant {
-  return { id: `v-${Math.random().toString(36).slice(2, 9)}`, label: "", price: 0 };
+  return { id: `v-${Math.random().toString(36).slice(2, 9)}`, label: "", price: 0, flavour: "" };
 }
 
 function ProductsAdmin({
@@ -993,12 +993,17 @@ function ProductsAdmin({
       toast.error("Name and price are required");
       return;
     }
+    const cleanFlavours = (draft.flavours || []).map((f) => f.trim()).filter(Boolean);
     const cleanVariants = (draft.variants || [])
       .filter((v) => v.label.trim() && v.price > 0)
-      .map((v) => ({ id: v.id, label: v.label.trim(), price: Number(v.price) }));
+      .map((v) => ({
+        id: v.id,
+        label: v.label.trim(),
+        price: Number(v.price),
+        flavour: v.flavour?.trim() || undefined,
+      }));
     const cleanGallery = (draft.gallery || []).filter(Boolean);
     const cleanGalleryPositions = cleanGallery.map((_, i) => (draft.galleryPositions || [])[i] || "center");
-    const cleanFlavours = (draft.flavours || []).map((f) => f.trim()).filter(Boolean);
     const cleanIngredients = (draft.ingredients || []).map((i) => i.trim()).filter(Boolean);
 
     setSaving(true);
@@ -1427,6 +1432,45 @@ function ProductModal({
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
                   </div>
+                  <div className="mt-2">
+                    <label className="mb-1 block text-[10px] uppercase tracking-wide text-muted-foreground">
+                      Flavour this price applies to (optional — leave blank if this size costs
+                      the same for every flavour)
+                    </label>
+                    {(d.flavours || []).filter((f) => f.trim()).length > 0 ? (
+                      <select
+                        value={v.flavour ?? ""}
+                        onChange={(e) => {
+                          const next = [...(d.variants || [])];
+                          next[i] = { ...next[i], flavour: e.target.value || undefined };
+                          setD({ ...d, variants: next });
+                        }}
+                        className="input w-full"
+                      >
+                        <option value="">All flavours (same price)</option>
+                        {(d.flavours || [])
+                          .map((f) => f.trim())
+                          .filter(Boolean)
+                          .map((f) => (
+                            <option key={f} value={f}>
+                              {f}
+                            </option>
+                          ))}
+                      </select>
+                    ) : (
+                      <input
+                        value={v.flavour ?? ""}
+                        onChange={(e) => {
+                          const next = [...(d.variants || [])];
+                          next[i] = { ...next[i], flavour: e.target.value };
+                          setD({ ...d, variants: next });
+                        }}
+                        placeholder="Add flavours above first, or leave blank"
+                        autoComplete="off"
+                        className="input w-full"
+                      />
+                    )}
+                  </div>
                 </div>
               ))}
               <button
@@ -1439,6 +1483,9 @@ function ProductModal({
               <p className="text-[11px] text-muted-foreground">
                 Customers will see one button per row above (e.g. "500g", "1kg"). If you leave
                 all rows empty, the single Price field near the top of this form is used instead.
+                To give the same size a different price per flavour, add one row per flavour
+                (e.g. two "500g" rows — one tagged "Dark Chocolate" at ₹585, one tagged "Nutella"
+                at ₹625) and set the Flavour dropdown on each row.
               </p>
             </div>
           </div>
