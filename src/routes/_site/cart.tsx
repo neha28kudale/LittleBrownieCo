@@ -1,10 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
-import { useCart } from "@/lib/cart";
+import { useCart, RIBBON_FEE } from "@/lib/cart";
 import { ArrowRight, Minus, Plus, Trash2 } from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import { DELIVERY_AGREEMENT_TEXT, ALLERGEN_AGREEMENT_TEXT } from "@/lib/site-content";
 
 export const Route = createFileRoute("/_site/cart")({
   head: () => ({
@@ -24,9 +20,17 @@ export const Route = createFileRoute("/_site/cart")({
 });
 
 function CartPage() {
-  const { detailed, subtotal, update, remove, clear } = useCart();
-  const [deliveryAgreed, setDeliveryAgreed] = useState(false);
-  const [allergenAgreed, setAllergenAgreed] = useState(false);
+  const {
+    detailed,
+    subtotal,
+    update,
+    remove,
+    clear,
+    isGift,
+    setIsGift,
+    giftMessage,
+    setGiftMessage,
+  } = useCart();
 
   if (detailed.length === 0) {
     return (
@@ -119,6 +123,12 @@ function CartPage() {
                 <dt className="text-muted-foreground">Items subtotal</dt>
                 <dd>₹{subtotal}</dd>
               </div>
+              {isGift && (
+                <div className="flex justify-between">
+                  <dt className="text-muted-foreground">Gift ribbon</dt>
+                  <dd>₹{RIBBON_FEE}</dd>
+                </div>
+              )}
               <div className="flex justify-between">
                 <dt className="text-muted-foreground">Delivery charges</dt>
                 <dd className="text-muted-foreground">Calculated at checkout</dd>
@@ -130,63 +140,57 @@ function CartPage() {
             </dl>
           </div>
 
-          <div className="rounded-lg border border-border bg-secondary/30 p-5 lg:p-6">
-            <p className="text-sm leading-relaxed text-muted-foreground">
-              {DELIVERY_AGREEMENT_TEXT}
-            </p>
-            <div className="mt-4 flex items-start gap-3">
-              <Checkbox
-                id="delivery-agreement"
-                checked={deliveryAgreed}
-                onCheckedChange={(checked) => setDeliveryAgreed(checked === true)}
-              />
-              <Label
-                htmlFor="delivery-agreement"
-                className="cursor-pointer text-sm leading-snug text-primary/90"
-              >
-                I understand and agree to the delivery charges as per the delivery policy.{" "}
-                <Link to="/policies" hash="delivery" className="text-accent hover:underline">
-                  View Delivery Policy
-                </Link>
-              </Label>
+          <div className="rounded-lg border border-border bg-card p-5 shadow-soft lg:p-6">
+            <h2 className="font-serif text-2xl text-primary">Is this a gift? 🎁</h2>
+            <div className="mt-4 space-y-3">
+              <label className="flex cursor-pointer items-start gap-3 rounded-lg p-1.5 transition-colors hover:bg-secondary/40">
+                <input
+                  type="radio"
+                  name="is-gift"
+                  checked={isGift}
+                  onChange={() => setIsGift(true)}
+                  className="mt-1 h-4 w-4 accent-primary"
+                />
+                <span className="text-sm leading-snug text-primary/90">
+                  Yes, add a ribbon (₹{RIBBON_FEE})
+                </span>
+              </label>
+              <label className="flex cursor-pointer items-start gap-3 rounded-lg p-1.5 transition-colors hover:bg-secondary/40">
+                <input
+                  type="radio"
+                  name="is-gift"
+                  checked={!isGift}
+                  onChange={() => {
+                    setIsGift(false);
+                    setGiftMessage("");
+                  }}
+                  className="mt-1 h-4 w-4 accent-primary"
+                />
+                <span className="text-sm leading-snug text-primary/90">No</span>
+              </label>
             </div>
+            {isGift && (
+              <label className="mt-4 block animate-in fade-in slide-in-from-top-1 duration-300">
+                <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                  Gift message
+                </span>
+                <textarea
+                  value={giftMessage}
+                  onChange={(e) => setGiftMessage(e.target.value)}
+                  rows={2}
+                  placeholder="Write a short note for the recipient…"
+                  className="mt-2 w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm text-primary outline-none focus:border-accent"
+                />
+              </label>
+            )}
           </div>
 
-          <div className="rounded-lg border border-accent/30 bg-card p-5 shadow-soft lg:p-6">
-            <div className="flex items-start gap-3">
-              <Checkbox
-                id="allergen-agreement"
-                checked={allergenAgreed}
-                onCheckedChange={(checked) => setAllergenAgreed(checked === true)}
-              />
-              <Label
-                htmlFor="allergen-agreement"
-                className="cursor-pointer text-sm leading-snug text-primary/90"
-              >
-                {ALLERGEN_AGREEMENT_TEXT}{" "}
-                <Link to="/good-to-know" className="text-accent hover:underline">
-                  View Ingredients &amp; Allergens
-                </Link>
-              </Label>
-            </div>
-          </div>
-
-          {deliveryAgreed && allergenAgreed ? (
-            <Link
-              to="/checkout"
-              className="flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-xs uppercase tracking-[0.18em] text-primary-foreground transition-colors hover:bg-cocoa-dark active:bg-cocoa-dark"
-            >
-              Continue to checkout <ArrowRight className="h-4 w-4" />
-            </Link>
-          ) : (
-            <button
-              type="button"
-              disabled
-              className="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-full bg-primary/40 px-6 py-3 text-xs uppercase tracking-[0.18em] text-primary-foreground"
-            >
-              Continue to checkout <ArrowRight className="h-4 w-4" />
-            </button>
-          )}
+          <Link
+            to="/checkout"
+            className="flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-xs uppercase tracking-[0.18em] text-primary-foreground transition-colors hover:bg-cocoa-dark active:bg-cocoa-dark"
+          >
+            Continue to checkout <ArrowRight className="h-4 w-4" />
+          </Link>
           <p className="text-center text-[11px] text-muted-foreground">
             Delivery date, time slot and payment are confirmed on the next step.
           </p>
