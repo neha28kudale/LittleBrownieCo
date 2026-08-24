@@ -42,10 +42,16 @@ export function ProductCard({
       >
         <img
           src={product.image}
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 h-full w-full scale-110 object-cover opacity-60 blur-2xl"
+        />
+        <img
+          src={product.image}
           alt={product.name}
           loading="lazy"
           style={{ objectPosition: product.imagePosition || "center" }}
-          className="h-full w-full object-contain transition-transform duration-700 group-hover:scale-105"
+          className="relative h-full w-full object-contain transition-transform duration-700 group-hover:scale-105"
         />
         <span className="absolute left-3 top-3 rounded-full border border-border/60 bg-background/92 px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-primary backdrop-blur sm:left-4 sm:top-4 sm:px-3">
           {categoryLabel || product.category}
