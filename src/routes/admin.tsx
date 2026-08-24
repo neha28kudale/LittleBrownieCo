@@ -33,6 +33,8 @@ import {
   updateDeliverySlabFee,
   type DeliverySlab,
 } from "@/lib/delivery";
+import { getCategoryLabels, updateCategoryLabel, type CategoryLabels } from "@/lib/categories";
+import { MENU_CATEGORIES } from "@/lib/site-content";
 import {
   getAllReviews,
   setReviewStatus,
@@ -58,6 +60,7 @@ import {
   Loader2,
   AlertTriangle,
   Users,
+  Tag,
   Phone,
   Mail,
   MapPin,
@@ -185,16 +188,25 @@ function AdminDashboard({
   onLogout: () => void;
 }) {
   const [tab, setTab] = useState<
-    "overview" | "orders" | "products" | "customers" | "reviews" | "analytics" | "delivery"
+    | "overview"
+    | "orders"
+    | "products"
+    | "customers"
+    | "reviews"
+    | "analytics"
+    | "delivery"
+    | "categories"
   >("overview");
   const [orders, setOrders] = useState<Order[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [deliverySlabs, setDeliverySlabs] = useState<DeliverySlab[]>([]);
+  const [categoryLabels, setCategoryLabels] = useState<CategoryLabels | null>(null);
   const [exporting, setExporting] = useState(false);
 
   const refreshProducts = () => getAllProductsAdmin().then(setProducts);
   const refreshDeliverySlabs = () => getDeliverySlabs().then(setDeliverySlabs);
+  const refreshCategoryLabels = () => getCategoryLabels().then(setCategoryLabels);
 
   useEffect(() => {
     refreshProducts();
@@ -202,6 +214,10 @@ function AdminDashboard({
 
   useEffect(() => {
     refreshDeliverySlabs();
+  }, []);
+
+  useEffect(() => {
+    refreshCategoryLabels();
   }, []);
 
   useEffect(() => {
@@ -301,6 +317,7 @@ function AdminDashboard({
     { id: "orders", label: "Orders", icon: ShoppingBag },
     { id: "products", label: "Products", icon: Package },
     { id: "delivery", label: "Delivery Fees", icon: Truck },
+    { id: "categories", label: "Categories", icon: Tag },
     { id: "customers", label: "Customers", icon: Users },
     { id: "reviews", label: "Reviews", icon: MessageSquare, badge: pendingReviewCount },
     { id: "analytics", label: "Analytics", icon: LayoutDashboard },
@@ -416,6 +433,9 @@ function AdminDashboard({
           {tab === "delivery" && (
             <DeliveryFeesAdmin slabs={deliverySlabs} refresh={refreshDeliverySlabs} />
           )}
+          {tab === "categories" && (
+            <CategoryLabelsAdmin labels={categoryLabels} refresh={refreshCategoryLabels} />
+          )}
           {tab === "customers" && <CustomersAdmin customers={customers} />}
           {tab === "reviews" && <ReviewsAdmin reviews={reviews} setStatus={reviewStatus} />}
           {tab === "analytics" && <Analytics orders={orders} products={products} />}
@@ -424,7 +444,7 @@ function AdminDashboard({
 
       {/* Mobile bottom tab bar */}
       <nav
-        className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-7 border-t border-border bg-background/95 backdrop-blur md:hidden"
+        className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-8 border-t border-border bg-background/95 backdrop-blur md:hidden"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
         {navItems.map(({ id, label, icon: Icon, badge }) => (
@@ -870,6 +890,75 @@ function DeliveryFeesAdmin({
             <p className="py-6 text-center text-sm text-muted-foreground">
               No delivery fee ranges found.
             </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CategoryLabelsAdmin({
+  labels,
+  refresh,
+}: {
+  labels: CategoryLabels | null;
+  refresh: () => void;
+}) {
+  const [drafts, setDrafts] = useState<Record<string, string>>({});
+  const [savingKey, setSavingKey] = useState<string | null>(null);
+
+  const save = async (key: (typeof MENU_CATEGORIES)[number]) => {
+    const raw = (drafts[key] ?? labels?.[key] ?? key).trim();
+    if (!raw) {
+      toast.error("Category name can't be empty.");
+      return;
+    }
+    setSavingKey(key);
+    const ok = await updateCategoryLabel(key, raw);
+    setSavingKey(null);
+    if (ok) {
+      toast.success(`"${key}" renamed to "${raw}"`);
+      refresh();
+    } else {
+      toast.error("Couldn't save — please try again.");
+    }
+  };
+
+  return (
+    <div className="max-w-2xl">
+      <div className="rounded-lg border border-border bg-card p-5 sm:p-6">
+        <h2 className="font-serif text-2xl text-primary">Categories</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Rename how a category appears on the menu and product pages (e.g. "Mini Bites" →
+          "Bite-Sized Treats"). This only changes the name customers see — products already
+          filed under a category stay there.
+        </p>
+
+        <div className="mt-5 divide-y divide-border">
+          {MENU_CATEGORIES.map((key) => (
+            <div key={key} className="flex flex-wrap items-center justify-between gap-3 py-3">
+              <span className="text-sm text-muted-foreground">{key}</span>
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={drafts[key] ?? labels?.[key] ?? key}
+                  onChange={(e) => setDrafts((d) => ({ ...d, [key]: e.target.value }))}
+                  className="w-48 rounded-lg border border-border bg-background px-3 py-1.5 text-sm text-primary outline-none focus:border-accent"
+                />
+                <button
+                  onClick={() => save(key)}
+                  disabled={savingKey === key || !labels}
+                  className="rounded-full bg-primary px-4 py-1.5 text-xs uppercase tracking-[0.14em] text-primary-foreground transition-colors hover:bg-cocoa-dark disabled:opacity-50"
+                >
+                  {savingKey === key ? "Saving…" : "Save"}
+                </button>
+              </div>
+            </div>
+          ))}
+
+          {!labels && (
+            <p className="py-6 text-center text-sm text-muted-foreground">Loading categories…</p>
           )}
         </div>
       </div>
