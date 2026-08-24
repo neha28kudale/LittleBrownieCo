@@ -91,8 +91,8 @@ function ProductPage() {
         </nav>
 
         <div className="mt-6 grid gap-8 md:mt-8 md:grid-cols-2 md:gap-12">
-          <div>
-            <div className="group relative aspect-[4/5] overflow-hidden rounded-md border border-border/70 bg-secondary">
+          <div className="min-w-0">
+            <div className="group relative aspect-[4/5] w-full max-w-full overflow-hidden rounded-md border border-border/70 bg-secondary">
               <img
                 src={product.gallery[active] || product.image}
                 alt={product.name}
@@ -102,7 +102,7 @@ function ProductPage() {
                     product.imagePosition ||
                     "center",
                 }}
-                className="h-full w-full object-cover"
+                className="h-full w-full object-contain"
               />
               {product.gallery.length > 1 && (
                 <>
@@ -143,7 +143,7 @@ function ProductPage() {
                   <button
                     key={i}
                     onClick={() => setActive(i)}
-                    className={`h-16 w-16 shrink-0 overflow-hidden rounded-sm border-2 sm:h-20 sm:w-20 ${active === i ? "border-accent" : "border-transparent"}`}
+                    className={`h-16 w-16 shrink-0 overflow-hidden rounded-sm border-2 bg-secondary sm:h-20 sm:w-20 ${active === i ? "border-accent" : "border-transparent"}`}
                     aria-label={`View image ${i + 1}`}
                   >
                     <img
@@ -158,7 +158,7 @@ function ProductPage() {
             )}
           </div>
 
-          <div className="flex flex-col">
+          <div className="flex min-w-0 flex-col">
             <span className="text-[11px] uppercase tracking-[0.28em] text-toffee">
               {categoryLabels[product.category]}
             </span>
