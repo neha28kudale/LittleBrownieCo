@@ -4,7 +4,6 @@ import { Footer } from "@/components/site/Footer";
 import { WhatsAppFab } from "@/components/site/WhatsAppFab";
 import { AllergyBanner } from "@/components/site/AllergyBanner";
 import { ScrollProgressBar } from "@/components/site/ScrollProgressBar";
-import { CartDrawer } from "@/components/site/CartDrawer";
 import { CartProvider } from "@/lib/cart";
 import { FavoritesProvider } from "@/lib/favorites";
 import { Toaster } from "sonner";
@@ -31,7 +30,6 @@ function SiteLayout() {
           </main>
           <Footer />
           <WhatsAppFab />
-          <CartDrawer />
           <Toaster position="bottom-center" theme="light" />
         </div>
       </CartProvider>
