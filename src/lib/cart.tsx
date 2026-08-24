@@ -132,6 +132,23 @@ export function CartProvider({ children }: { children: ReactNode }) {
     getProducts().then(setCatalog);
   }, []);
 
+  // Once the catalog is loaded, drop any cart items that no longer match
+  // a real product/variant (e.g. leftover from a renamed/removed product).
+  // Without this, the header badge (count) and the cart page (detailed)
+  // can disagree, since detailed silently filters orphaned items.
+  useEffect(() => {
+    if (catalog.length === 0) return;
+
+    setItems((prev) => {
+      const valid = prev.filter((item) => {
+        const product = catalog.find((p) => p.id === item.productId);
+        return !!product?.variants.find((v) => v.id === item.variantId);
+      });
+
+      return valid.length === prev.length ? prev : valid;
+    });
+  }, [catalog]);
+
   useEffect(() => {
     if (!storageLoaded) return;
 
@@ -239,7 +256,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     })
     .filter(Boolean) as DetailedItem[];
 
-  const count = items.reduce(
+  const count = detailed.reduce(
     (total, item) => total + item.qty,
     0,
   );
