@@ -20,6 +20,9 @@ type CartCtx = {
   count: number;
   subtotal: number;
   detailed: DetailedItem[];
+  drawerOpen: boolean;
+  openDrawer: () => void;
+  closeDrawer: () => void;
 };
 
 const Ctx = createContext<CartCtx | null>(null);
@@ -28,6 +31,7 @@ const KEY = "lbc_cart_v2";
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [catalog, setCatalog] = useState<Product[]>([]);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   useEffect(() => {
     try {
@@ -46,13 +50,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
     } catch {}
   }, [items]);
 
-  const add: CartCtx["add"] = (productId, variantId, qty = 1) =>
+  const add: CartCtx["add"] = (productId, variantId, qty = 1) => {
     setItems((prev) => {
       const key = `${productId}:${variantId}`;
       const existing = prev.find((i) => i.key === key);
       if (existing) return prev.map((i) => (i.key === key ? { ...i, qty: i.qty + qty } : i));
       return [...prev, { key, productId, variantId, qty }];
     });
+    setDrawerOpen(true);
+  };
 
   const remove: CartCtx["remove"] = (key) => setItems((prev) => prev.filter((i) => i.key !== key));
 
@@ -78,7 +84,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const subtotal = detailed.reduce((s, i) => s + i.lineTotal, 0);
 
   return (
-    <Ctx.Provider value={{ items, add, remove, update, clear, count, subtotal, detailed }}>
+    <Ctx.Provider
+      value={{
+        items,
+        add,
+        remove,
+        update,
+        clear,
+        count,
+        subtotal,
+        detailed,
+        drawerOpen,
+        openDrawer: () => setDrawerOpen(true),
+        closeDrawer: () => setDrawerOpen(false),
+      }}
+    >
       {children}
     </Ctx.Provider>
   );
