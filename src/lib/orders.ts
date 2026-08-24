@@ -115,7 +115,10 @@ export async function createOrder(input: {
     // receipts, admin views and the bakery's own records.
     product_id: null,
     product_name: i.product.name,
-    variant_label: i.variant.label,
+    // Fold flavour into the saved label (e.g. "1kg — Nutella") so it shows
+    // up correctly in order history/exports without needing a new column,
+    // since flavour-specific pricing means the size alone is ambiguous now.
+    variant_label: i.variant.flavour ? `${i.variant.label} — ${i.variant.flavour}` : i.variant.label,
     unit_price: i.variant.price,
     qty: i.qty,
     line_total: i.lineTotal,
