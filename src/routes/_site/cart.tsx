@@ -68,7 +68,8 @@ function CartPage() {
                   <div className="min-w-0">
                     <h3 className="font-serif text-lg text-primary sm:text-xl">{d.product.name}</h3>
                     <p className="text-xs text-muted-foreground">
-                      {d.variant.label} · ₹{d.variant.price} each
+                      {d.variant.label}
+                      {d.variant.flavour ? ` · ${d.variant.flavour}` : ""} · ₹{d.variant.price} each
                     </p>
                   </div>
                   <button
