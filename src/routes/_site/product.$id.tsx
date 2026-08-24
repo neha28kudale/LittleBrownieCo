@@ -150,7 +150,7 @@ function ProductPage() {
                       src={g}
                       alt=""
                       style={{ objectPosition: product.galleryPositions?.[i] || "center" }}
-                      className="h-full w-full object-cover"
+                      className="h-full w-full object-contain"
                     />
                   </button>
                 ))}
