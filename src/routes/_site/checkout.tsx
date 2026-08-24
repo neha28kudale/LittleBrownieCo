@@ -542,7 +542,7 @@ function Checkout() {
           </div>
 
           {/* DELIVERY AGREEMENT */}
-          <div className="rounded-lg border border-border bg-secondary/30 p-5 sm:p-6">
+          <div className="rounded-lg border border-border bg-card p-5 shadow-soft sm:p-6">
             <p className="text-sm leading-relaxed text-muted-foreground">
               {DELIVERY_AGREEMENT_TEXT}
             </p>
