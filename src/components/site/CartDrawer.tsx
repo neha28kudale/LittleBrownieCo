@@ -6,8 +6,9 @@ import { useCart } from "@/lib/cart";
 /** Slides in from the right whenever something is added to the cart, so the
  * customer immediately sees what just happened and where the cart is —
  * instead of only a toast they might miss. Lets them adjust quantities,
- * jump to the full cart page, or go straight to checkout without hunting
- * for the cart icon. */
+ * jump to the full cart page, or checkout — which routes them through
+ * the cart page first (so they don't miss the Gift option) instead of
+ * hunting for the cart icon. */
 export function CartDrawer() {
   const { detailed, subtotal, count, update, remove, drawerOpen, closeDrawer } = useCart();
 
@@ -128,7 +129,7 @@ export function CartDrawer() {
                   View Cart
                 </Link>
                 <Link
-                  to="/checkout"
+                  to="/cart"
                   onClick={closeDrawer}
                   className="rounded-full bg-primary px-4 py-3 text-center text-xs uppercase tracking-[0.18em] text-primary-foreground transition-colors hover:bg-cocoa-dark"
                 >
