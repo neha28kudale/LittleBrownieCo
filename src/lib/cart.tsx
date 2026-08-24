@@ -81,7 +81,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
       if (existing) return prev.map((i) => (i.key === key ? { ...i, qty: i.qty + qty } : i));
       return [...prev, { key, productId, variantId, qty }];
     });
-    setDrawerOpen(true);
   };
 
   const remove: CartCtx["remove"] = (key) => setItems((prev) => prev.filter((i) => i.key !== key));
