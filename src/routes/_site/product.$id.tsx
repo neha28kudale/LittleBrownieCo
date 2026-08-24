@@ -112,7 +112,7 @@ function ProductPage() {
                       setActive((i) => (i - 1 + product.gallery.length) % product.gallery.length)
                     }
                     aria-label="Previous image"
-                    className="absolute left-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-background/80 text-primary opacity-100 shadow-sm backdrop-blur transition-opacity duration-200 hover:bg-background sm:h-10 sm:w-10 sm:opacity-0 sm:group-hover:opacity-100 sm:focus-visible:opacity-100"
+                    className="absolute left-2 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-background/80 text-primary shadow-sm backdrop-blur sm:h-10 sm:w-10"
                   >
                     <ChevronLeft className="h-5 w-5" />
                   </button>
@@ -120,11 +120,11 @@ function ProductPage() {
                     type="button"
                     onClick={() => setActive((i) => (i + 1) % product.gallery.length)}
                     aria-label="Next image"
-                    className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-background/80 text-primary opacity-100 shadow-sm backdrop-blur transition-opacity duration-200 hover:bg-background sm:h-10 sm:w-10 sm:opacity-0 sm:group-hover:opacity-100 sm:focus-visible:opacity-100"
+                    className="absolute right-2 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-background/80 text-primary shadow-sm backdrop-blur sm:h-10 sm:w-10"
                   >
                     <ChevronRight className="h-5 w-5" />
                   </button>
-                  <div className="absolute bottom-2 left-1/2 flex -translate-x-1/2 gap-1.5">
+                  <div className="absolute bottom-2 left-1/2 z-10 flex -translate-x-1/2 gap-1.5">
                     {product.gallery.map((_, i) => (
                       <span
                         key={i}
