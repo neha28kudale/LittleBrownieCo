@@ -92,7 +92,7 @@ function ProductPage() {
 
         <div className="mt-6 grid gap-8 md:mt-8 md:grid-cols-2 md:gap-12">
           <div>
-            <div className="group relative aspect-square overflow-hidden rounded-md border border-border/70 bg-secondary sm:aspect-[4/5]">
+            <div className="group relative aspect-[4/5] overflow-hidden rounded-md border border-border/70 bg-secondary">
               <img
                 src={product.gallery[active] || product.image}
                 alt={product.name}
