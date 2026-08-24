@@ -107,7 +107,7 @@ export const giftingGallery = [
   { src: IMG.hamperBagHeart, alt: "Kraft gift bag with hand-stamped hearts" },
 ];
 
-export type Variant = { id: string; label: string; price: number };
+export type Variant = { id: string; label: string; price: number; flavour?: string };
 
 export type Product = {
   id: string;
@@ -822,7 +822,7 @@ export const galleryImages = [
 //   { src: IMG.hamperBagHeart, alt: "Kraft gift bag with hand-stamped hearts" },
 // ];
 
-// export type Variant = { id: string; label: string; price: number };
+// export type Variant = { id: string; label: string; price: number; flavour?: string };
 
 // export type Product = {
 //   id: string;
