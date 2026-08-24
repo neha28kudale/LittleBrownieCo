@@ -107,6 +107,10 @@ export const giftingGallery = [
   { src: IMG.hamperBagHeart, alt: "Kraft gift bag with hand-stamped hearts" },
 ];
 
+/** `flavour` is optional — leave it unset for a size/option that applies to
+ * every flavour. Set it to tie that size+price combo to one specific
+ * flavour (e.g. "1kg" can be ₹665 for Dark Chocolate and ₹700 for Nutella
+ * by adding two rows with the same label but different flavour + price). */
 export type Variant = { id: string; label: string; price: number; flavour?: string };
 
 export type Product = {
@@ -339,7 +343,7 @@ function rowToProduct(row: any, variantRows: any[]): Product {
   const variants: Variant[] = variantRows
     .filter((v) => v.product_id === row.id)
     .sort((a, b) => a.sort_order - b.sort_order)
-    .map((v) => ({ id: v.id, label: v.label, price: Number(v.price) }));
+    .map((v) => ({ id: v.id, label: v.label, price: Number(v.price), flavour: v.flavour ?? undefined }));
 
   return {
     id: row.id,
@@ -475,9 +479,10 @@ export async function createProductRow(
           product_id: product.id,
           label: v.label,
           price: v.price,
+          flavour: v.flavour || null,
           sort_order: i,
         }))
-      : [{ product_id: product.id, label: "Standard", price: draft.price, sort_order: 0 }];
+      : [{ product_id: product.id, label: "Standard", price: draft.price, flavour: null, sort_order: 0 }];
 
   const { error: variantError } = await supabase.from("product_variants").insert(variantsToInsert);
 
@@ -524,6 +529,7 @@ export async function updateProductRow(
         product_id: id,
         label: v.label,
         price: v.price,
+        flavour: v.flavour || null,
         sort_order: i,
       })),
     );
@@ -822,7 +828,7 @@ export const galleryImages = [
 //   { src: IMG.hamperBagHeart, alt: "Kraft gift bag with hand-stamped hearts" },
 // ];
 
-// export type Variant = { id: string; label: string; price: number; flavour?: string };
+// export type Variant = { id: string; label: string; price: number };
 
 // export type Product = {
 //   id: string;
