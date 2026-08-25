@@ -48,11 +48,9 @@ export const POLICY_SECTIONS = [
       "We currently offer delivery within Bangalore only.",
       "Pick-up is not available. All orders will be delivered to the address provided at checkout.",
       "Deliveries are arranged through third-party partners such as Uber, Porter and Rapido.",
-      "We compare the available delivery options and choose the most suitable option based on availability and delivery charges.",
-      "Delivery charges are separate from the order amount and will be communicated before dispatch.",
-      "Delivery charges can be paid directly to the delivery partner upon receiving the order, as communicated at the time of dispatch.",
-      "Once your order is dispatched, we will share the tracking details, wherever available.",
-      "Please ensure that your delivery address and contact number are accurate and reachable.",
+      "Delivery charges are calculated at checkout based on the distance between our kitchen and the delivery address.",
+      "Once your order is dispatched, we will share the tracking details through SMS or WhatsApp.",
+      "Please ensure that your delivery address and contact number are accurate and that you are reachable at the time of delivery.",
       "We are not responsible for delays caused by traffic, weather, road conditions or delivery partners.",
       "If you are unavailable or unreachable at the time of delivery, any additional delivery or re-delivery charges will be borne by you.",
     ],
@@ -86,7 +84,7 @@ export const GOOD_TO_KNOW = {
 } as const;
 
 export const DELIVERY_AGREEMENT_TEXT =
-  "Delivery charges are calculated based on the distance entered by you from our location. We use Uber, Rapido/Porter to deliver your order. Your delivery tracking details will be shared with you via WhatsApp on the delivery date, using the number provided at checkout.";
+  "Delivery charges are calculated at checkout based on the distance between our kitchen and your delivery address. We use Uber, Porter and Rapido to deliver your order. Your delivery tracking details will be shared with you via SMS or WhatsApp on the delivery date, using the number provided at checkout.";
 
 export const ALLERGEN_AGREEMENT_TEXT =
   "I have read and understood the ingredients and allergen information provided for the products I am ordering.";
@@ -102,7 +100,7 @@ export const FAQ_ITEMS = [
   },
   {
     q: "How are delivery charges calculated?",
-    a: "Delivery charges are calculated separately based on distance. We use Uber, Porter or Rapido and book the cheapest available option. Charges and tracking details are shared once your order is dispatched, and are payable directly to the delivery partner when you receive your order.",
+    a: "Delivery charges are calculated at checkout based on the distance between our kitchen and your delivery address. Deliveries are arranged through third-party partners such as Uber, Porter and Rapido, and tracking details are shared via SMS or WhatsApp once your order is dispatched.",
   },
   {
     q: "Can I cancel my order?",
