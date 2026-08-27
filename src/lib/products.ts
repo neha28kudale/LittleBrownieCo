@@ -719,30 +719,23 @@ export function whatsappLink(message: string) {
 /**
  * Google Reviews links.
  *
- * ⚠️ GOOGLE_PLACE_ID below was set to the Place ID for "India" (the country) —
- * that's a geocoding result, not the business's own Google Business Profile,
- * which is why "Leave a review on Google" was landing on a generic
- * "India - Google Search" page instead of the write-a-review form.
- *
- * To fix it for real, get the correct Place ID for Little Brownie Co.'s
- * Google Business Profile (NOT a geocoded address) from Google's Place ID
- * Finder: https://developers.google.com/maps/documentation/places/web-service/place-id
- * Search "Little Brownie Co" there, confirm it's the bakery listing (with its
- * reviews/rating), copy the Place ID, and paste it in below.
+ * GOOGLE_PLACE_ID is the numeric CID from Little Brownie Co.'s actual Google
+ * Maps listing URL (the "0x38f23acf11e2aece" feature id, converted from hex
+ * to decimal). Google's write-review endpoint accepts this CID directly.
  */
-export const GOOGLE_PLACE_ID = "REPLACE_WITH_LITTLE_BROWNIE_CO_PLACE_ID";
+export const GOOGLE_PLACE_ID = "4103406871520653006";
 
 /** "Write a review" form — used for the "Leave a review on Google" buttons. */
 export const GOOGLE_REVIEWS_URL =
   `https://search.google.com/local/writereview?placeid=${GOOGLE_PLACE_ID}`;
 
 /**
- * The business's Google Maps listing page — used for "Read more reviews on
- * Google" links, so visitors land on the page that actually shows existing
- * reviews rather than the write-a-review form. This short link was provided
- * directly, so it's already correct and doesn't need a Place ID.
+ * The business's actual Google Maps listing page, with the Reviews tab open
+ * (the "!9m1!1b1" segment). Used for "Read more reviews on Google" links, so
+ * visitors land on the real reviews list for Little Brownie Co.
  */
-export const GOOGLE_MAPS_URL = "https://maps.app.goo.gl/FqSmxZe8JWfc5h6S8";
+export const GOOGLE_MAPS_URL =
+  "https://www.google.com/maps/place/Little+Brownie+Co./@12.987977,77.6219718,11z/data=!4m8!3m7!1s0xaf52317c26fdc78f:0x38f23acf11e2aece!8m2!3d12.987977!4d77.6219718!9m1!1b1!16s%2Fg%2F11xmql93l9!18m1!1e1?entry=ttu";
 
 export const galleryImages = [
   IMG.gallery1,
