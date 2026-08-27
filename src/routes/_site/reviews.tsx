@@ -56,8 +56,8 @@ function Stars({
   );
 }
 
-// Homepage displays the top 4 highest-rated reviews.
-// This page displays the next 5 unique reviews.
+// Homepage shows the first 4 highest-rated reviews.
+// This page shows the next 5 reviews so they don't repeat.
 const HOMEPAGE_REVIEW_COUNT = 4;
 const REVIEWS_PAGE_COUNT = 5;
 
@@ -72,21 +72,21 @@ function Reviews() {
   useEffect(() => {
     const load = () => {
       getApprovedReviews().then((r) => {
-        // Same sorting used on the homepage.
+        // Keep the same sorting as the homepage.
         const sorted = [...r].sort(
           (a, b) => b.rating - a.rating,
         );
 
         setAllReviews(sorted);
 
-        // Skip the first 4 reviews shown on the homepage
-        // and display the next 5 unique reviews here.
-        const uniqueReviews = sorted.slice(
-          HOMEPAGE_REVIEW_COUNT,
-          HOMEPAGE_REVIEW_COUNT + REVIEWS_PAGE_COUNT,
+        // Skip the first 4 shown on the homepage.
+        // Show the next 5 unique reviews here.
+        setReviews(
+          sorted.slice(
+            HOMEPAGE_REVIEW_COUNT,
+            HOMEPAGE_REVIEW_COUNT + REVIEWS_PAGE_COUNT,
+          ),
         );
-
-        setReviews(uniqueReviews);
       });
     };
 
@@ -98,7 +98,7 @@ function Reviews() {
   const avg =
     allReviews.length > 0
       ? (
-          allReviews.reduce((s, r) => s + r.rating, 0) /
+          allReviews.reduce((sum, review) => sum + review.rating, 0) /
           allReviews.length
         ).toFixed(1)
       : "5.0";
@@ -173,7 +173,7 @@ function Reviews() {
         </a>
       </section>
 
-      {/* REVIEWS + FORM */}
+      {/* REVIEWS + REVIEW FORM */}
       <section className="container-x mt-8 grid gap-8 md:mt-12 md:grid-cols-12">
         {/* CUSTOMER REVIEWS */}
         <div className="md:col-span-7">
@@ -222,33 +222,18 @@ function Reviews() {
               <ArrowUpRight className="h-3.5 w-3.5" />
             </a>
 
-            <p className="mt-2 text-[11px] text-muted-foreground">
-              Google reviews have to be posted by you on Google
-              directly — tap above to open their review form.
+            {/* COMBINED REVIEW MESSAGE */}
+            <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+              Loved your brownies? Leave us a review on Google or tell us what you think right here.
             </p>
 
-            {/* DIVIDER */}
-            <div className="my-6 flex items-center gap-3">
-              <div className="h-px flex-1 bg-border" />
-
-              <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-                or
-              </span>
-
-              <div className="h-px flex-1 bg-border" />
-            </div>
-
-            <p className="text-xs text-muted-foreground">
-              Prefer to leave a review here instead?
-            </p>
-
-            {/* SUBMITTED STATE */}
+            {/* WEBSITE REVIEW FORM */}
             {submitted ? (
               <div className="mt-6 rounded-md border border-border bg-surface-soft p-5 text-sm text-primary/80">
-                Thank you for taking the time to leave us a
-                review!
+                Thank you for taking the time to leave us a review!
 
                 <button
+                  type="button"
                   onClick={() => setSubmitted(false)}
                   className="mt-3 block text-xs uppercase tracking-[0.18em] text-accent hover:underline"
                 >
@@ -256,7 +241,6 @@ function Reviews() {
                 </button>
               </div>
             ) : (
-              /* REVIEW FORM */
               <form
                 onSubmit={submit}
                 className="mt-6 space-y-4"
@@ -302,7 +286,7 @@ function Reviews() {
                   </div>
                 </div>
 
-                {/* REVIEW TEXT */}
+                {/* REVIEW */}
                 <label className="block">
                   <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
                     Your review
