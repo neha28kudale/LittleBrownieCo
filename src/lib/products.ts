@@ -725,10 +725,6 @@ export function whatsappLink(message: string) {
  */
 export const GOOGLE_PLACE_ID = "4103406871520653006";
 
-/** "Write a review" form — used for the "Leave a review on Google" buttons. */
-export const GOOGLE_REVIEWS_URL =
-  `https://search.google.com/local/writereview?placeid=${GOOGLE_PLACE_ID}`;
-
 /**
  * The business's actual Google Maps listing page, with the Reviews tab open
  * (the "!9m1!1b1" segment). Used for "Read more reviews on Google" links, so
@@ -736,6 +732,19 @@ export const GOOGLE_REVIEWS_URL =
  */
 export const GOOGLE_MAPS_URL =
   "https://www.google.com/maps/place/Little+Brownie+Co./@12.987977,77.6219718,11z/data=!4m8!3m7!1s0xaf52317c26fdc78f:0x38f23acf11e2aece!8m2!3d12.987977!4d77.6219718!9m1!1b1!16s%2Fg%2F11xmql93l9!18m1!1e1?entry=ttu";
+
+/**
+ * "Write a review" link — used for the "Leave a review on Google" buttons.
+ *
+ * NOTE: `search.google.com/local/writereview?placeid=<CID>` was 404ing for
+ * visitors — that endpoint expects Google's base64-style Place ID (the one
+ * starting with "ChIJ..."), not the numeric CID/FID used in Maps URLs. We
+ * don't have the real "ChIJ..." Place ID on file, so this points at the
+ * business's Maps listing instead (visitors can tap "Write a review" from
+ * there). Swap this back to a `?placeid=` link once the real Place ID is
+ * available — see GOOGLE_PLACE_ID above.
+ */
+export const GOOGLE_REVIEWS_URL = GOOGLE_MAPS_URL;
 
 export const galleryImages = [
   IMG.gallery1,
