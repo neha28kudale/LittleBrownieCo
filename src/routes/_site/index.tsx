@@ -612,16 +612,14 @@ function Home() {
             </p>
             <div className="mt-4 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
               <a
-                href={GOOGLE_REVIEWS_URL}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1.5 text-sm text-accent hover:underline"
-              >
-                {googleRating
-                  ? `${googleRating.rating.toFixed(1)}★ on Google (${googleRating.count} reviews)`
-                  : "Read our Google reviews"}{" "}
-                <ArrowUpRight className="h-3.5 w-3.5" />
-              </a>
+  href={GOOGLE_REVIEWS_URL}
+  target="_blank"
+  rel="noreferrer"
+  className="inline-flex items-center gap-1.5 text-sm text-accent hover:underline"
+>
+  Loved by brownie lovers in Bengaluru
+  <ArrowUpRight className="h-3.5 w-3.5" />
+</a>
               <Link
                 to="/reviews"
                 className="inline-flex items-center gap-1.5 text-sm text-accent hover:underline"
