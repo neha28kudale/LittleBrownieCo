@@ -717,15 +717,14 @@ export function whatsappLink(message: string) {
 }
 
 /**
- * Google Reviews link. This is a search-based fallback (business name +
- * address) that works without any API key. Once the owner shares her
- * Google Business Profile "Place ID", swap this for
- * `https://search.google.com/local/writereview?placeid=<PLACE_ID>` (to
- * collect new reviews) and/or wire up the Places API to embed reviews
- * directly — see the note in src/lib/reviews.ts.
+ * Google Reviews link. Points to the Google "write a review" page for the
+ * business's own Google Business Profile (Place ID below), so visitors land
+ * directly on Google Reviews rather than a Google Maps location page.
  */
+export const GOOGLE_PLACE_ID = "ChIJkbeSa_BfYzARphNChaFPjNc";
+
 export const GOOGLE_REVIEWS_URL =
-  "https://maps.app.goo.gl/FqSmxZe8JWfc5h6S8?g_st=ic";
+  `https://search.google.com/local/writereview?placeid=${GOOGLE_PLACE_ID}`;
 
 export const galleryImages = [
   IMG.gallery1,
