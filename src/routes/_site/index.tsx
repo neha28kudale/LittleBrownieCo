@@ -611,13 +611,15 @@ function Home() {
               See what our customers have to say on Google, and if you've tried our brownies, we'd love to hear from you too.
             </p>
             <div className="mt-4 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-              <a
+             <a
   href={GOOGLE_REVIEWS_URL}
   target="_blank"
   rel="noreferrer"
   className="inline-flex items-center gap-1.5 text-sm text-accent hover:underline"
 >
-  Loved by brownie lovers in Bengaluru
+  {googleRating
+    ? `${4.9 ★ on Google (${googleRating.count} reviews)`
+    : "Read our Google reviews"}{" "}
   <ArrowUpRight className="h-3.5 w-3.5" />
 </a>
               <Link
