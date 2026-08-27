@@ -260,7 +260,13 @@ import {
   GOOGLE_REVIEWS_URL,
   type Product,
 } from "@/lib/products";
-import { getApprovedReviews, getGoogleReviews, type Review, type GoogleReview } from "@/lib/reviews";
+import {
+  getApprovedReviews,
+  getGoogleReviews,
+  subscribeReviews,
+  type Review,
+  type GoogleReview,
+} from "@/lib/reviews";
 import { ProductCard } from "@/components/site/ProductCard";
 import { Reveal } from "@/components/site/Reveal";
 import { InstagramFeed } from "@/components/site/InstagramFeed"; 
@@ -311,7 +317,14 @@ function Home() {
   const heroPausedRef = useRef(false);
 
   useEffect(() => {
-    getApprovedReviews().then((r) => setReviews(r.slice(0, 4)));
+    const loadReviews = () => {
+      getApprovedReviews().then((r) =>
+        setReviews([...r].sort((a, b) => b.rating - a.rating).slice(0, 4)),
+      );
+    };
+    loadReviews();
+    const unsubscribe = subscribeReviews(loadReviews);
+
     getGoogleReviews().then((g) => {
       if (g.configured && g.rating != null && g.ratingCount != null) {
         setGoogleRating({ rating: g.rating, count: g.ratingCount });
@@ -320,6 +333,8 @@ function Home() {
         setGoogleReviews(g.reviews.slice(0, 4));
       }
     });
+
+    return unsubscribe;
   }, []);
 
   const goToHeroSlide = (index: number) => {
