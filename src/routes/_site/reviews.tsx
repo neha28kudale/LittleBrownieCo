@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
-import { Star } from "lucide-react";
+import { ArrowUpRight, Star } from "lucide-react";
 import { toast } from "sonner";
 import {
   getApprovedReviews,
@@ -49,7 +49,9 @@ function Reviews() {
 
   useEffect(() => {
     const load = () => {
-      getApprovedReviews().then(setReviews);
+      getApprovedReviews().then((r) =>
+        setReviews([...r].sort((a, b) => b.rating - a.rating)),
+      );
     };
     load();
     return subscribeReviews(load);
@@ -129,8 +131,27 @@ function Reviews() {
         <div className="md:col-span-5">
           <div className="rounded-md border border-border bg-card p-6 shadow-soft sm:p-8">
             <h2 className="font-serif text-2xl text-primary">Leave a review</h2>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Submitted reviews are checked by our team before they go live.
+
+            <a
+              href={GOOGLE_REVIEWS_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-4 flex items-center justify-center gap-2 rounded-full bg-primary px-5 py-2.5 text-xs uppercase tracking-[0.18em] text-primary-foreground transition-colors hover:bg-cocoa-dark active:bg-cocoa-dark"
+            >
+              Leave a review on Google <ArrowUpRight className="h-3.5 w-3.5" />
+            </a>
+            <p className="mt-2 text-[11px] text-muted-foreground">
+              Google reviews have to be posted by you on Google directly — tap above to open their review form.
+            </p>
+
+            <div className="my-6 flex items-center gap-3">
+              <div className="h-px flex-1 bg-border" />
+              <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">or</span>
+              <div className="h-px flex-1 bg-border" />
+            </div>
+
+            <p className="text-xs text-muted-foreground">
+              Prefer to leave it here instead? Reviews below are checked by our team before they go live on this page.
             </p>
 
             {submitted ? (
