@@ -157,8 +157,7 @@ function Reviews() {
           />
 
           <span className="text-sm text-muted-foreground">
-            {avg} average · {allReviews.length} review
-            {allReviews.length === 1 ? "" : "s"}
+            {avg} average · 25+ reviews
           </span>
         </div>
 
