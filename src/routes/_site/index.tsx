@@ -633,9 +633,7 @@ function Home() {
   rel="noreferrer"
   className="inline-flex items-center gap-1.5 text-sm text-accent hover:underline"
 >
-  {googleRating
-    ? `${googleRating.rating.toFixed(1)} ★ on Google (${googleRating.count}+ reviews)`
-    : "4.9 ★ on Google (25+ reviews)"}
+  4.9 ★ on Google (25+ reviews)
   <ArrowUpRight className="h-3.5 w-3.5" />
 </a>
               <Link
