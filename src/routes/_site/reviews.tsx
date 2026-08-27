@@ -107,9 +107,9 @@ function Reviews() {
           href={GOOGLE_MAPS_URL}
           target="_blank"
           rel="noreferrer"
-          className="mt-3 inline-block text-sm text-accent hover:underline"
+          className="mt-3 inline-flex items-center gap-1.5 text-sm text-accent hover:underline"
         >
-          Read more reviews on Google
+          4.9 ★ on Google (25+ reviews) <ArrowUpRight className="h-3.5 w-3.5" />
         </a>
       </section>
 
