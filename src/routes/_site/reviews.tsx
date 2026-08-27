@@ -39,28 +39,32 @@ function Stars({ rating, size = "h-4 w-4" }: { rating: number; size?: string }) 
   );
 }
 
+const REVIEWS_PAGE_COUNT = 9; // 4 already shown on the homepage + 5 more here
+
 function Reviews() {
+  const [allReviews, setAllReviews] = useState<Review[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [name, setName] = useState("");
-  const [location, setLocation] = useState("");
-  const [rating, setRating] = useState(5);
+  const [rating, setRating] = useState(0);
   const [text, setText] = useState("");
   const [submitted, setSubmitted] = useState(false);
-  const [lastSubmittedRating, setLastSubmittedRating] = useState(5);
+  const [lastSubmittedRating, setLastSubmittedRating] = useState(0);
 
   useEffect(() => {
     const load = () => {
-      getApprovedReviews().then((r) =>
-        setReviews([...r].sort((a, b) => b.rating - a.rating)),
-      );
+      getApprovedReviews().then((r) => {
+        const sorted = [...r].sort((a, b) => b.rating - a.rating);
+        setAllReviews(sorted);
+        setReviews(sorted.slice(0, REVIEWS_PAGE_COUNT));
+      });
     };
     load();
     return subscribeReviews(load);
   }, []);
 
   const avg =
-    reviews.length > 0
-      ? (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1)
+    allReviews.length > 0
+      ? (allReviews.reduce((s, r) => s + r.rating, 0) / allReviews.length).toFixed(1)
       : "5.0";
 
   const submit = async (e: FormEvent) => {
@@ -69,7 +73,11 @@ function Reviews() {
       toast.error("Please add your name and a review.");
       return;
     }
-    const result = await submitReview({ name, location, rating, text });
+    if (!rating) {
+      toast.error("Please pick a star rating.");
+      return;
+    }
+    const result = await submitReview({ name, location: "", rating, text });
     if (!result.ok) {
       toast.error(result.error);
       return;
@@ -77,8 +85,7 @@ function Reviews() {
     setSubmitted(true);
     setLastSubmittedRating(rating);
     setName("");
-    setLocation("");
-    setRating(5);
+    setRating(0);
     setText("");
     toast.success("Thanks! Your review has been submitted for approval.");
   };
@@ -88,12 +95,12 @@ function Reviews() {
       <section className="container-x pt-10 pb-6 text-center md:pt-20 md:pb-8">
         <span className="text-[11px] uppercase tracking-[0.28em] text-toffee">Reviews</span>
         <h1 className="mx-auto mt-3 max-w-3xl font-serif text-4xl leading-[1.05] text-primary sm:text-5xl md:text-7xl">
-          What our customers say.
+          A few words from our happy customers.
         </h1>
         <div className="mt-4 flex items-center justify-center gap-2">
           <Stars rating={Math.round(Number(avg))} size="h-5 w-5" />
           <span className="text-sm text-muted-foreground">
-            {avg} average · {reviews.length} review{reviews.length === 1 ? "" : "s"}
+            {avg} average · {allReviews.length} review{allReviews.length === 1 ? "" : "s"}
           </span>
         </div>
         <a
@@ -153,12 +160,12 @@ function Reviews() {
             </div>
 
             <p className="text-xs text-muted-foreground">
-              Prefer to leave it here instead? Reviews below are checked by our team before they go live on this page.
+              Prefer to leave a review here instead?
             </p>
 
             {submitted ? (
               <div className="mt-6 rounded-md border border-border bg-surface-soft p-5 text-sm text-primary/80">
-                Thank you! Your review is awaiting approval and will appear here once it's live.
+                Thank you for taking the time to leave us a review!
                 {lastSubmittedRating >= 4 && (
                   <div className="mt-4 rounded-md border border-accent/30 bg-background p-4">
                     <p className="text-sm text-primary">
@@ -191,17 +198,6 @@ function Reviews() {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required
-                    className="mt-2 w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm text-primary outline-none focus:border-accent"
-                  />
-                </label>
-                <label className="block">
-                  <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-                    Area (optional)
-                  </span>
-                  <input
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    placeholder="e.g. Indiranagar"
                     className="mt-2 w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm text-primary outline-none focus:border-accent"
                   />
                 </label>
