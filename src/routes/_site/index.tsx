@@ -260,7 +260,7 @@ import {
   GOOGLE_REVIEWS_URL,
   type Product,
 } from "@/lib/products";
-import { getApprovedReviews, getGoogleReviews, type Review } from "@/lib/reviews";
+import { getApprovedReviews, getGoogleReviews, type Review, type GoogleReview } from "@/lib/reviews";
 import { ProductCard } from "@/components/site/ProductCard";
 import { Reveal } from "@/components/site/Reveal";
 import { InstagramFeed } from "@/components/site/InstagramFeed"; 
@@ -303,6 +303,7 @@ function Home() {
   const { products } = Route.useLoaderData() as { products: Product[] };
   const signature = signatureOf(products);
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [googleReviews, setGoogleReviews] = useState<GoogleReview[]>([]);
   const [googleRating, setGoogleRating] = useState<{ rating: number; count: number } | null>(
     null,
   );
@@ -314,6 +315,9 @@ function Home() {
     getGoogleReviews().then((g) => {
       if (g.configured && g.rating != null && g.ratingCount != null) {
         setGoogleRating({ rating: g.rating, count: g.ratingCount });
+      }
+      if (g.configured && g.reviews.length > 0) {
+        setGoogleReviews(g.reviews.slice(0, 4));
       }
     });
   }, []);
@@ -603,10 +607,6 @@ function Home() {
             <h2 className="mt-4 font-serif text-4xl leading-tight text-primary md:text-5xl">
               Baked with love, reviewed with love.
             </h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              See what our customers have to say on Google, and if you've
-              tried our brownies, we'd love to hear from you too.
-            </p>
             <a
               href={GOOGLE_REVIEWS_URL}
               target="_blank"
