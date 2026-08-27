@@ -1,5 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, ArrowUpRight, MessageCircleMore, Star } from "lucide-react";
+import {
+  ArrowRight,
+  ArrowUpRight,
+  MessageCircleMore,
+  Star,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import {
   IMG,
@@ -36,7 +41,8 @@ export const Route = createFileRoute("/_site/")({
       },
       {
         property: "og:description",
-        content: "Where every bite earns you brownie points. Order online from Bengaluru.",
+        content:
+          "Where every bite earns you brownie points. Order online from Bengaluru.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -302,16 +308,21 @@ function Home() {
             </div>
 
             <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+              {/* 01 */}
               <div>
-                <div className="flex items-center gap-3">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary font-serif text-sm text-primary-foreground">
+                <div className="relative flex h-16 w-fit items-center">
+                  <span className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-caramel bg-[#eadfce] font-serif text-2xl text-primary">
                     01
                   </span>
 
-                  <h3 className="font-serif text-2xl text-primary md:whitespace-nowrap">
-                    🍫Choose your brownies
-                  </h3>
+                  <span className="relative -ml-3 text-3xl drop-shadow-sm">
+                    🍫
+                  </span>
                 </div>
+
+                <h3 className="mt-4 font-serif text-2xl text-primary">
+                  Pick Your favourites
+                </h3>
 
                 <p className="mt-3 text-sm text-muted-foreground">
                   Browse the{" "}
@@ -325,16 +336,21 @@ function Home() {
                 </p>
               </div>
 
+              {/* 02 */}
               <div>
-                <div className="flex items-center gap-3">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary font-serif text-sm text-primary-foreground">
+                <div className="relative flex h-16 w-fit items-center">
+                  <span className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-[#a9b59c] bg-[#dce3d2] font-serif text-2xl text-primary">
                     02
                   </span>
 
-                  <h3 className="font-serif text-2xl text-primary">
-                    💳Checkout & pay
-                  </h3>
+                  <span className="relative -ml-3 text-3xl drop-shadow-sm">
+                    💳
+                  </span>
                 </div>
+
+                <h3 className="mt-4 font-serif text-2xl text-primary">
+                  Place Your Order
+                </h3>
 
                 <p className="mt-3 text-sm text-muted-foreground">
                   Enter your details, choose your delivery date & time,
@@ -342,16 +358,21 @@ function Home() {
                 </p>
               </div>
 
+              {/* 03 */}
               <div>
-                <div className="flex items-center gap-3">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary font-serif text-sm text-primary-foreground">
+                <div className="relative flex h-16 w-fit items-center">
+                  <span className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-[#d69d8d] bg-[#f0d6ce] font-serif text-2xl text-primary">
                     03
                   </span>
 
-                  <h3 className="font-serif text-2xl text-primary">
-                    👩‍🍳We get baking
-                  </h3>
+                  <span className="relative -ml-3 text-3xl drop-shadow-sm">
+                    👩‍🍳
+                  </span>
                 </div>
+
+                <h3 className="mt-4 font-serif text-2xl text-primary">
+                  Fresh from our oven
+                </h3>
 
                 <p className="mt-3 text-sm text-muted-foreground">
                   We'll verify your order, confirm it and start baking
@@ -359,16 +380,21 @@ function Home() {
                 </p>
               </div>
 
+              {/* 04 */}
               <div>
-                <div className="flex items-center gap-3">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary font-serif text-sm text-primary-foreground">
+                <div className="relative flex h-16 w-fit items-center">
+                  <span className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-[#bca4b8] bg-[#e2d4df] font-serif text-2xl text-primary">
                     04
                   </span>
 
-                  <h3 className="font-serif text-2xl text-primary">
-                    📦Track & enjoy
-                  </h3>
+                  <span className="relative -ml-3 text-3xl drop-shadow-sm">
+                    📦
+                  </span>
                 </div>
+
+                <h3 className="mt-4 font-serif text-2xl text-primary">
+                  Dig in & Enjoy!
+                </h3>
 
                 <p className="mt-3 text-sm text-muted-foreground">
                   Track your order anytime through{" "}
@@ -455,7 +481,6 @@ function Home() {
               Kind words
             </span>
 
-            {/* FIXED: removed font-bold */}
             <h2 className="mt-4 font-serif text-4xl leading-tight text-primary md:text-5xl">
               Baked with love, reviewed with love.
             </h2>
@@ -465,13 +490,13 @@ function Home() {
               tried our brownies, we'd love to hear from you too.
             </p>
 
-            <div className="mt-4 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+            <div className="mt-6 flex justify-center">
               <Link
                 to="/reviews"
-                className="inline-flex items-center gap-1.5 text-sm text-accent hover:underline"
+                className="inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-sm font-medium uppercase tracking-[0.16em] text-primary-foreground shadow-soft transition-all duration-300 hover:-translate-y-0.5 hover:bg-cocoa-dark hover:shadow-md active:translate-y-0 active:bg-cocoa-dark"
               >
-                Leave a review{" "}
-                <ArrowUpRight className="h-3.5 w-3.5" />
+                Leave a review
+                <ArrowUpRight className="h-4 w-4" />
               </Link>
             </div>
           </div>
