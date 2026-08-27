@@ -607,17 +607,28 @@ function Home() {
             <h2 className="mt-4 font-serif text-4xl leading-tight text-primary md:text-5xl">
               Baked with love, reviewed with love.
             </h2>
-            <a
-              href={GOOGLE_REVIEWS_URL}
-              target="_blank"
-              rel="noreferrer"
-              className="mt-4 inline-flex items-center gap-1.5 text-sm text-accent hover:underline"
-            >
-              {googleRating
-                ? `${googleRating.rating.toFixed(1)}★ on Google (${googleRating.count} reviews)`
-                : "Read our Google reviews"}{" "}
-              <ArrowUpRight className="h-3.5 w-3.5" />
-            </a>
+            <p className="mt-4 text-sm text-muted-foreground">
+              See what our customers have to say on Google, and if you've tried our brownies, we'd love to hear from you too.
+            </p>
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+              <a
+                href={GOOGLE_REVIEWS_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1.5 text-sm text-accent hover:underline"
+              >
+                {googleRating
+                  ? `${googleRating.rating.toFixed(1)}★ on Google (${googleRating.count} reviews)`
+                  : "Read our Google reviews"}{" "}
+                <ArrowUpRight className="h-3.5 w-3.5" />
+              </a>
+              <Link
+                to="/reviews"
+                className="inline-flex items-center gap-1.5 text-sm text-accent hover:underline"
+              >
+                Leave a review <ArrowUpRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
           </div>
           {reviews.length > 0 ? (
             <div className="mt-10 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
