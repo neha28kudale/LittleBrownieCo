@@ -616,11 +616,11 @@ function Home() {
       <InstagramFeed />
 
       {/* REVIEWS */}
-      <Reveal as="section" className="mt-14 bg-[oklch(0.9_0.03_78)] py-16">
-        <div className="container-x">
+      <Reveal as="section" className="container-x mt-14">
+        <div className="rounded-[1.2rem] border border-border bg-[oklch(0.9_0.03_78)] px-5 py-12 sm:px-8 md:py-16">
           <div className="mx-auto max-w-2xl text-center">
             <span className="text-[11px] uppercase tracking-[0.28em] text-toffee">Kind words</span>
-            <h2 className="mt-4 font-serif text-4xl leading-tight text-primary md:text-5xl">
+            <h2 className="mt-4 font-serif text-4xl font-bold leading-tight text-cocoa-dark md:text-5xl">
               Baked with love, reviewed with love.
             </h2>
             <p className="mt-4 text-sm text-muted-foreground">
