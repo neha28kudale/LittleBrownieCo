@@ -725,7 +725,7 @@ export function whatsappLink(message: string) {
  * directly — see the note in src/lib/reviews.ts.
  */
 export const GOOGLE_REVIEWS_URL =
-  "https://www.google.com/search?q=Little+Brownie+Co.+Bengaluru+reviews";
+  "https://maps.app.goo.gl/FqSmxZe8JWfc5h6S8?g_st=ic";
 
 export const galleryImages = [
   IMG.gallery1,
