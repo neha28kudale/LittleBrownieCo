@@ -248,6 +248,7 @@
 //     </>
 //   );
 // }
+import { ProductCard } from "@/components/site/ProductCard";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, ArrowUpRight, MessageCircleMore, Star } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
