@@ -59,7 +59,7 @@ function Stars({
 // Homepage shows the first 4 highest-rated reviews.
 // This page shows the next 5 reviews so they don't repeat.
 const HOMEPAGE_REVIEW_COUNT = 4;
-const REVIEWS_PAGE_COUNT = 5;
+const REVIEWS_PAGE_COUNT = 6;
 
 function Reviews() {
   const [allReviews, setAllReviews] = useState<Review[]>([]);
