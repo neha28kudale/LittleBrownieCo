@@ -257,8 +257,6 @@ import {
   signatureOf,
   fromPrice,
   whatsappLink,
-  GOOGLE_REVIEWS_URL,
-  GOOGLE_MAPS_URL,
   type Product,
 } from "@/lib/products";
 import {
@@ -620,22 +618,13 @@ function Home() {
         <div className="rounded-[1.2rem] border border-toffee/25 bg-[oklch(0.9_0.03_78)] px-5 py-12 shadow-soft sm:px-8 md:py-16">
           <div className="mx-auto max-w-2xl text-center">
             <span className="text-[11px] uppercase tracking-[0.28em] text-toffee">Kind words</span>
-            <h2 className="mt-4 font-serif text-4xl font-bold leading-tight tracking-tight text-cocoa-dark md:text-5xl">
+            <h2 className="mt-4 font-serif text-4xl font-bold leading-tight tracking-tight text-primary md:text-5xl">
               Baked with love, reviewed with love.
             </h2>
             <p className="mt-4 text-sm text-muted-foreground">
               See what our customers have to say on Google, and if you've tried our brownies, we'd love to hear from you too.
             </p>
             <div className="mt-4 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-             <a
-  href={GOOGLE_MAPS_URL}
-  target="_blank"
-  rel="noreferrer"
-  className="inline-flex items-center gap-1.5 text-sm text-accent hover:underline"
->
-  4.9 ★ on Google (25+ reviews)
-  <ArrowUpRight className="h-3.5 w-3.5" />
-</a>
               <Link
                 to="/reviews"
                 className="inline-flex items-center gap-1.5 text-sm text-accent hover:underline"
