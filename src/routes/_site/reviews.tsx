@@ -8,7 +8,7 @@ import {
   subscribeReviews,
   type Review,
 } from "@/lib/reviews";
-import { GOOGLE_REVIEWS_URL } from "@/lib/products";
+import { GOOGLE_REVIEWS_URL, GOOGLE_MAPS_URL } from "@/lib/products";
 
 export const Route = createFileRoute("/_site/reviews")({
   head: () => ({
@@ -97,7 +97,7 @@ function Reviews() {
           </span>
         </div>
         <a
-          href={GOOGLE_REVIEWS_URL}
+          href={GOOGLE_MAPS_URL}
           target="_blank"
           rel="noreferrer"
           className="mt-3 inline-block text-sm text-accent hover:underline"
