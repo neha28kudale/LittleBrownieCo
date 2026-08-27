@@ -617,10 +617,10 @@ function Home() {
 
       {/* REVIEWS */}
       <Reveal as="section" className="container-x mt-14">
-        <div className="rounded-[1.2rem] border border-border bg-[oklch(0.9_0.03_78)] px-5 py-12 sm:px-8 md:py-16">
+        <div className="rounded-[1.2rem] border border-toffee/25 bg-[oklch(0.9_0.03_78)] px-5 py-12 shadow-soft sm:px-8 md:py-16">
           <div className="mx-auto max-w-2xl text-center">
             <span className="text-[11px] uppercase tracking-[0.28em] text-toffee">Kind words</span>
-            <h2 className="mt-4 font-serif text-4xl font-bold leading-tight text-cocoa-dark md:text-5xl">
+            <h2 className="mt-4 font-serif text-4xl font-bold leading-tight tracking-tight text-cocoa-dark md:text-5xl">
               Baked with love, reviewed with love.
             </h2>
             <p className="mt-4 text-sm text-muted-foreground">
@@ -647,7 +647,7 @@ function Home() {
           {reviews.length > 0 ? (
             <div className="mt-10 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
               {reviews.map((r) => (
-                <figure key={r.id} className="flex flex-col rounded-md bg-background p-6">
+                <figure key={r.id} className="flex flex-col rounded-md bg-background p-6 shadow-soft">
                   <div className="flex gap-0.5 text-accent">
                     {Array.from({ length: r.rating }).map((_, i) => (
                       <Star key={i} className="h-4 w-4 fill-current" />
