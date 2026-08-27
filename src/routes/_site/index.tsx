@@ -618,8 +618,8 @@ function Home() {
   className="inline-flex items-center gap-1.5 text-sm text-accent hover:underline"
 >
   {googleRating
-    ? `${4.9 ★ on Google (${googleRating.count} reviews)`
-    : "Read our Google reviews"}{" "}
+  ? `4.9 ★ on Google (${googleRating.count} reviews)`
+  : "Read our Google reviews"}{" "}
   <ArrowUpRight className="h-3.5 w-3.5" />
 </a>
               <Link
