@@ -80,9 +80,7 @@ function Home() {
     const loadReviews = () => {
       getApprovedReviews().then((r) =>
         setReviews(
-          [...r]
-            .sort((a, b) => b.rating - a.rating)
-            .slice(0, 4),
+          [...r].sort((a, b) => b.rating - a.rating).slice(0, 4),
         ),
       );
     };
@@ -143,7 +141,7 @@ function Home() {
     <>
       {/* HERO */}
       <section className="relative overflow-hidden">
-        <div className="container-x grid gap-10 pb-10 pt-8 md:grid-cols-12 md:items-start md:gap-8 md:pb-16 md:pt-14">
+        <div className="container-x grid gap-10 pb-10 pt-8 md:grid-cols-12 md:items-start md:gap-8 md:pb-0 md:pt-14">
           <div className="flex flex-col justify-center md:col-span-6">
             <div className="img-zoom overflow-hidden rounded-[1.2rem] border border-border/80 shadow-soft">
               <img
@@ -294,7 +292,7 @@ function Home() {
       </section>
 
       {/* BROWNIE JOURNEY */}
-      <Reveal as="section" className="mt-8 md:mt-14">
+      <Reveal as="section" className="mt-8 md:mt-0">
         <div className="container-x">
           <div className="rounded-[1.5rem] border border-border bg-[oklch(0.9_0.03_78)] px-5 py-8 sm:px-8 md:py-10">
             <div className="max-w-2xl">
