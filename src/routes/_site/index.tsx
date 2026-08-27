@@ -339,7 +339,7 @@ function Home() {
               {/* 02 */}
               <div>
                 <div className="flex items-center">
-                  <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-2 border-[#a9b59c] bg-[#dce3d2] font-serif text-2xl text-primary">
+                  <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-2 border-caramel bg-[#eadfce] font-serif text-2xl text-primary">
                     02
                   </span>
 
@@ -361,7 +361,7 @@ function Home() {
               {/* 03 */}
               <div>
                 <div className="flex items-center">
-                  <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-2 border-[#d69d8d] bg-[#f0d6ce] font-serif text-2xl text-primary">
+                  <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-2 border-caramel bg-[#eadfce] font-serif text-2xl text-primary">
                     03
                   </span>
 
@@ -383,7 +383,7 @@ function Home() {
               {/* 04 */}
               <div>
                 <div className="flex items-center">
-                  <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-2 border-[#bca4b8] bg-[#e2d4df] font-serif text-2xl text-primary">
+                  <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-2 border-caramel bg-[#eadfce] font-serif text-2xl text-primary">
                     04
                   </span>
 
