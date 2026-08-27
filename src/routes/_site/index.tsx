@@ -603,6 +603,10 @@ function Home() {
             <h2 className="mt-4 font-serif text-4xl leading-tight text-primary md:text-5xl">
               Baked with love, reviewed with love.
             </h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              See what our customers have to say on Google, and if you've
+              tried our brownies, we'd love to hear from you too.
+            </p>
             <a
               href={GOOGLE_REVIEWS_URL}
               target="_blank"
