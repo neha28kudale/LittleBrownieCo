@@ -310,21 +310,21 @@ function Home() {
             <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
               {/* 01 */}
               <div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center">
                   <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-2 border-caramel bg-[#eadfce] font-serif text-2xl text-primary">
                     01
                   </span>
 
-                  <span className="shrink-0 text-3xl drop-shadow-sm">
+                  <span className="relative -ml-3 shrink-0 text-3xl drop-shadow-sm">
                     🍫
                   </span>
 
-                  <h3 className="font-serif text-2xl leading-tight text-primary">
+                  <h3 className="ml-3 font-serif text-2xl leading-tight text-primary">
                     Pick Your favourites
                   </h3>
                 </div>
 
-                <p className="mt-4 text-sm text-muted-foreground">
+                <p className="mt-3 text-sm text-muted-foreground">
                   Browse the{" "}
                   <Link
                     to="/menu"
@@ -338,21 +338,21 @@ function Home() {
 
               {/* 02 */}
               <div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center">
                   <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-2 border-[#a9b59c] bg-[#dce3d2] font-serif text-2xl text-primary">
                     02
                   </span>
 
-                  <span className="shrink-0 text-3xl drop-shadow-sm">
+                  <span className="relative -ml-3 shrink-0 text-3xl drop-shadow-sm">
                     💳
                   </span>
 
-                  <h3 className="font-serif text-2xl leading-tight text-primary">
+                  <h3 className="ml-3 font-serif text-2xl leading-tight text-primary">
                     Place Your Order
                   </h3>
                 </div>
 
-                <p className="mt-4 text-sm text-muted-foreground">
+                <p className="mt-3 text-sm text-muted-foreground">
                   Enter your details, choose your delivery date & time,
                   and make the payment.
                 </p>
@@ -360,21 +360,21 @@ function Home() {
 
               {/* 03 */}
               <div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center">
                   <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-2 border-[#d69d8d] bg-[#f0d6ce] font-serif text-2xl text-primary">
                     03
                   </span>
 
-                  <span className="shrink-0 text-3xl drop-shadow-sm">
+                  <span className="relative -ml-3 shrink-0 text-3xl drop-shadow-sm">
                     👩‍🍳
                   </span>
 
-                  <h3 className="font-serif text-2xl leading-tight text-primary">
+                  <h3 className="ml-3 font-serif text-2xl leading-tight text-primary">
                     Fresh from our oven
                   </h3>
                 </div>
 
-                <p className="mt-4 text-sm text-muted-foreground">
+                <p className="mt-3 text-sm text-muted-foreground">
                   We'll verify your order, confirm it and start baking
                   fresh.
                 </p>
@@ -382,21 +382,21 @@ function Home() {
 
               {/* 04 */}
               <div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center">
                   <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-2 border-[#bca4b8] bg-[#e2d4df] font-serif text-2xl text-primary">
                     04
                   </span>
 
-                  <span className="shrink-0 text-3xl drop-shadow-sm">
+                  <span className="relative -ml-3 shrink-0 text-3xl drop-shadow-sm">
                     📦
                   </span>
 
-                  <h3 className="font-serif text-2xl leading-tight text-primary">
+                  <h3 className="ml-3 font-serif text-2xl leading-tight text-primary">
                     Dig in & Enjoy!
                   </h3>
                 </div>
 
-                <p className="mt-4 text-sm text-muted-foreground">
+                <p className="mt-3 text-sm text-muted-foreground">
                   Track your order anytime through{" "}
                   <Link
                     to="/track-order"
