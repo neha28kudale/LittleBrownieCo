@@ -717,14 +717,32 @@ export function whatsappLink(message: string) {
 }
 
 /**
- * Google Reviews link. Points to the Google "write a review" page for the
- * business's own Google Business Profile (Place ID below), so visitors land
- * directly on Google Reviews rather than a Google Maps location page.
+ * Google Reviews links.
+ *
+ * ⚠️ GOOGLE_PLACE_ID below was set to the Place ID for "India" (the country) —
+ * that's a geocoding result, not the business's own Google Business Profile,
+ * which is why "Leave a review on Google" was landing on a generic
+ * "India - Google Search" page instead of the write-a-review form.
+ *
+ * To fix it for real, get the correct Place ID for Little Brownie Co.'s
+ * Google Business Profile (NOT a geocoded address) from Google's Place ID
+ * Finder: https://developers.google.com/maps/documentation/places/web-service/place-id
+ * Search "Little Brownie Co" there, confirm it's the bakery listing (with its
+ * reviews/rating), copy the Place ID, and paste it in below.
  */
-export const GOOGLE_PLACE_ID = "ChIJkbeSa_BfYzARphNChaFPjNc";
+export const GOOGLE_PLACE_ID = "REPLACE_WITH_LITTLE_BROWNIE_CO_PLACE_ID";
 
+/** "Write a review" form — used for the "Leave a review on Google" buttons. */
 export const GOOGLE_REVIEWS_URL =
   `https://search.google.com/local/writereview?placeid=${GOOGLE_PLACE_ID}`;
+
+/**
+ * The business's Google Maps listing page — used for "Read more reviews on
+ * Google" links, so visitors land on the page that actually shows existing
+ * reviews rather than the write-a-review form. This short link was provided
+ * directly, so it's already correct and doesn't need a Place ID.
+ */
+export const GOOGLE_MAPS_URL = "https://maps.app.goo.gl/FqSmxZe8JWfc5h6S8";
 
 export const galleryImages = [
   IMG.gallery1,
