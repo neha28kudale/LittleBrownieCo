@@ -46,6 +46,7 @@ function Reviews() {
   const [rating, setRating] = useState(5);
   const [text, setText] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [lastSubmittedRating, setLastSubmittedRating] = useState(5);
 
   useEffect(() => {
     const load = () => {
@@ -74,6 +75,7 @@ function Reviews() {
       return;
     }
     setSubmitted(true);
+    setLastSubmittedRating(rating);
     setName("");
     setLocation("");
     setRating(5);
@@ -157,6 +159,21 @@ function Reviews() {
             {submitted ? (
               <div className="mt-6 rounded-md border border-border bg-surface-soft p-5 text-sm text-primary/80">
                 Thank you! Your review is awaiting approval and will appear here once it's live.
+                {lastSubmittedRating >= 4 && (
+                  <div className="mt-4 rounded-md border border-accent/30 bg-background p-4">
+                    <p className="text-sm text-primary">
+                      Loved it? It'd mean a lot if you shared it on Google too — it takes less than a minute.
+                    </p>
+                    <a
+                      href={GOOGLE_REVIEWS_URL}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="mt-3 inline-flex items-center gap-1.5 text-xs uppercase tracking-[0.18em] text-accent hover:underline"
+                    >
+                      Post this on Google <ArrowUpRight className="h-3.5 w-3.5" />
+                    </a>
+                  </div>
+                )}
                 <button
                   onClick={() => setSubmitted(false)}
                   className="mt-3 block text-xs uppercase tracking-[0.18em] text-accent hover:underline"
