@@ -36,6 +36,7 @@ import {
 import {
   getAllReviews,
   setReviewStatus,
+  setShowOnHomepage,
   subscribeReviews,
   type Review,
 } from "@/lib/reviews";
@@ -219,6 +220,12 @@ function AdminDashboard({
     load();
     return subscribeReviews(load);
   }, []);
+
+  const reviewHomepage = async (id: string, showOnHomepage: boolean) => {
+    await setShowOnHomepage(id, showOnHomepage);
+    setReviews(await getAllReviews());
+    toast.success(showOnHomepage ? "Added to homepage" : "Removed from homepage");
+  };
 
   const reviewStatus = async (id: string, status: Review["status"]) => {
     await setReviewStatus(id, status);
@@ -417,7 +424,9 @@ function AdminDashboard({
             <DeliveryFeesAdmin slabs={deliverySlabs} refresh={refreshDeliverySlabs} />
           )}
           {tab === "customers" && <CustomersAdmin customers={customers} />}
-          {tab === "reviews" && <ReviewsAdmin reviews={reviews} setStatus={reviewStatus} />}
+          {tab === "reviews" && (
+            <ReviewsAdmin reviews={reviews} setStatus={reviewStatus} setHomepage={reviewHomepage} />
+          )}
           {tab === "analytics" && <Analytics orders={orders} products={products} />}
         </div>
       </main>
@@ -880,9 +889,11 @@ function DeliveryFeesAdmin({
 function ReviewsAdmin({
   reviews,
   setStatus,
+  setHomepage,
 }: {
   reviews: Review[];
   setStatus: (id: string, status: Review["status"]) => void | Promise<void>;
+  setHomepage: (id: string, showOnHomepage: boolean) => void | Promise<void>;
 }) {
   const pending = reviews.filter((r) => r.status === "pending");
   const decided = reviews.filter((r) => r.status !== "pending");
@@ -938,6 +949,18 @@ function ReviewsAdmin({
             Reject
           </button>
         )}
+        {r.status === "approved" && (
+          <button
+            onClick={() => setHomepage(r.id, !r.showOnHomepage)}
+            className={`rounded-full border px-4 py-1.5 text-xs uppercase tracking-wider ${
+              r.showOnHomepage
+                ? "border-accent bg-accent/25 text-cocoa"
+                : "border-border text-primary hover:bg-secondary"
+            }`}
+          >
+            {r.showOnHomepage ? "On homepage ✓" : "Show on homepage"}
+          </button>
+        )}
       </div>
     </div>
   );
@@ -947,8 +970,8 @@ function ReviewsAdmin({
       <div>
         <h2 className="font-serif text-2xl text-primary">Pending approval</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          New customer reviews wait here until approved — only approved reviews show on the
-          public Reviews page.
+          New customer reviews wait here until approved — approved reviews show on the public
+          Reviews page. Use "Show on homepage" to also feature a review on the homepage.
         </p>
         <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {pending.length === 0 && (
@@ -1859,4 +1882,3 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
     </label>
   );
 }
-
