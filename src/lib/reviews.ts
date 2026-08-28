@@ -24,6 +24,7 @@ export type Review = {
   text: string;
   createdAt: string;
   status: ReviewStatus;
+  showOnHomepage: boolean;
 };
 
 function fromRow(row: {
@@ -34,6 +35,7 @@ function fromRow(row: {
   body: string;
   status: ReviewStatus;
   created_at: string;
+  show_on_homepage: boolean | null;
 }): Review {
   return {
     id: row.id,
@@ -43,6 +45,7 @@ function fromRow(row: {
     text: row.body,
     createdAt: row.created_at,
     status: row.status,
+    showOnHomepage: !!row.show_on_homepage,
   };
 }
 
@@ -95,6 +98,14 @@ export async function setReviewStatus(id: string, status: ReviewStatus) {
   if (error) console.error("[reviews] setReviewStatus", error);
 }
 
+export async function setShowOnHomepage(id: string, showOnHomepage: boolean) {
+  const { error } = await supabase
+    .from("reviews")
+    .update({ show_on_homepage: showOnHomepage })
+    .eq("id", id);
+  if (error) console.error("[reviews] setShowOnHomepage", error);
+}
+
 export async function deleteReview(id: string) {
   const { error } = await supabase.from("reviews").delete().eq("id", id);
   if (error) console.error("[reviews] deleteReview", error);
@@ -142,4 +153,3 @@ export async function getGoogleReviews(): Promise<{
     return { reviews: [], rating: null, ratingCount: null, mapsUrl: null, configured: false };
   }
 }
-
