@@ -33,8 +33,6 @@ import {
   updateDeliverySlabFee,
   type DeliverySlab,
 } from "@/lib/delivery";
-import { getCategoryLabels, updateCategoryLabel, type CategoryLabels } from "@/lib/categories";
-import { MENU_CATEGORIES } from "@/lib/site-content";
 import {
   getAllReviews,
   setReviewStatus,
@@ -60,12 +58,13 @@ import {
   Loader2,
   AlertTriangle,
   Users,
-  Tag,
   Phone,
   Mail,
   MapPin,
   Download,
   Truck,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "sonner";
@@ -188,25 +187,16 @@ function AdminDashboard({
   onLogout: () => void;
 }) {
   const [tab, setTab] = useState<
-    | "overview"
-    | "orders"
-    | "products"
-    | "customers"
-    | "reviews"
-    | "analytics"
-    | "delivery"
-    | "categories"
+    "overview" | "orders" | "products" | "customers" | "reviews" | "analytics" | "delivery"
   >("overview");
   const [orders, setOrders] = useState<Order[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [deliverySlabs, setDeliverySlabs] = useState<DeliverySlab[]>([]);
-  const [categoryLabels, setCategoryLabels] = useState<CategoryLabels | null>(null);
   const [exporting, setExporting] = useState(false);
 
   const refreshProducts = () => getAllProductsAdmin().then(setProducts);
   const refreshDeliverySlabs = () => getDeliverySlabs().then(setDeliverySlabs);
-  const refreshCategoryLabels = () => getCategoryLabels().then(setCategoryLabels);
 
   useEffect(() => {
     refreshProducts();
@@ -214,10 +204,6 @@ function AdminDashboard({
 
   useEffect(() => {
     refreshDeliverySlabs();
-  }, []);
-
-  useEffect(() => {
-    refreshCategoryLabels();
   }, []);
 
   useEffect(() => {
@@ -317,7 +303,6 @@ function AdminDashboard({
     { id: "orders", label: "Orders", icon: ShoppingBag },
     { id: "products", label: "Products", icon: Package },
     { id: "delivery", label: "Delivery Fees", icon: Truck },
-    { id: "categories", label: "Categories", icon: Tag },
     { id: "customers", label: "Customers", icon: Users },
     { id: "reviews", label: "Reviews", icon: MessageSquare, badge: pendingReviewCount },
     { id: "analytics", label: "Analytics", icon: LayoutDashboard },
@@ -433,9 +418,6 @@ function AdminDashboard({
           {tab === "delivery" && (
             <DeliveryFeesAdmin slabs={deliverySlabs} refresh={refreshDeliverySlabs} />
           )}
-          {tab === "categories" && (
-            <CategoryLabelsAdmin labels={categoryLabels} refresh={refreshCategoryLabels} />
-          )}
           {tab === "customers" && <CustomersAdmin customers={customers} />}
           {tab === "reviews" && <ReviewsAdmin reviews={reviews} setStatus={reviewStatus} />}
           {tab === "analytics" && <Analytics orders={orders} products={products} />}
@@ -444,7 +426,7 @@ function AdminDashboard({
 
       {/* Mobile bottom tab bar */}
       <nav
-        className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-8 border-t border-border bg-background/95 backdrop-blur md:hidden"
+        className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-7 border-t border-border bg-background/95 backdrop-blur md:hidden"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
         {navItems.map(({ id, label, icon: Icon, badge }) => (
@@ -897,75 +879,6 @@ function DeliveryFeesAdmin({
   );
 }
 
-function CategoryLabelsAdmin({
-  labels,
-  refresh,
-}: {
-  labels: CategoryLabels | null;
-  refresh: () => void;
-}) {
-  const [drafts, setDrafts] = useState<Record<string, string>>({});
-  const [savingKey, setSavingKey] = useState<string | null>(null);
-
-  const save = async (key: (typeof MENU_CATEGORIES)[number]) => {
-    const raw = (drafts[key] ?? labels?.[key] ?? key).trim();
-    if (!raw) {
-      toast.error("Category name can't be empty.");
-      return;
-    }
-    setSavingKey(key);
-    const ok = await updateCategoryLabel(key, raw);
-    setSavingKey(null);
-    if (ok) {
-      toast.success(`"${key}" renamed to "${raw}"`);
-      refresh();
-    } else {
-      toast.error("Couldn't save — please try again.");
-    }
-  };
-
-  return (
-    <div className="max-w-2xl">
-      <div className="rounded-lg border border-border bg-card p-5 sm:p-6">
-        <h2 className="font-serif text-2xl text-primary">Categories</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Rename how a category appears on the menu and product pages (e.g. "Mini Bites" →
-          "Bite-Sized Treats"). This only changes the name customers see — products already
-          filed under a category stay there.
-        </p>
-
-        <div className="mt-5 divide-y divide-border">
-          {MENU_CATEGORIES.map((key) => (
-            <div key={key} className="flex flex-wrap items-center justify-between gap-3 py-3">
-              <span className="text-sm text-muted-foreground">{key}</span>
-
-              <div className="flex items-center gap-2">
-                <input
-                  type="text"
-                  value={drafts[key] ?? labels?.[key] ?? key}
-                  onChange={(e) => setDrafts((d) => ({ ...d, [key]: e.target.value }))}
-                  className="w-48 rounded-lg border border-border bg-background px-3 py-1.5 text-sm text-primary outline-none focus:border-accent"
-                />
-                <button
-                  onClick={() => save(key)}
-                  disabled={savingKey === key || !labels}
-                  className="rounded-full bg-primary px-4 py-1.5 text-xs uppercase tracking-[0.14em] text-primary-foreground transition-colors hover:bg-cocoa-dark disabled:opacity-50"
-                >
-                  {savingKey === key ? "Saving…" : "Save"}
-                </button>
-              </div>
-            </div>
-          ))}
-
-          {!labels && (
-            <p className="py-6 text-center text-sm text-muted-foreground">Loading categories…</p>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function ReviewsAdmin({
   reviews,
   setStatus,
@@ -973,9 +886,6 @@ function ReviewsAdmin({
   reviews: Review[];
   setStatus: (id: string, status: Review["status"]) => void | Promise<void>;
 }) {
-  const pending = reviews.filter((r) => r.status === "pending");
-  const decided = reviews.filter((r) => r.status !== "pending");
-
   const RatingStars = ({ rating }: { rating: number }) => (
     <div className="flex gap-0.5">
       {Array.from({ length: 5 }).map((_, i) => (
@@ -987,75 +897,58 @@ function ReviewsAdmin({
     </div>
   );
 
-  const Card = ({ r }: { r: Review }) => (
-    <div className="rounded-lg border border-border bg-card p-5">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <div className="font-medium text-primary">
-            {r.name}
-            {r.location ? ` · ${r.location}` : ""}
+  const Card = ({ r }: { r: Review }) => {
+    const shown = r.status === "approved";
+    return (
+      <div className="rounded-lg border border-border bg-card p-5">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <div className="font-medium text-primary">
+              {r.name}
+              {r.location ? ` · ${r.location}` : ""}
+            </div>
+            <RatingStars rating={r.rating} />
           </div>
-          <RatingStars rating={r.rating} />
+          <label className="flex shrink-0 cursor-pointer items-center gap-2">
+            <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+              {shown ? "On site" : "Hidden"}
+            </span>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={shown}
+              onClick={() => setStatus(r.id, shown ? "rejected" : "approved")}
+              className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${
+                shown ? "bg-primary" : "bg-border"
+              }`}
+            >
+              <span
+                className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
+                  shown ? "translate-x-5" : "translate-x-0.5"
+                }`}
+              />
+            </button>
+          </label>
         </div>
-        <span
-          className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] uppercase tracking-wider ${
-            r.status === "approved"
-              ? "bg-secondary text-primary"
-              : r.status === "rejected"
-                ? "bg-destructive/15 text-destructive"
-                : "bg-accent/25 text-cocoa"
-          }`}
-        >
-          {r.status}
-        </span>
+        <p className="mt-3 text-sm leading-relaxed text-primary/80">"{r.text}"</p>
       </div>
-      <p className="mt-3 text-sm leading-relaxed text-primary/80">"{r.text}"</p>
-      <div className="mt-4 flex gap-2">
-        {r.status !== "approved" && (
-          <button
-            onClick={() => setStatus(r.id, "approved")}
-            className="rounded-full bg-primary px-4 py-1.5 text-xs uppercase tracking-wider text-primary-foreground hover:bg-cocoa-dark active:bg-cocoa-dark"
-          >
-            Approve
-          </button>
-        )}
-        {r.status !== "rejected" && (
-          <button
-            onClick={() => setStatus(r.id, "rejected")}
-            className="rounded-full border border-border px-4 py-1.5 text-xs uppercase tracking-wider text-primary hover:bg-destructive/10 hover:text-destructive"
-          >
-            Reject
-          </button>
-        )}
-      </div>
-    </div>
-  );
+    );
+  };
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h2 className="font-serif text-2xl text-primary">Pending approval</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          New customer reviews wait here until approved — only approved reviews show on the
-          public Reviews page.
-        </p>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {pending.length === 0 && (
-            <p className="text-sm text-muted-foreground">No reviews waiting for approval.</p>
-          )}
-          {pending.map((r) => (
-            <Card key={r.id} r={r} />
-          ))}
-        </div>
-      </div>
-
-      <div>
-        <h2 className="font-serif text-2xl text-primary">Approved &amp; rejected</h2>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {decided.map((r) => (
-            <Card key={r.id} r={r} />
-          ))}
-        </div>
+    <div>
+      <h2 className="font-serif text-2xl text-primary">Reviews</h2>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Flip a review "On site" to show it on the public Reviews page, or "Hidden" to keep it
+        off — no approve/reject step needed.
+      </p>
+      <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {reviews.length === 0 && (
+          <p className="text-sm text-muted-foreground">No reviews yet.</p>
+        )}
+        {reviews.map((r) => (
+          <Card key={r.id} r={r} />
+        ))}
       </div>
     </div>
   );
@@ -1064,7 +957,7 @@ function ReviewsAdmin({
 type Draft = Partial<Product> & { price?: number };
 
 function emptyVariant(): Variant {
-  return { id: `v-${Math.random().toString(36).slice(2, 9)}`, label: "", price: 0, flavour: "" };
+  return { id: `v-${Math.random().toString(36).slice(2, 9)}`, label: "", price: 0 };
 }
 
 function ProductsAdmin({
@@ -1082,17 +975,12 @@ function ProductsAdmin({
       toast.error("Name and price are required");
       return;
     }
-    const cleanFlavours = (draft.flavours || []).map((f) => f.trim()).filter(Boolean);
     const cleanVariants = (draft.variants || [])
       .filter((v) => v.label.trim() && v.price > 0)
-      .map((v) => ({
-        id: v.id,
-        label: v.label.trim(),
-        price: Number(v.price),
-        flavour: v.flavour?.trim() || undefined,
-      }));
+      .map((v) => ({ id: v.id, label: v.label.trim(), price: Number(v.price) }));
     const cleanGallery = (draft.gallery || []).filter(Boolean);
     const cleanGalleryPositions = cleanGallery.map((_, i) => (draft.galleryPositions || [])[i] || "center");
+    const cleanFlavours = (draft.flavours || []).map((f) => f.trim()).filter(Boolean);
     const cleanIngredients = (draft.ingredients || []).map((i) => i.trim()).filter(Boolean);
 
     setSaving(true);
@@ -1521,45 +1409,6 @@ function ProductModal({
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
                   </div>
-                  <div className="mt-2">
-                    <label className="mb-1 block text-[10px] uppercase tracking-wide text-muted-foreground">
-                      Flavour this price applies to (optional — leave blank if this size costs
-                      the same for every flavour)
-                    </label>
-                    {(d.flavours || []).filter((f) => f.trim()).length > 0 ? (
-                      <select
-                        value={v.flavour ?? ""}
-                        onChange={(e) => {
-                          const next = [...(d.variants || [])];
-                          next[i] = { ...next[i], flavour: e.target.value || undefined };
-                          setD({ ...d, variants: next });
-                        }}
-                        className="input w-full"
-                      >
-                        <option value="">All flavours (same price)</option>
-                        {(d.flavours || [])
-                          .map((f) => f.trim())
-                          .filter(Boolean)
-                          .map((f) => (
-                            <option key={f} value={f}>
-                              {f}
-                            </option>
-                          ))}
-                      </select>
-                    ) : (
-                      <input
-                        value={v.flavour ?? ""}
-                        onChange={(e) => {
-                          const next = [...(d.variants || [])];
-                          next[i] = { ...next[i], flavour: e.target.value };
-                          setD({ ...d, variants: next });
-                        }}
-                        placeholder="Add flavours above first, or leave blank"
-                        autoComplete="off"
-                        className="input w-full"
-                      />
-                    )}
-                  </div>
                 </div>
               ))}
               <button
@@ -1572,9 +1421,6 @@ function ProductModal({
               <p className="text-[11px] text-muted-foreground">
                 Customers will see one button per row above (e.g. "500g", "1kg"). If you leave
                 all rows empty, the single Price field near the top of this form is used instead.
-                To give the same size a different price per flavour, add one row per flavour
-                (e.g. two "500g" rows — one tagged "Dark Chocolate" at ₹585, one tagged "Nutella"
-                at ₹625) and set the Flavour dropdown on each row.
               </p>
             </div>
           </div>
@@ -1585,11 +1431,25 @@ function ProductModal({
               Gallery photos
             </span>
             <p className="mb-2 mt-1 text-[11px] text-muted-foreground">
-              Tap the dots under a photo to choose which part of it stays in frame.
+              Use the arrows to reorder photos. Tap the dots under a photo to choose which part
+              of it stays in frame.
             </p>
             <div className="mt-2 flex flex-wrap gap-4">
-              {(d.gallery || []).map((g, i) => (
-                <div key={i} className="w-20 shrink-0">
+              {(d.gallery || []).map((g, i) => {
+                const galleryLen = (d.gallery || []).length;
+                const moveTo = (from: number, to: number) => {
+                  if (to < 0 || to >= galleryLen) return;
+                  const nextGallery = [...(d.gallery || [])];
+                  const nextPositions = [...(d.galleryPositions || [])];
+                  while (nextPositions.length < galleryLen) nextPositions.push("center");
+                  const [movedImg] = nextGallery.splice(from, 1);
+                  nextGallery.splice(to, 0, movedImg);
+                  const [movedPos] = nextPositions.splice(from, 1);
+                  nextPositions.splice(to, 0, movedPos);
+                  setD({ ...d, gallery: nextGallery, galleryPositions: nextPositions });
+                };
+                return (
+                <div key={g + i} className="w-20 shrink-0">
                   <div className="relative h-20 w-20">
                     <img
                       src={g}
@@ -1608,6 +1468,27 @@ function ProductModal({
                       aria-label="Remove photo"
                     >
                       <X className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                  <div className="mt-1.5 flex items-center justify-between gap-1">
+                    <button
+                      type="button"
+                      onClick={() => moveTo(i, i - 1)}
+                      disabled={i === 0}
+                      aria-label="Move photo left"
+                      className="grid h-6 w-6 place-items-center rounded-md border border-border text-primary hover:border-accent hover:text-accent disabled:opacity-30"
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </button>
+                    <span className="text-[10px] text-muted-foreground">{i + 1}</span>
+                    <button
+                      type="button"
+                      onClick={() => moveTo(i, i + 1)}
+                      disabled={i === galleryLen - 1}
+                      aria-label="Move photo right"
+                      className="grid h-6 w-6 place-items-center rounded-md border border-border text-primary hover:border-accent hover:text-accent disabled:opacity-30"
+                    >
+                      <ChevronRight className="h-4 w-4" />
                     </button>
                   </div>
                   <div className="mt-1.5 grid w-20 grid-cols-3 gap-0.5 rounded-md border border-dashed border-border bg-secondary/40 p-1">
@@ -1643,7 +1524,8 @@ function ProductModal({
                     ))}
                   </div>
                 </div>
-              ))}
+                );
+              })}
               <label className="grid h-20 w-20 shrink-0 cursor-pointer place-items-center rounded-md border border-dashed border-border text-muted-foreground hover:border-accent hover:text-accent">
                 {galleryUploading ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
