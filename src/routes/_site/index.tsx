@@ -81,6 +81,7 @@ function Home() {
       getApprovedReviews().then((r) =>
         setReviews(
           [...r]
+            .filter((review) => review.showOnHomepage)
             .sort((a, b) => b.rating - a.rating)
             .slice(0, 4),
         ),
