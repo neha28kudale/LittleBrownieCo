@@ -112,12 +112,49 @@ export async function getDeliverySlabs(): Promise<DeliverySlab[]> {
   return data.map(slabFromRow);
 }
 
-/** Admin-only: update the fee for a single slab. The km ranges themselves
- * are fixed (they match the 11 ranges agreed with the owner) — only the
- * price per range is meant to be edited from the dashboard. */
+/** Admin-only: update the fee for a single slab. */
 export async function updateDeliverySlabFee(id: string, fee: number) {
   const { error } = await supabase.from("delivery_slabs").update({ fee }).eq("id", id);
   if (error) console.error("[delivery] updateDeliverySlabFee", error);
+  return !error;
+}
+
+/** Admin-only: update the km range (and fee) for a single slab. Pass
+ * `maxKm: null` for an open-ended "X+ km" range. */
+export async function updateDeliverySlab(
+  id: string,
+  input: { minKm: number; maxKm: number | null; fee: number }
+) {
+  const { error } = await supabase
+    .from("delivery_slabs")
+    .update({ min_km: input.minKm, max_km: input.maxKm, fee: input.fee })
+    .eq("id", id);
+  if (error) console.error("[delivery] updateDeliverySlab", error);
+  return !error;
+}
+
+/** Admin-only: add a new km range. Appended to the end of the display
+ * order by default. */
+export async function createDeliverySlab(input: {
+  minKm: number;
+  maxKm: number | null;
+  fee: number;
+  sortOrder: number;
+}) {
+  const { error } = await supabase.from("delivery_slabs").insert({
+    min_km: input.minKm,
+    max_km: input.maxKm,
+    fee: input.fee,
+    sort_order: input.sortOrder,
+  });
+  if (error) console.error("[delivery] createDeliverySlab", error);
+  return !error;
+}
+
+/** Admin-only: remove a km range entirely. */
+export async function deleteDeliverySlab(id: string) {
+  const { error } = await supabase.from("delivery_slabs").delete().eq("id", id);
+  if (error) console.error("[delivery] deleteDeliverySlab", error);
   return !error;
 }
 
