@@ -31,6 +31,9 @@ import {
 import {
   getDeliverySlabs,
   updateDeliverySlabFee,
+  updateDeliverySlab,
+  createDeliverySlab,
+  deleteDeliverySlab,
   type DeliverySlab,
 } from "@/lib/delivery";
 import {
@@ -804,9 +807,10 @@ function Orders({
 }
 
 /* Delivery fees are distance-based (see src/lib/delivery.ts +
-   supabase/functions/calculate-delivery-fee). The km ranges themselves are
-   fixed to match what was agreed with the owner — only the fee per range
-   is editable here. */
+   supabase/functions/calculate-delivery-fee). Admins can add, edit (both
+   the km range and the fee), and remove ranges here. */
+
+type SlabDraft = { minKm: string; maxKm: string; fee: string };
 
 function DeliveryFeesAdmin({
   slabs,
@@ -815,29 +819,90 @@ function DeliveryFeesAdmin({
   slabs: DeliverySlab[];
   refresh: () => void;
 }) {
-  const [drafts, setDrafts] = useState<Record<string, string>>({});
+  const [edits, setEdits] = useState<Record<string, SlabDraft>>({});
   const [savingId, setSavingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [adding, setAdding] = useState(false);
+  const [newSlab, setNewSlab] = useState<SlabDraft>({ minKm: "", maxKm: "", fee: "" });
 
   const rangeLabel = (s: DeliverySlab) =>
     s.maxKm === null ? `${s.minKm}+ km` : `${s.minKm}–${s.maxKm} km`;
 
-  const save = async (slab: DeliverySlab) => {
-    const raw = drafts[slab.id] ?? String(slab.fee);
-    const fee = Number(raw);
-    if (Number.isNaN(fee) || fee < 0) {
-      toast.error("Please enter a valid fee.");
+  const startEdit = (s: DeliverySlab) =>
+    setEdits((d) => ({
+      ...d,
+      [s.id]: { minKm: String(s.minKm), maxKm: s.maxKm === null ? "" : String(s.maxKm), fee: String(s.fee) },
+    }));
+
+  const cancelEdit = (id: string) =>
+    setEdits((d) => {
+      const { [id]: _drop, ...rest } = d;
+      return rest;
+    });
+
+  const parseDraft = (draft: SlabDraft): { minKm: number; maxKm: number | null; fee: number } | null => {
+    const minKm = Number(draft.minKm);
+    const fee = Number(draft.fee);
+    const maxKm = draft.maxKm.trim() === "" ? null : Number(draft.maxKm);
+    if (Number.isNaN(minKm) || minKm < 0) return null;
+    if (Number.isNaN(fee) || fee < 0) return null;
+    if (maxKm !== null && (Number.isNaN(maxKm) || maxKm <= minKm)) return null;
+    return { minKm, maxKm, fee };
+  };
+
+  const save = async (id: string) => {
+    const draft = edits[id];
+    const parsed = draft && parseDraft(draft);
+    if (!parsed) {
+      toast.error("Please enter a valid range (max > min) and fee.");
       return;
     }
-    setSavingId(slab.id);
-    const ok = await updateDeliverySlabFee(slab.id, fee);
+    setSavingId(id);
+    const ok = await updateDeliverySlab(id, parsed);
     setSavingId(null);
     if (ok) {
-      toast.success(`Updated ${rangeLabel(slab)} fee`);
+      toast.success("Delivery range updated");
+      cancelEdit(id);
       refresh();
     } else {
       toast.error("Couldn't save — please try again.");
     }
   };
+
+  const remove = async (s: DeliverySlab) => {
+    if (!window.confirm(`Remove the ${rangeLabel(s)} range?`)) return;
+    setDeletingId(s.id);
+    const ok = await deleteDeliverySlab(s.id);
+    setDeletingId(null);
+    if (ok) {
+      toast.success("Range removed");
+      refresh();
+    } else {
+      toast.error("Couldn't remove — please try again.");
+    }
+  };
+
+  const addSlab = async () => {
+    const parsed = parseDraft(newSlab);
+    if (!parsed) {
+      toast.error("Please enter a valid range (max > min) and fee.");
+      return;
+    }
+    setAdding(true);
+    const nextSortOrder = slabs.reduce((max, s) => Math.max(max, s.sortOrder), 0) + 1;
+    const ok = await createDeliverySlab({ ...parsed, sortOrder: nextSortOrder });
+    setAdding(false);
+    if (ok) {
+      toast.success("Range added");
+      setNewSlab({ minKm: "", maxKm: "", fee: "" });
+      refresh();
+    } else {
+      toast.error("Couldn't add — please try again.");
+    }
+  };
+
+  const draftInputClass =
+    "w-20 rounded-lg border border-border bg-background px-2 py-1.5 text-sm text-primary outline-none focus:border-accent";
 
   return (
     <div className="max-w-2xl">
@@ -847,41 +912,132 @@ function DeliveryFeesAdmin({
           At checkout, the customer's delivery pincode is checked against our
           dispatch pincode (560029) to work out the distance, which is
           matched against the ranges below. Customers only ever see the
-          final fee, never these ranges.
+          final fee, never these ranges. Ranges should not overlap.
         </p>
 
         <div className="mt-5 divide-y divide-border">
-          {slabs.map((s) => (
-            <div key={s.id} className="flex items-center justify-between gap-4 py-3">
-              <span className="text-sm text-primary/90">{rangeLabel(s)}</span>
+          {slabs.map((s) => {
+            const editing = edits[s.id];
+            return (
+              <div key={s.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
+                {editing ? (
+                  <div className="flex flex-wrap items-center gap-2">
+                    <input
+                      type="number"
+                      min={0}
+                      value={editing.minKm}
+                      onChange={(e) => setEdits((d) => ({ ...d, [s.id]: { ...editing, minKm: e.target.value } }))}
+                      placeholder="Min km"
+                      className={draftInputClass}
+                    />
+                    <span className="text-sm text-muted-foreground">–</span>
+                    <input
+                      type="number"
+                      min={0}
+                      value={editing.maxKm}
+                      onChange={(e) => setEdits((d) => ({ ...d, [s.id]: { ...editing, maxKm: e.target.value } }))}
+                      placeholder="Max (blank = +)"
+                      className={draftInputClass}
+                    />
+                    <span className="text-sm text-muted-foreground">km · ₹</span>
+                    <input
+                      type="number"
+                      min={0}
+                      value={editing.fee}
+                      onChange={(e) => setEdits((d) => ({ ...d, [s.id]: { ...editing, fee: e.target.value } }))}
+                      placeholder="Fee"
+                      className={draftInputClass}
+                    />
+                  </div>
+                ) : (
+                  <span className="text-sm text-primary/90">
+                    {rangeLabel(s)} — ₹{s.fee}
+                  </span>
+                )}
 
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">₹</span>
-                <input
-                  type="number"
-                  min={0}
-                  value={drafts[s.id] ?? s.fee}
-                  onChange={(e) =>
-                    setDrafts((d) => ({ ...d, [s.id]: e.target.value }))
-                  }
-                  className="w-24 rounded-lg border border-border bg-background px-3 py-1.5 text-sm text-primary outline-none focus:border-accent"
-                />
-                <button
-                  onClick={() => save(s)}
-                  disabled={savingId === s.id}
-                  className="rounded-full bg-primary px-4 py-1.5 text-xs uppercase tracking-[0.14em] text-primary-foreground transition-colors hover:bg-cocoa-dark disabled:opacity-50"
-                >
-                  {savingId === s.id ? "Saving…" : "Save"}
-                </button>
+                <div className="flex items-center gap-2">
+                  {editing ? (
+                    <>
+                      <button
+                        onClick={() => save(s.id)}
+                        disabled={savingId === s.id}
+                        className="rounded-full bg-primary px-4 py-1.5 text-xs uppercase tracking-[0.14em] text-primary-foreground transition-colors hover:bg-cocoa-dark disabled:opacity-50"
+                      >
+                        {savingId === s.id ? "Saving…" : "Save"}
+                      </button>
+                      <button
+                        onClick={() => cancelEdit(s.id)}
+                        className="rounded-full border border-border px-4 py-1.5 text-xs uppercase tracking-[0.14em] text-muted-foreground transition-colors hover:bg-muted"
+                      >
+                        Cancel
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => startEdit(s)}
+                        className="rounded-full border border-border px-4 py-1.5 text-xs uppercase tracking-[0.14em] text-primary transition-colors hover:bg-muted"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => remove(s)}
+                        disabled={deletingId === s.id}
+                        className="rounded-full border border-destructive/40 px-4 py-1.5 text-xs uppercase tracking-[0.14em] text-destructive transition-colors hover:bg-destructive/10 disabled:opacity-50"
+                      >
+                        {deletingId === s.id ? "Removing…" : "Remove"}
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
 
           {slabs.length === 0 && (
             <p className="py-6 text-center text-sm text-muted-foreground">
               No delivery fee ranges found.
             </p>
           )}
+        </div>
+
+        <div className="mt-5 border-t border-border pt-5">
+          <h3 className="text-xs uppercase tracking-[0.14em] text-muted-foreground">Add a new range</h3>
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <input
+              type="number"
+              min={0}
+              value={newSlab.minKm}
+              onChange={(e) => setNewSlab((d) => ({ ...d, minKm: e.target.value }))}
+              placeholder="Min km"
+              className={draftInputClass}
+            />
+            <span className="text-sm text-muted-foreground">–</span>
+            <input
+              type="number"
+              min={0}
+              value={newSlab.maxKm}
+              onChange={(e) => setNewSlab((d) => ({ ...d, maxKm: e.target.value }))}
+              placeholder="Max (blank = +)"
+              className={draftInputClass}
+            />
+            <span className="text-sm text-muted-foreground">km · ₹</span>
+            <input
+              type="number"
+              min={0}
+              value={newSlab.fee}
+              onChange={(e) => setNewSlab((d) => ({ ...d, fee: e.target.value }))}
+              placeholder="Fee"
+              className={draftInputClass}
+            />
+            <button
+              onClick={addSlab}
+              disabled={adding}
+              className="rounded-full bg-primary px-4 py-1.5 text-xs uppercase tracking-[0.14em] text-primary-foreground transition-colors hover:bg-cocoa-dark disabled:opacity-50"
+            >
+              {adding ? "Adding…" : "Add range"}
+            </button>
+          </div>
         </div>
       </div>
     </div>
