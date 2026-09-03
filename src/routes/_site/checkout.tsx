@@ -657,10 +657,10 @@ function Checkout() {
             </div>
           </dl>
 
-          <p className="mt-4 text-[11px] leading-relaxed text-muted-foreground">
+          <p className="mt-4 rounded-md bg-muted/60 px-3 py-2 text-[11px] leading-relaxed text-foreground/80">
             {deliveryPricingConfigured
-              ? "Delivery charges are calculated based on the distance from our kitchen to your delivery location."
-              : "Delivery charges are calculated at dispatch based on your delivery location. The final delivery charge will be shared with you before dispatch."}
+              ? "Delivery charges are calculated based on the distance between our kitchen to your delivery location. Your order will be delivered through a trusted third-party delivery partner such as Uber, Porter or Rapido."
+              : "Delivery charges are calculated at dispatch based on your delivery location. The final delivery charge will be shared with you before dispatch. Your order will be delivered through a trusted third-party delivery partner such as Uber, Porter or Rapido."}
           </p>
 
           <button
