@@ -21,6 +21,7 @@ export type OrderStatus =
   | "delivered"
   | "rejected";
 export type PaymentStatus = "pending" | "paid" | "failed";
+export type FailureReason = "expired" | "rejected" | null;
 
 export type OrderItemRow = {
   productName: string;
@@ -48,6 +49,7 @@ export type Order = {
   giftMessage?: string;
   ribbonFee: number;
   paymentStatus: PaymentStatus;
+  failureReason: FailureReason;
   orderStatus: OrderStatus;
   cashfreeOrderId?: string;
   createdAt: string;
@@ -151,6 +153,7 @@ function fromRow(row: any, items: any[]): Order {
     giftMessage: row.gift_message ?? undefined,
     ribbonFee: Number(row.ribbon_fee ?? 0),
     paymentStatus: row.payment_status,
+    failureReason: row.failure_reason ?? null,
     orderStatus: row.order_status,
     cashfreeOrderId: row.cashfree_order_id ?? undefined,
     createdAt: row.created_at,
