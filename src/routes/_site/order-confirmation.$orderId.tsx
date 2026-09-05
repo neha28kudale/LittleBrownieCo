@@ -5,6 +5,9 @@ import { getOrderById, type Order } from "@/lib/orders";
 import { formatDisplayDate } from "@/lib/delivery";
 import { IMG } from "@/lib/products";
 import { ConfettiBurst } from "@/components/site/ConfettiBurst";
+import { supabase } from "@/lib/supabase";
+
+const CASHFREE_MODE = (import.meta.env.VITE_CASHFREE_MODE as string) || "sandbox";
 
 export const Route = createFileRoute("/_site/order-confirmation/$orderId")({
   head: () => ({
@@ -28,6 +31,13 @@ function StatusPill({ order }: { order: Order }) {
     return (
       <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1.5 text-xs font-medium text-primary">
         <CheckCircle2 className="h-3.5 w-3.5" /> Order confirmed
+      </span>
+    );
+  }
+  if (order.paymentStatus !== "paid") {
+    return (
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-accent/25 px-3 py-1.5 text-xs font-medium text-cocoa">
+        <Clock className="h-3.5 w-3.5" /> Awaiting payment confirmation
       </span>
     );
   }
@@ -95,7 +105,37 @@ function OrderConfirmation() {
   const [order, setOrder] = useState<Order | null | "loading">("loading");
 
   useEffect(() => {
-    getOrderById(orderId).then(setOrder);
+    let cancelled = false;
+    let attempts = 0;
+
+    const poll = async () => {
+      const current = await getOrderById(orderId);
+      if (cancelled) return;
+      setOrder(current);
+
+      // If we're still "pending" after the webhook should've had a chance to
+      // fire, actively ask Cashfree directly — this is what catches a
+      // customer hitting "back"/closing the tab without paying, since no
+      // webhook is ever sent for that case and the row would otherwise sit
+      // as "pending" (and misleadingly render as a normal placed order)
+      // forever.
+      if (current && current.paymentStatus === "pending" && attempts < 6) {
+        attempts += 1;
+        try {
+          await supabase.functions.invoke("verify-cashfree-order", {
+            body: { orderId, mode: CASHFREE_MODE },
+          });
+        } catch (err) {
+          console.error("[order-confirmation] verify-cashfree-order", err);
+        }
+        if (!cancelled) setTimeout(poll, 3000);
+      }
+    };
+
+    poll();
+    return () => {
+      cancelled = true;
+    };
   }, [orderId]);
 
   if (order === "loading") {
@@ -132,11 +172,18 @@ function OrderConfirmation() {
             className="mx-auto h-16 w-16 animate-float rounded-full border border-border object-cover"
           />
           <h1 className="mt-4 font-serif text-3xl text-primary sm:text-4xl">
-            {order.orderStatus === "rejected" ? "Payment couldn't be verified" : "Thank you for your order!"}
+            {order.orderStatus === "rejected"
+              ? "Payment couldn't be verified"
+              : order.paymentStatus === "paid"
+                ? "Thank you for your order!"
+                : "Almost there…"}
           </h1>
           <p className="mx-auto mt-3 max-w-md text-sm text-muted-foreground">
-            Thank you for placing your order. Your order will be confirmed after verification of
-            payment status.
+            {order.orderStatus === "rejected"
+              ? "We couldn't verify your payment for this order, so it hasn't been placed. Please try checking out again, or reach out to us on WhatsApp if you've been charged."
+              : order.paymentStatus === "paid"
+                ? "Thank you for placing your order. Your order will be confirmed after verification of payment status."
+                : "We haven't received confirmation that your payment went through yet. If you completed payment, this page will update shortly — if you closed the payment window before finishing, no payment was taken and this order won't be processed."}
           </p>
           <div className="mt-4 flex justify-center">
             <StatusPill order={order} />
@@ -220,7 +267,7 @@ function OrderConfirmation() {
             </dd>
           </div>
           <div className="flex justify-between border-t border-border pt-3 font-serif text-xl text-primary">
-            <dt>Paid now</dt>
+            <dt>{order.paymentStatus === "paid" ? "Paid" : order.paymentStatus === "failed" ? "Payment failed" : "Amount due"}</dt>
             <dd>₹{order.total}</dd>
           </div>
         </dl>
