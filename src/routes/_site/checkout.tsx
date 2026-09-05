@@ -108,6 +108,29 @@ function Checkout() {
     setDate(toISODate(earliestDeliveryDate()));
   }, []);
 
+  // Catches the customer hitting the browser's BACK button while on
+  // Cashfree's hosted payment page. That doesn't go through Cashfree's own
+  // cancel flow (which redirects via returnUrl on its own) — it just
+  // restores this checkout page from the browser's cache ("bfcache"), with
+  // no navigation and no chance for our order-confirmation logic to run.
+  // `pageshow` with `event.persisted === true` is what fires in exactly
+  // that situation, so we use it to immediately send them to the
+  // confirmation page ourselves, where the existing "checking payment…" /
+  // "payment wasn't completed" flow takes over right away instead of them
+  // being stuck looking at this (already-submitted, cart-cleared) page.
+  useEffect(() => {
+    const handlePageShow = (event: PageTransitionEvent) => {
+      if (!event.persisted) return;
+      const pendingOrderId = sessionStorage.getItem("lbc_pending_order_id");
+      if (pendingOrderId) {
+        sessionStorage.removeItem("lbc_pending_order_id");
+        navigate({ to: "/order-confirmation/$orderId", params: { orderId: pendingOrderId } });
+      }
+    };
+    window.addEventListener("pageshow", handlePageShow);
+    return () => window.removeEventListener("pageshow", handlePageShow);
+  }, [navigate]);
+
   const minDate = toISODate(earliestDeliveryDate());
   const maxDate = toISODate(maxDeliveryDate());
 
@@ -272,6 +295,14 @@ function Checkout() {
       }
 
       clear();
+
+      // Remember this order so that if the customer hits the browser's
+      // BACK button while on Cashfree's hosted page (as opposed to using
+      // Cashfree's own cancel button, which redirects via returnUrl on its
+      // own), we can catch it the moment they land back here — see the
+      // pageshow listener below — instead of leaving them stuck looking at
+      // an empty checkout page with no explanation.
+      sessionStorage.setItem("lbc_pending_order_id", order.id);
 
       const cashfree = (window as any).Cashfree?.({
         mode: CASHFREE_MODE,
