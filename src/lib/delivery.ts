@@ -13,6 +13,17 @@ export type DeliveryFeeResult =
   | { ok: false; configured: false }
   | { ok: false; configured: true; needsManualConfirm?: boolean; error: string };
 
+/** All valid Bangalore (Bengaluru) postal pincodes fall in the 560xxx
+ * range (560001–560300-ish, with a few outliers like 562xxx for far
+ * outskirts we don't deliver to anyway). We only deliver within Bangalore,
+ * so any pincode outside 560xxx is rejected outright — no fee lookup, no
+ * "manual confirm" fallback, nothing. This is checked both in the UI
+ * (checkout.tsx) and here in getDeliveryFee, so it can't be bypassed by
+ * skipping the form validation. */
+export function isBangalorePincode(pincode: string): boolean {
+  return /^560\d{3}$/.test(pincode.trim());
+}
+
 /** Looks up the delivery fee for a delivery address, based on driving
  * distance from our fixed dispatch location (560029). Geocodes the address
  * first; if that doesn't resolve with high confidence, falls back to
@@ -34,6 +45,14 @@ export async function getDeliveryFee(input: {
   const pincode = input.pincode.trim();
   if (!/^\d{6}$/.test(pincode)) {
     return { ok: false, configured: true, error: "Please enter a valid 6-digit pincode." };
+  }
+
+  if (!isBangalorePincode(pincode)) {
+    return {
+      ok: false,
+      configured: true,
+      error: "We only deliver within Bangalore. Please enter a Bangalore pincode (560xxx).",
+    };
   }
 
   if (!input.landmark.trim()) {
