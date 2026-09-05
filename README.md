@@ -1,216 +1,112 @@
 # 🍫 Little Brownie Co.
 
-An online storefront for **Little Brownie Co.**, a bakery brand selling handcrafted brownies, gifting boxes, and treats. Built as a fast, modern e-commerce site with a customer-facing storefront, cart & checkout with online payments, order tracking, and a built-in admin dashboard for managing products, orders, delivery fees, and reviews.
+A full-stack e-commerce web app built for **Little Brownie Co.**, a handcrafted brownie bakery based in Bengaluru. The platform lets customers browse the menu, place orders, track deliveries, and get in touch — while giving the business a clean, modern storefront to manage sales online.
 
-**Live repo:** [neha28kudale/LittleBrownieCo](https://github.com/neha28kudale/LittleBrownieCo)
-**Live demo:** https://www.littlebrownieco.in/
+**🔗 Live site:** [www.littlebrownieco.in](https://www.littlebrownieco.in/)
 
 ---
 
 ## ✨ Features
 
-### Storefront
-- **Home / Menu / Product pages** with categories, variants, and pricing
-- **Cart & Checkout** flow with delivery fee calculation based on location
-- **Online payments** via Cashfree (order creation + webhook confirmation)
-- **Order tracking** by order ID, with an order confirmation page
-- **Favorites / Wishlist** support
-- **Gifting** page for gift boxes/hampers
-- **Google Reviews** integration (fetched via a Supabase Edge Function)
-- **Instagram feed** embed on the homepage
-- **Location autocomplete** for delivery addresses (Google Places)
-- **Allergy banner**, veg/non-veg badges, FAQs, policies, sustainability & "good to know" info pages
-- Responsive UI with scroll progress bar, reveal/scroll animations, and a WhatsApp floating contact button
-
-### Admin Dashboard (`/admin`)
-- Secure admin login (Supabase Auth, with a legacy local password fallback)
-- Full **product management**: create, update, delete products & variants, upload/delete product images
-- **Order management**: view all orders, update order status in real time (live subscriptions)
-- **Delivery fee slab** management
-- **Review moderation**: approve/reject customer reviews in real time
-
-### Backend
-- **Supabase** as the backend (Postgres database, Auth, Storage, Realtime, Edge Functions)
-- **Edge Functions** for:
-  - `create-cashfree-order` — creates a payment order with Cashfree
-  - `cashfree-webhook` — handles payment status webhooks
-  - `calculate-delivery-fee` — computes delivery charges by location/slab
-  - `google-reviews` — fetches Google Business reviews
-  - `instagram-feed` — fetches Instagram post data
-  - `places-autocomplete` — proxies Google Places Autocomplete
-- SQL **migrations** for schema, extra product fields, and seed data
+- **Product menu & catalog** — browse brownies (loaves, slabs, boxes, tubs, and more) with pricing, descriptions, and images
+- **Shopping cart & checkout** — add items to cart, review order, and complete purchase
+- **Order tracking** — customers can track the status of their order after placing it
+- **WhatsApp integration** — one-click chat for orders, custom gifting requests, and quotes
+- **Reviews section** — collects and displays customer feedback
+- **Informational pages** — About Us, FAQs, Ingredients & Allergens, Sustainable Packaging, and Order/Delivery Policies
+- **Responsive design** — works cleanly across mobile and desktop
+- **Backend powered by Supabase** — for data storage, auth, and order management
 
 ---
 
 ## 🛠️ Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Framework | React 19 + [TanStack Router](https://tanstack.com/router) (file-based routing) |
-| Data fetching | [TanStack Query](https://tanstack.com/query) |
-| Styling | [Tailwind CSS v4](https://tailwindcss.com/) + [shadcn/ui](https://ui.shadcn.com/) (Radix UI primitives) |
-| Forms & validation | React Hook Form + Zod |
-| Backend / DB | [Supabase](https://supabase.com/) (Postgres, Auth, Storage, Realtime, Edge Functions) |
-| Payments | [Cashfree](https://www.cashfree.com/) |
-| Location services | Google Places API |
-| Build tool | [Vite](https://vitejs.dev/) |
-| Language | TypeScript |
+**Frontend**
+- [React 19](https://react.dev/) with [TypeScript](https://www.typescriptlang.org/)
+- [TanStack Start](https://tanstack.com/start) + [TanStack Router](https://tanstack.com/router) for routing and SSR
+- [Tailwind CSS v4](https://tailwindcss.com/) for styling
+- [Radix UI](https://www.radix-ui.com/) + [shadcn/ui](https://ui.shadcn.com/)-style components for accessible, reusable UI primitives
+- [React Hook Form](https://react-hook-form.com/) + [Zod](https://zod.dev/) for form handling and validation
+- [Recharts](https://recharts.org/) for data visualization
+- [Lucide React](https://lucide.dev/) for icons
+
+**Backend / Infra**
+- [Supabase](https://supabase.com/) for database, authentication, and backend services
+- [Vite](https://vitejs.dev/) as the build tool
+
+**Tooling**
+- ESLint + Prettier for code quality and formatting
+- npm for package management
 
 ---
 
-## 📁 Project Structure
+## 📂 Project Structure
 
 ```
 LittleBrownieCo/
-├── public/                      # Static assets (favicon, robots.txt)
-├── src/
-│   ├── admin.tsx                # Admin dashboard entry/logic
-│   ├── router.tsx                # App router setup
-│   ├── server.ts / start.ts      # TanStack Start server entry
-│   ├── styles.css                # Global styles (Tailwind)
-│   ├── assets/                   # Images used across the site
-│   ├── components/
-│   │   ├── site/                 # Storefront UI (Header, Footer, CartDrawer,
-│   │   │                           ProductCard, InstagramFeed, WhatsAppFab, etc.)
-│   │   └── ui/                   # shadcn/ui component primitives
-│   ├── hooks/                    # Custom React hooks
-│   ├── lib/                      # Core logic: products, cart, orders, favorites,
-│   │                                delivery, reviews, admin-auth, supabase client, etc.
-│   └── routes/                   # File-based routes (TanStack Router)
-│       ├── __root.tsx            # App shell / root layout
-│       ├── admin.tsx             # /admin route
-│       └── _site/                # Customer-facing pages: home, menu, product,
-│                                    cart, checkout, gifts, reviews, faqs, about,
-│                                    contact, policies, track-order, and more
-├── supabase/
-│   ├── functions/                # Edge Functions (Cashfree, delivery fee,
-│   │                                Google reviews, Instagram feed, Places autocomplete)
-│   └── migrations/                # Database schema & seed SQL
-├── .env.example                  # Environment variable template
-├── components.json                # shadcn/ui config
-├── vite.config.ts
-├── tsconfig.json
-└── package.json
+├── public/              # Static assets
+├── src/                 # Application source code (components, routes, pages, logic)
+├── supabase/            # Supabase config, migrations, and backend setup
+├── .env.example         # Environment variable template
+├── package.json         # Dependencies and scripts
+├── vite.config.ts       # Vite configuration
+└── tsconfig.json        # TypeScript configuration
 ```
-
-> Routing follows TanStack Start's file-based convention — see `src/routes/README.md` for details (e.g. `index.tsx` → `/`, `$id.tsx` → dynamic segment, `__root.tsx` → app shell). Don't hand-edit `routeTree.gen.ts`.
 
 ---
 
 ## 🚀 Getting Started
 
 ### Prerequisites
-- [Node.js](https://nodejs.org/) 18+ (or [Bun](https://bun.sh/), since `bunfig.toml` is included)
-- A [Supabase](https://supabase.com/) project
-- A [Cashfree](https://www.cashfree.com/) merchant account (for payments)
-- A Google Cloud project with the **Places API** enabled (for address autocomplete)
+- [Node.js](https://nodejs.org/) (v18 or higher recommended)
+- npm (comes with Node.js)
+- A [Supabase](https://supabase.com/) project (for backend/database features)
 
-### 1. Clone the repository
-```bash
-git clone https://github.com/neha28kudale/LittleBrownieCo.git
-cd LittleBrownieCo
-```
+### Installation
 
-### 2. Install dependencies
-```bash
-npm install
-# or
-bun install
-```
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/neha28kudale/LittleBrownieCo.git
+   cd LittleBrownieCo
+   ```
 
-### 3. Configure environment variables
-Copy the example file and fill in your own values:
-```bash
-cp .env.example .env
-```
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-```env
-# Supabase (safe to expose client-side — anon key is public by design)
-VITE_SUPABASE_URL=your-supabase-project-url
-VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+3. **Set up environment variables**
+   ```bash
+   cp .env.example .env
+   ```
+   Fill in your Supabase project URL and keys (and any other required values) in the `.env` file.
 
-# Legacy/local-only admin password fallback (unused once Supabase Auth is wired for admin login)
-VITE_ADMIN_PASSWORD=change-me
-```
+4. **Run the development server**
+   ```bash
+   npm run dev
+   ```
+   The app will be available at `http://localhost:5173` (or the port shown in your terminal).
 
-The following are **server-side secrets** and must be set in your Supabase project (Edge Function secrets) — **not** in the `.env` file:
-```bash
-supabase secrets set CASHFREE_APP_ID=<your-cashfree-app-id>
-supabase secrets set CASHFREE_SECRET_KEY=<your-cashfree-secret-key>
-supabase secrets set CASHFREE_WEBHOOK_SECRET=<your-cashfree-webhook-secret>
-supabase secrets set CASHFREE_ENV=sandbox   # sandbox | production
+### Other useful scripts
 
-supabase secrets set GOOGLE_PLACES_API_KEY=<your-google-places-api-key>
-supabase secrets set GOOGLE_PLACE_ID=<your-google-business-profile-place-id>
-```
-
-### 4. Set up the database
-Run the migrations against your Supabase project (via the Supabase CLI or SQL editor), in order:
-```
-supabase/migrations/0001_init.sql
-supabase/migrations/0002_products_extra.sql
-supabase/migrations/0003_seed_products.sql
-```
-
-### 5. Deploy Supabase Edge Functions
-```bash
-supabase functions deploy create-cashfree-order
-supabase functions deploy cashfree-webhook
-supabase functions deploy calculate-delivery-fee
-supabase functions deploy google-reviews
-supabase functions deploy instagram-feed
-supabase functions deploy places-autocomplete
-```
-
-### 6. Run the development server
-```bash
-npm run dev
-```
-The app will be available at `http://localhost:3000` (default Vite dev port may vary).
+| Command             | Description                              |
+|----------------------|-------------------------------------------|
+| `npm run build`      | Build the app for production             |
+| `npm run build:dev`  | Build in development mode                |
+| `npm run preview`    | Preview the production build locally     |
+| `npm run lint`       | Run ESLint checks                        |
+| `npm run format`     | Format code with Prettier                |
 
 ---
 
-## 📜 Available Scripts
+## 📌 About This Project
 
-| Script | Description |
-|---|---|
-| `npm run dev` | Start the local development server |
-| `npm run build` | Build the app for production |
-| `npm run build:dev` | Build in development mode |
-| `npm run preview` | Preview the production build locally |
-| `npm run lint` | Run ESLint |
-| `npm run format` | Format code with Prettier |
+This project was built to give a small, real-world bakery business a proper online ordering presence — from product discovery all the way to checkout and order tracking. It reflects practical, end-to-end product thinking: understanding a real customer's needs, designing a usable storefront, and building it with a modern, production-ready tech stack.
 
 ---
 
-## 🔐 Admin Access
+## 📬 Contact
 
-The admin dashboard lives at `/admin` and is used to manage:
-- Products & variants (including image uploads)
-- Orders (with live status updates)
-- Delivery fee slabs
-- Customer reviews (approve/reject)
+Built by **Neha Kudale** — [GitHub](https://github.com/neha28kudale)
 
-Admin login is handled through Supabase Auth (`src/lib/admin-auth.ts`), with `VITE_ADMIN_PASSWORD` retained only as a legacy local fallback.
-
----
-
-## 🗄️ Database
-
-Schema, extended product fields, and seed data live under `supabase/migrations/`. The app uses Supabase's Postgres database along with Realtime subscriptions (for live order and review updates in the admin panel) and Storage (for product images).
-
----
-
-## 💳 Payments
-
-Payments are processed through **Cashfree**:
-1. `create-cashfree-order` (Edge Function) creates a payment order when a customer checks out.
-2. `cashfree-webhook` (Edge Function) receives payment status updates from Cashfree and updates the order accordingly.
-
-Set `CASHFREE_ENV=sandbox` while testing and switch to `production` when going live.
-
----
-
-## 👩‍💻 Author
-
-**Neha Kudale** — [@neha28kudale](https://github.com/neha28kudale)
+For questions about the project, reach out via [WhatsApp](https://wa.me/9850416581) 
