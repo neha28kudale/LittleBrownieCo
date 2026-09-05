@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Printer, CheckCircle2, Clock, XCircle, Check } from "lucide-react";
+import { Printer, CheckCircle2, Clock, XCircle, Check, Loader2, RefreshCw } from "lucide-react";
 import { getOrderById, type Order } from "@/lib/orders";
 import { formatDisplayDate } from "@/lib/delivery";
 import { IMG } from "@/lib/products";
@@ -8,6 +8,7 @@ import { ConfettiBurst } from "@/components/site/ConfettiBurst";
 import { supabase } from "@/lib/supabase";
 
 const CASHFREE_MODE = (import.meta.env.VITE_CASHFREE_MODE as string) || "sandbox";
+const MAX_VERIFY_ATTEMPTS = 6;
 
 export const Route = createFileRoute("/_site/order-confirmation/$orderId")({
   head: () => ({
@@ -100,9 +101,87 @@ function OrderTracker({ order }: { order: Order }) {
   );
 }
 
+/** Full-screen "checking your payment" state — shown instead of the receipt
+ * while we don't yet know if payment succeeded, so the customer never sees
+ * a receipt-looking page before we're sure. */
+function CheckingPayment() {
+  return (
+    <section className="container-x flex flex-col items-center justify-center py-24 text-center md:py-32">
+      <Loader2 className="h-10 w-10 animate-spin text-accent" />
+      <h1 className="mt-6 font-serif text-2xl text-primary sm:text-3xl">
+        Checking your payment…
+      </h1>
+      <p className="mx-auto mt-3 max-w-sm text-sm text-muted-foreground">
+        This usually takes just a few seconds. Please don't close this page.
+      </p>
+    </section>
+  );
+}
+
+/** Standalone failure/timeout screen — no order details or "Paid" language,
+ * since no payment actually went through. */
+function PaymentNotCompleted({
+  order,
+  timedOut,
+  onRetry,
+  retrying,
+}: {
+  order: Order;
+  timedOut: boolean;
+  onRetry: () => void;
+  retrying: boolean;
+}) {
+  return (
+    <section className="container-x py-20 text-center md:py-28">
+      <div className="mx-auto max-w-md">
+        <XCircle className="mx-auto h-12 w-12 text-destructive" />
+        <h1 className="mt-5 font-serif text-3xl text-primary sm:text-4xl">
+          Payment wasn't completed
+        </h1>
+        <p className="mt-3 text-sm text-muted-foreground">
+          {timedOut
+            ? "We're still waiting to hear back about this payment. If money was deducted from your account, please don't place a new order — reach out to us on WhatsApp with your reference below and we'll sort it out."
+            : "No payment was received for this order, so it hasn't been placed. If you were charged, please reach out to us on WhatsApp with your reference below."}
+        </p>
+
+        <div className="mt-6 inline-block rounded-md bg-muted/60 px-4 py-2 text-xs text-muted-foreground">
+          Reference: <span className="font-mono text-primary">{order.orderNumber}</span>
+        </div>
+
+        <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+          <button
+            onClick={onRetry}
+            disabled={retrying}
+            className="flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-xs uppercase tracking-[0.18em] text-primary-foreground transition-colors hover:bg-cocoa-dark disabled:opacity-50"
+          >
+            {retrying ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" /> Opening payment…
+              </>
+            ) : (
+              <>
+                <RefreshCw className="h-4 w-4" /> Try payment again
+              </>
+            )}
+          </button>
+
+          <Link
+            to="/menu"
+            className="rounded-full border border-border px-6 py-3 text-xs uppercase tracking-[0.18em] text-primary hover:bg-caramel hover:text-cocoa"
+          >
+            Back to menu
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function OrderConfirmation() {
   const { orderId } = Route.useParams();
   const [order, setOrder] = useState<Order | null | "loading">("loading");
+  const [verifyAttempts, setVerifyAttempts] = useState(0);
+  const [retrying, setRetrying] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -119,8 +198,9 @@ function OrderConfirmation() {
       // webhook is ever sent for that case and the row would otherwise sit
       // as "pending" (and misleadingly render as a normal placed order)
       // forever.
-      if (current && current.paymentStatus === "pending" && attempts < 6) {
+      if (current && current.paymentStatus === "pending" && attempts < MAX_VERIFY_ATTEMPTS) {
         attempts += 1;
+        setVerifyAttempts(attempts);
         try {
           await supabase.functions.invoke("verify-cashfree-order", {
             body: { orderId, mode: CASHFREE_MODE },
@@ -129,6 +209,8 @@ function OrderConfirmation() {
           console.error("[order-confirmation] verify-cashfree-order", err);
         }
         if (!cancelled) setTimeout(poll, 3000);
+      } else {
+        setVerifyAttempts(attempts);
       }
     };
 
@@ -137,6 +219,29 @@ function OrderConfirmation() {
       cancelled = true;
     };
   }, [orderId]);
+
+  const retryPayment = async () => {
+    if (order === "loading" || !order) return;
+    setRetrying(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("create-cashfree-order", {
+        body: { orderId: order.id, mode: CASHFREE_MODE },
+      });
+      if (error || !data?.paymentSessionId) {
+        throw new Error(error?.message || "Couldn't reopen payment. Please try again.");
+      }
+      const cashfree = (window as any).Cashfree?.({ mode: CASHFREE_MODE });
+      if (!cashfree) throw new Error("Payment SDK failed to load.");
+      cashfree.checkout({
+        paymentSessionId: data.paymentSessionId,
+        redirectTarget: "_self",
+        returnUrl: `${window.location.origin}/order-confirmation/${order.id}`,
+      });
+    } catch (err) {
+      console.error("[order-confirmation] retryPayment", err);
+      setRetrying(false);
+    }
+  };
 
   if (order === "loading") {
     return <div className="container-x py-24 text-center text-muted-foreground">Loading…</div>;
@@ -153,6 +258,26 @@ function OrderConfirmation() {
     );
   }
 
+  // Payment still unresolved and we haven't finished checking yet — show a
+  // plain loading state instead of the receipt, so nothing that looks like
+  // a confirmed order appears before we actually know the outcome.
+  if (order.paymentStatus === "pending" && verifyAttempts < MAX_VERIFY_ATTEMPTS) {
+    return <CheckingPayment />;
+  }
+
+  // Payment definitively failed, OR we gave up checking and it's still
+  // pending (likely abandoned checkout) — standalone screen, no receipt.
+  if (order.orderStatus === "rejected" || order.paymentStatus === "pending") {
+    return (
+      <PaymentNotCompleted
+        order={order}
+        timedOut={order.paymentStatus === "pending"}
+        onRetry={retryPayment}
+        retrying={retrying}
+      />
+    );
+  }
+
   return (
     <section className="container-x py-10 md:py-16">
       <style>{`
@@ -162,7 +287,7 @@ function OrderConfirmation() {
         }
       `}</style>
 
-      {order.orderStatus !== "rejected" && <ConfettiBurst />}
+      <ConfettiBurst />
 
       <div className="mx-auto max-w-2xl" data-no-print>
         <div className="text-center">
@@ -172,18 +297,10 @@ function OrderConfirmation() {
             className="mx-auto h-16 w-16 animate-float rounded-full border border-border object-cover"
           />
           <h1 className="mt-4 font-serif text-3xl text-primary sm:text-4xl">
-            {order.orderStatus === "rejected"
-              ? "Payment couldn't be verified"
-              : order.paymentStatus === "paid"
-                ? "Thank you for your order!"
-                : "Almost there…"}
+            Thank you for your order!
           </h1>
           <p className="mx-auto mt-3 max-w-md text-sm text-muted-foreground">
-            {order.orderStatus === "rejected"
-              ? "We couldn't verify your payment for this order, so it hasn't been placed. Please try checking out again, or reach out to us on WhatsApp if you've been charged."
-              : order.paymentStatus === "paid"
-                ? "Thank you for placing your order. Your order will be confirmed after verification of payment status."
-                : "We haven't received confirmation that your payment went through yet. If you completed payment, this page will update shortly — if you closed the payment window before finishing, no payment was taken and this order won't be processed."}
+            Thank you for placing your order. Your order will be confirmed shortly.
           </p>
           <div className="mt-4 flex justify-center">
             <StatusPill order={order} />
@@ -267,7 +384,7 @@ function OrderConfirmation() {
             </dd>
           </div>
           <div className="flex justify-between border-t border-border pt-3 font-serif text-xl text-primary">
-            <dt>{order.paymentStatus === "paid" ? "Paid" : order.paymentStatus === "failed" ? "Payment failed" : "Amount due"}</dt>
+            <dt>Paid</dt>
             <dd>₹{order.total}</dd>
           </div>
         </dl>
