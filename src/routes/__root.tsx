@@ -77,35 +77,32 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Little Brownie Co. | Website Launching Soon" },
+      { title: "Little Brownie Co. | Handcrafted Brownies in Bengaluru" },
       {
         name: "description",
         content:
-          "Handcrafted small-batch brownies from Bengaluru. Our online ordering site is launching soon — follow @littlebrownieco__blr on Instagram for updates.",
+          "Handcrafted, small-batch brownies from Bengaluru. Order online — Belgian chocolate, cultured butter, baked fresh to order.",
       },
-      { property: "og:title", content: "Little Brownie Co. | Website Launching Soon" },
+      { property: "og:title", content: "Little Brownie Co. | Handcrafted Brownies in Bengaluru" },
       {
         property: "og:description",
-        content:
-          "Handcrafted small-batch brownies from Bengaluru. Our online ordering site is launching soon — follow @littlebrownieco__blr on Instagram for updates.",
+        content: "Where every bite earns you brownie points. Order online from Bengaluru.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Little Brownie Co. | Website Launching Soon" },
+      { name: "twitter:title", content: "Little Brownie Co. | Handcrafted Brownies in Bengaluru" },
       {
         name: "twitter:description",
         content:
-          "Handcrafted small-batch brownies from Bengaluru. Our online ordering site is launching soon — follow @littlebrownieco__blr on Instagram for updates.",
+          "Handcrafted, small-batch brownies from Bengaluru. Order online — Belgian chocolate, cultured butter, baked fresh to order.",
       },
       {
         property: "og:image",
-        content:
-          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/63fdcc065e21e31f66aff02432ea15aa/id-preview-17ff6613--d3ea0ab8-fc18-44c4-bfe3-b8444846a6c1.lovable.app-1786460693425.png",
+        content: "https://littlebrownieco.in/og-image.png",
       },
       {
         name: "twitter:image",
-        content:
-          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/63fdcc065e21e31f66aff02432ea15aa/id-preview-17ff6613--d3ea0ab8-fc18-44c4-bfe3-b8444846a6c1.lovable.app-1786460693425.png",
+        content: "https://littlebrownieco.in/og-image.png",
       },
     ],
     links: [
