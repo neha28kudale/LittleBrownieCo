@@ -146,21 +146,18 @@ function PaymentNotCompleted({
               is <strong>not</strong> the same as a failed payment.
               <br />
               If money was debited from your account, please don't pay again. Contact us on WhatsApp with
-              the reference below and we'll check the status for you.
+              your name and phone number and we'll check the status for you.
             </>
           ) : (
             <>
               Something went wrong while processing your payment. Please try again or use another payment
               method.
               <br />
-              If your account was charged, please contact us before making another payment.
+              If your account was charged, please contact us on WhatsApp with your name and phone number
+              before making another payment.
             </>
           )}
         </p>
-
-        <div className="mt-6 inline-block rounded-md bg-muted/60 px-4 py-2 text-xs text-muted-foreground">
-          Reference: <span className="font-mono text-primary">{order.orderNumber}</span>
-        </div>
 
         <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <button
