@@ -11,6 +11,7 @@ import {
   formatDisplayDate,
   toISODate,
   getDeliveryFee,
+  isBangalorePincode,
 } from "@/lib/delivery";
 import { DELIVERY_AGREEMENT_TEXT, ALLERGEN_AGREEMENT_TEXT } from "@/lib/site-content";
 import { supabase } from "@/lib/supabase";
@@ -58,7 +59,7 @@ function Checkout() {
 
   // Debounced address + pincode + landmark -> delivery fee lookup.
   useEffect(() => {
-    if (!/^\d{6}$/.test(pincode) || !landmark.text.trim()) {
+    if (!isBangalorePincode(pincode) || !landmark.text.trim()) {
       setDeliveryFee(null);
       setDistanceKm(undefined);
       setDeliveryFeeError("");
@@ -162,6 +163,11 @@ function Checkout() {
 
     if (deliveryPricingConfigured && !/^\d{6}$/.test(pincode)) {
       toast.error("Please enter your delivery pincode.");
+      return;
+    }
+
+    if (deliveryPricingConfigured && !isBangalorePincode(pincode)) {
+      toast.error("We only deliver within Bangalore. Please enter a Bangalore pincode (560xxx).");
       return;
     }
 
@@ -429,9 +435,15 @@ function Checkout() {
                   type="text"
                   inputMode="numeric"
                   maxLength={6}
-                  placeholder="6-digit pincode"
+                  placeholder="e.g. 560001"
                   className="mt-2 w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm text-primary outline-none focus:border-accent"
                 />
+
+                {pincode.length === 6 && !isBangalorePincode(pincode) && (
+                  <span className="mt-1 block text-[11px] text-destructive">
+                    We only deliver within Bangalore. Please enter a Bangalore pincode (560xxx).
+                  </span>
+                )}
               </label>
 
               {/* LANDMARK */}
@@ -449,7 +461,11 @@ function Checkout() {
               </label>
 
               <div className="sm:col-span-2">
-                <span className="block text-[11px] text-muted-foreground">
+                <span className="block text-[11px] font-medium text-accent">
+                  We only deliver within Bangalore.
+                </span>
+
+                <span className="mt-1 block text-[11px] text-muted-foreground">
                   Delivery charges are calculated based on the driving distance from our
                   kitchen to your delivery location. A landmark helps us pinpoint your
                   location accurately — please name something well-known nearby (a mall,
