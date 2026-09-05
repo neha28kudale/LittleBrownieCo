@@ -137,12 +137,25 @@ function PaymentNotCompleted({
       <div className="mx-auto max-w-md">
         <XCircle className="mx-auto h-12 w-12 text-destructive" />
         <h1 className="mt-5 font-serif text-3xl text-primary sm:text-4xl">
-          Payment Failed
+          {timedOut ? "We couldn't confirm your payment" : "Payment Failed"}
         </h1>
         <p className="mt-3 text-sm text-muted-foreground">
-          Something went wrong while processing your payment. Please try again or use another payment method.
-          <br />
-          If your account was charged, please contact us before making another payment.
+          {timedOut ? (
+            <>
+              Cashfree hasn't confirmed this payment yet — it may still be processing on their end. This
+              is <strong>not</strong> the same as a failed payment.
+              <br />
+              If money was debited from your account, please don't pay again. Contact us on WhatsApp with
+              the reference below and we'll check the status for you.
+            </>
+          ) : (
+            <>
+              Something went wrong while processing your payment. Please try again or use another payment
+              method.
+              <br />
+              If your account was charged, please contact us before making another payment.
+            </>
+          )}
         </p>
 
         <div className="mt-6 inline-block rounded-md bg-muted/60 px-4 py-2 text-xs text-muted-foreground">
