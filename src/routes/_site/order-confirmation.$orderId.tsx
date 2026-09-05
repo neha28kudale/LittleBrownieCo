@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { Printer, CheckCircle2, Clock, XCircle, Check, Loader2, RefreshCw } from "lucide-react";
 import { getOrderById, type Order } from "@/lib/orders";
 import { formatDisplayDate } from "@/lib/delivery";
@@ -227,11 +228,30 @@ function OrderConfirmation() {
       const { data, error } = await supabase.functions.invoke("create-cashfree-order", {
         body: { orderId: order.id, mode: CASHFREE_MODE },
       });
+
       if (error || !data?.paymentSessionId) {
-        throw new Error(error?.message || "Couldn't reopen payment. Please try again.");
+        // supabase.functions.invoke()'s `error.message` is just a generic
+        // "non-2xx status code" wrapper — pull the real reason out of the
+        // response body (same pattern as checkout.tsx) so the customer (and
+        // our logs) see what actually went wrong instead of nothing at all.
+        let detail = error?.message || "Payment gateway isn't configured yet.";
+        const ctx = (error as any)?.context;
+        if (ctx?.json) {
+          try {
+            const body = await ctx.json();
+            if (body?.error) detail = body.error;
+          } catch {
+            // ignore — fall back to generic message
+          }
+        }
+        throw new Error(detail);
       }
+
       const cashfree = (window as any).Cashfree?.({ mode: CASHFREE_MODE });
-      if (!cashfree) throw new Error("Payment SDK failed to load.");
+      if (!cashfree) {
+        throw new Error("Payment couldn't load. Please refresh the page and try again.");
+      }
+
       cashfree.checkout({
         paymentSessionId: data.paymentSessionId,
         redirectTarget: "_self",
@@ -239,6 +259,7 @@ function OrderConfirmation() {
       });
     } catch (err) {
       console.error("[order-confirmation] retryPayment", err);
+      toast.error(err instanceof Error ? err.message : "Couldn't reopen payment. Please try again.");
       setRetrying(false);
     }
   };
