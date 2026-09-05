@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import type { ReactNode } from "react";
 import { toast } from "sonner";
 import { Printer, CheckCircle2, Clock, XCircle, Check, Loader2, RefreshCw } from "lucide-react";
 import { getOrderById, type Order } from "@/lib/orders";
@@ -120,44 +121,70 @@ function CheckingPayment() {
 }
 
 /** Standalone failure/timeout screen — no order details or "Paid" language,
- * since no payment actually went through. */
+ * since no payment actually went through. Three distinct variants per the
+ * bakery's requested copy:
+ *   "not_completed"       — customer never finished a payment attempt at
+ *                            all (closed tab, refreshed, hit back before
+ *                            reaching/completing Cashfree's page).
+ *   "failed"               — bank/gateway explicitly rejected the attempt.
+ *   "pending_verification" — an attempt happened but Cashfree hasn't
+ *                            given us a final yes/no yet. */
 function PaymentNotCompleted({
+  variant,
   order,
-  timedOut,
   onRetry,
   retrying,
 }: {
+  variant: "not_completed" | "failed" | "pending_verification";
   order: Order;
-  timedOut: boolean;
   onRetry: () => void;
   retrying: boolean;
 }) {
+  const COPY: Record<typeof variant, { title: string; body: ReactNode }> = {
+    not_completed: {
+      title: "Payment Not Completed",
+      body: (
+        <>
+          Your order has not been confirmed as the payment was not completed.
+          <br />
+          You can try making the payment again. If any amount was debited from your account, please
+          reach out to us on WhatsApp and we'll help you check the payment status.
+        </>
+      ),
+    },
+    failed: {
+      title: "Payment Failed",
+      body: (
+        <>
+          Your order has not been confirmed as the payment was unsuccessful.
+          <br />
+          You can try making the payment again or use a different payment method. If any amount was
+          debited from your account, please reach out to us on WhatsApp and we'll help you check the
+          payment status.
+        </>
+      ),
+    },
+    pending_verification: {
+      title: "Payment Pending / Verification",
+      body: (
+        <>
+          Your order has not been confirmed yet as we're unable to verify the payment at the moment.
+          <br />
+          Please don't make another payment right now. If any amount was debited from your account,
+          please reach out to us on WhatsApp and we'll check the payment status for you.
+        </>
+      ),
+    },
+  };
+
+  const { title, body } = COPY[variant];
+
   return (
     <section className="container-x py-20 text-center md:py-28">
       <div className="mx-auto max-w-md">
         <XCircle className="mx-auto h-12 w-12 text-destructive" />
-        <h1 className="mt-5 font-serif text-3xl text-primary sm:text-4xl">
-          {timedOut ? "We couldn't confirm your payment" : "Payment Failed"}
-        </h1>
-        <p className="mt-3 text-sm text-muted-foreground">
-          {timedOut ? (
-            <>
-              Cashfree hasn't confirmed this payment yet — it may still be processing on their end. This
-              is <strong>not</strong> the same as a failed payment.
-              <br />
-              If money was debited from your account, please don't pay again. Contact us on WhatsApp with
-              your name and phone number and we'll check the status for you.
-            </>
-          ) : (
-            <>
-              Something went wrong while processing your payment. Please try again or use another payment
-              method.
-              <br />
-              If your account was charged, please contact us on WhatsApp with your name and phone number
-              before making another payment.
-            </>
-          )}
-        </p>
+        <h1 className="mt-5 font-serif text-3xl text-primary sm:text-4xl">{title}</h1>
+        <p className="mt-3 text-sm text-muted-foreground">{body}</p>
 
         <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <button
@@ -192,6 +219,7 @@ function OrderConfirmation() {
   const { orderId } = Route.useParams();
   const [order, setOrder] = useState<Order | null | "loading">("loading");
   const [verifyAttempts, setVerifyAttempts] = useState(0);
+  const [paymentAttempted, setPaymentAttempted] = useState(false);
   const [retrying, setRetrying] = useState(false);
 
   useEffect(() => {
@@ -213,9 +241,16 @@ function OrderConfirmation() {
         attempts += 1;
         setVerifyAttempts(attempts);
         try {
-          await supabase.functions.invoke("verify-cashfree-order", {
+          const { data } = await supabase.functions.invoke("verify-cashfree-order", {
             body: { orderId, mode: CASHFREE_MODE },
           });
+          // Remember whether Cashfree has seen an actual payment attempt
+          // for this order at all — distinguishes "customer never paid"
+          // from "attempt is genuinely stuck/unclear" for the copy shown
+          // once we give up polling.
+          if (data && typeof data.attempted === "boolean") {
+            setPaymentAttempted(data.attempted);
+          }
         } catch (err) {
           console.error("[order-confirmation] verify-cashfree-order", err);
         }
@@ -297,12 +332,21 @@ function OrderConfirmation() {
   }
 
   // Payment definitively failed, OR we gave up checking and it's still
-  // pending (likely abandoned checkout) — standalone screen, no receipt.
+  // pending (likely abandoned checkout, or a genuinely stuck attempt) —
+  // standalone screen, no receipt. Pick the exact copy variant:
+  //   - order_status "rejected"        -> explicit failure from Cashfree
+  //   - still pending, no attempt seen -> customer never completed payment
+  //   - still pending, attempt seen    -> stuck/unclear, ask them to wait
   if (order.orderStatus === "rejected" || order.paymentStatus === "pending") {
+    const variant = order.orderStatus === "rejected"
+      ? "failed"
+      : paymentAttempted
+        ? "pending_verification"
+        : "not_completed";
     return (
       <PaymentNotCompleted
         order={order}
-        timedOut={order.paymentStatus === "pending"}
+        variant={variant}
         onRetry={retryPayment}
         retrying={retrying}
       />
