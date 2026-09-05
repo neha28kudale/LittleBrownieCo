@@ -135,7 +135,7 @@ function PaymentNotCompleted({
   onRetry,
   retrying,
 }: {
-  variant: "not_completed" | "failed" | "pending_verification";
+  variant: "not_completed" | "failed" | "pending_verification" | "expired";
   order: Order;
   onRetry: () => void;
   retrying: boolean;
@@ -172,6 +172,18 @@ function PaymentNotCompleted({
           <br />
           Please don't make another payment right now. If any amount was debited from your account,
           please reach out to us on WhatsApp and we'll check the payment status for you.
+        </>
+      ),
+    },
+    expired: {
+      title: "Payment Session Expired",
+      body: (
+        <>
+          Your order has not been confirmed as the payment session/link expired before it could be
+          completed.
+          <br />
+          Please try making the payment again with a fresh session. If any amount was debited from your
+          account, please reach out to us on WhatsApp and we'll help you check the payment status.
         </>
       ),
     },
@@ -334,15 +346,21 @@ function OrderConfirmation() {
   // Payment definitively failed, OR we gave up checking and it's still
   // pending (likely abandoned checkout, or a genuinely stuck attempt) —
   // standalone screen, no receipt. Pick the exact copy variant:
-  //   - order_status "rejected"        -> explicit failure from Cashfree
+  //   - order_status "rejected", failure_reason "expired" -> session/link
+  //     expired before payment was completed
+  //   - order_status "rejected", failure_reason "rejected" (or unset,
+  //     for orders predating this column) -> explicit bank/gateway failure
   //   - still pending, no attempt seen -> customer never completed payment
   //   - still pending, attempt seen    -> stuck/unclear, ask them to wait
   if (order.orderStatus === "rejected" || order.paymentStatus === "pending") {
-    const variant = order.orderStatus === "rejected"
-      ? "failed"
-      : paymentAttempted
-        ? "pending_verification"
-        : "not_completed";
+    const variant =
+      order.orderStatus === "rejected"
+        ? order.failureReason === "expired"
+          ? "expired"
+          : "failed"
+        : paymentAttempted
+          ? "pending_verification"
+          : "not_completed";
     return (
       <PaymentNotCompleted
         order={order}
