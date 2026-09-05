@@ -137,12 +137,12 @@ function PaymentNotCompleted({
       <div className="mx-auto max-w-md">
         <XCircle className="mx-auto h-12 w-12 text-destructive" />
         <h1 className="mt-5 font-serif text-3xl text-primary sm:text-4xl">
-          Payment wasn't completed
+          Payment Failed
         </h1>
         <p className="mt-3 text-sm text-muted-foreground">
-          {timedOut
-            ? "We're still waiting to hear back about this payment. If money was deducted from your account, please don't place a new order — reach out to us on WhatsApp with your reference below and we'll sort it out."
-            : "No payment was received for this order, so it hasn't been placed. If you were charged, please reach out to us on WhatsApp with your reference below."}
+          Something went wrong while processing your payment. Please try again or use another payment method.
+          <br />
+          If your account was charged, please contact us before making another payment.
         </p>
 
         <div className="mt-6 inline-block rounded-md bg-muted/60 px-4 py-2 text-xs text-muted-foreground">
