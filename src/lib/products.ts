@@ -392,12 +392,29 @@ export async function getProducts(): Promise<Product[]> {
   return rows.map((r: any) => rowToProduct(r, variantRows ?? []));
 }
 
-/** All products including inactive — for the admin dashboard. */
+/** Admin: persist a new top-to-bottom display order for products (reflects
+ * immediately on the public site, since `getProducts` sorts by sort_order). */
+export async function reorderProducts(
+  idsInOrder: string[],
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const results = await Promise.all(
+    idsInOrder.map((id, i) => supabase.from("products").update({ sort_order: i }).eq("id", id)),
+  );
+  const failed = results.find((r) => r.error);
+  if (failed?.error) return { ok: false, error: failed.error.message };
+  return { ok: true };
+}
+
+
+/** All products including inactive — for the admin dashboard. Ordered by
+ * sort_order so the admin list matches the public site's display order,
+ * which is what makes the move up/down reorder controls meaningful. */
 export async function getAllProductsAdmin(): Promise<Product[]> {
   const { data: rows, error } = await supabase
     .from("products")
     .select("*")
-    .order("created_at", { ascending: false });
+    .order("sort_order", { ascending: true });
+
   if (error || !rows) {
     if (error) console.error("[products] getAllProductsAdmin", error);
     return [];
