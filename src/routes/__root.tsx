@@ -77,24 +77,25 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Little Brownie Co. | Handcrafted Brownies in Bengaluru" },
+      { title: "Little Brownie Co. | Premium Mini Brownies in Bengaluru" },
       {
         name: "description",
         content:
-          "Handcrafted, small-batch brownies from Bengaluru. Order online — Belgian chocolate, cultured butter, baked fresh to order.",
+          "Where every bite earns you brownie points. Premium mini brownies, freshly baked in Bengaluru. Order your favourites online from Little Brownie Co.",
       },
-      { property: "og:title", content: "Little Brownie Co. | Handcrafted Brownies in Bengaluru" },
+      { property: "og:title", content: "Little Brownie Co. | Premium Mini Brownies in Bengaluru" },
       {
         property: "og:description",
-        content: "Where every bite earns you brownie points. Order online from Bengaluru.",
+        content:
+          "Where every bite earns you brownie points. Premium mini brownies, freshly baked in Bengaluru. Order your favourites online from Little Brownie Co.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Little Brownie Co. | Handcrafted Brownies in Bengaluru" },
+      { name: "twitter:title", content: "Little Brownie Co. | Premium Mini Brownies in Bengaluru" },
       {
         name: "twitter:description",
         content:
-          "Handcrafted, small-batch brownies from Bengaluru. Order online — Belgian chocolate, cultured butter, baked fresh to order.",
+          "Where every bite earns you brownie points. Premium mini brownies, freshly baked in Bengaluru. Order your favourites online from Little Brownie Co.",
       },
       {
         property: "og:image",
