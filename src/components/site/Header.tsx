@@ -49,7 +49,7 @@ export function Header() {
                 Little Brownie Co.
               </div>
               <div className="truncate pt-1 text-[9px] uppercase tracking-[0.14em] text-muted-foreground sm:text-[11px] sm:tracking-[0.22em]">
-                Premium Mini Brownies since 2025
+                Handcrafted since 2025
               </div>
             </div>
           </Link>
