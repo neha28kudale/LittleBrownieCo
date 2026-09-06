@@ -653,6 +653,7 @@ function Orders({
   const [statusTab, setStatusTab] = useState<"all" | OrderStatus>("all");
   const [search, setSearch] = useState("");
   const [dateFilter, setDateFilter] = useState("");
+  const [placedDateFilter, setPlacedDateFilter] = useState("");
 
   const statusCounts = useMemo(() => {
     const counts: Record<"all" | OrderStatus, number> = {
@@ -673,15 +674,16 @@ function Orders({
     return orders.filter((o) => {
       if (statusTab !== "all" && o.orderStatus !== statusTab) return false;
       if (dateFilter && o.deliveryDate !== dateFilter) return false;
+      if (placedDateFilter && o.createdAt.split("T")[0] !== placedDateFilter) return false;
       if (q) {
         const haystack = `${o.customerName} ${o.orderNumber} ${o.phone}`.toLowerCase();
         if (!haystack.includes(q)) return false;
       }
       return true;
     });
-  }, [orders, statusTab, search, dateFilter]);
+  }, [orders, statusTab, search, dateFilter, placedDateFilter]);
 
-  const hasActiveFilters = !!search || !!dateFilter;
+  const hasActiveFilters = !!search || !!dateFilter || !!placedDateFilter;
 
   const ActionButtons = ({ o }: { o: Order }) => (
     <div className="flex gap-1.5" onClick={(e) => e.stopPropagation()}>
@@ -798,6 +800,35 @@ function Orders({
           placeholder="Search by customer name, order # or phone"
           className="w-full flex-1 rounded-full border border-border bg-background px-4 py-2.5 text-sm text-primary outline-none focus:border-accent sm:max-w-xs"
         />
+        <div className="flex w-full flex-col gap-1 sm:w-auto">
+        <span className="pl-1 text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+          Order placed date
+        </span>
+        <div className="relative w-full sm:w-auto">
+          <input
+            type="date"
+            value={placedDateFilter}
+            onChange={(e) => setPlacedDateFilter(e.target.value)}
+            title="Filter by order placed date"
+            className="w-full rounded-full border border-border bg-background px-4 py-2.5 pr-9 text-sm text-primary outline-none focus:border-accent sm:w-auto"
+          />
+          {placedDateFilter && (
+            <button
+              type="button"
+              onClick={() => setPlacedDateFilter("")}
+              aria-label="Clear order placed date filter"
+              title="Clear order placed date filter"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-muted-foreground hover:text-accent"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
+        </div>
+        </div>
+        <div className="flex w-full flex-col gap-1 sm:w-auto">
+        <span className="pl-1 text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+          Delivery date
+        </span>
         <div className="relative w-full sm:w-auto">
           <input
             type="date"
@@ -818,11 +849,13 @@ function Orders({
             </button>
           )}
         </div>
+        </div>
         {hasActiveFilters && (
           <button
             onClick={() => {
               setSearch("");
               setDateFilter("");
+              setPlacedDateFilter("");
             }}
             className="text-xs uppercase tracking-[0.14em] text-muted-foreground hover:text-accent"
           >
