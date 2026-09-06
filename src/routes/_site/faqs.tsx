@@ -41,7 +41,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "Do you offer same-day delivery?",
-    a: "We don’t offer same-day delivery, as all our brownies are baked fresh to order. All orders must be placed at least one day in advance, between 9 AM and 5 PM, for delivery the following day or later.",
+    a: "No, we currently do not offer same-day delivery. Orders placed between 9 AM and 5 PM can be scheduled for the next day or any future date of your choice. Orders placed after 5 PM can be scheduled from the day after the next day onwards. You can choose your preferred delivery date and time during checkout while placing your order.",
   },
   {
     q: "What are your order and delivery timings?",
@@ -49,7 +49,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "Do you charge for delivery?",
-    a: "Yes, delivery charges are additional and vary based on your delivery location. We use delivery partners such as Uber, Rapido and Porter, and always try to choose the most economical available option. The exact delivery charge and tracking details will be shared with you when your order is dispatched.",
+    a: "Yes, delivery charges apply to all orders as we currently offer delivery only and do not offer pickups. The delivery charge is calculated based on the distance between our kitchen and the delivery address you enter at checkout. The applicable delivery charge will be displayed during checkout before you place your order. We use trusted third-party delivery partners such as Uber, Rapido, and Porter to deliver your order. Once your order is dispatched, we'll share the tracking details with you so you can follow your delivery.",
   },
   {
     q: "Are your brownies baked fresh?",
