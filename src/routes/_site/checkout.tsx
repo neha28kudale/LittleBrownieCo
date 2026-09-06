@@ -1,4 +1,15 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { Checkout } from "@/components/CheckoutPage";
+
+export const Route = createFileRoute("/_site/checkout")({
+  head: () => ({
+    meta: [
+      { title: "Checkout — Little Brownie Co." },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
+  component: Checkout,
+});import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
