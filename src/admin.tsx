@@ -262,6 +262,11 @@ function AdminDashboard({
       total: orders.length,
       pending: orders.filter((o) => o.orderStatus === "order_placed").length,
       completed: orders.filter((o) => o.orderStatus === "order_confirmed").length,
+      approved: orders.filter((o) => o.orderStatus === "order_confirmed").length,
+      baking: orders.filter((o) => o.orderStatus === "baking").length,
+      outForDelivery: orders.filter((o) => o.orderStatus === "out_for_delivery").length,
+      delivered: orders.filter((o) => o.orderStatus === "delivered").length,
+      rejected: orders.filter((o) => o.orderStatus === "rejected").length,
       products: products.length,
       revenue: orders
         .filter((o) => o.orderStatus !== "rejected" && o.paymentStatus === "paid")
@@ -467,7 +472,18 @@ function Overview({
   stats,
   orders,
 }: {
-  stats: { total: number; pending: number; completed: number; products: number; revenue: number };
+  stats: {
+    total: number;
+    pending: number;
+    completed: number;
+    approved: number;
+    baking: number;
+    outForDelivery: number;
+    delivered: number;
+    rejected: number;
+    products: number;
+    revenue: number;
+  };
   orders: Order[];
 }) {
   const cards = [
@@ -475,6 +491,14 @@ function Overview({
     { label: "Pending Orders", value: stats.pending },
     { label: "Completed Orders", value: stats.completed },
     { label: "Products Live", value: stats.products },
+  ];
+  const orderStatusCards = [
+    { label: "Pending", value: stats.pending },
+    { label: "Approved", value: stats.approved },
+    { label: "Baking", value: stats.baking },
+    { label: "Out for Delivery", value: stats.outForDelivery },
+    { label: "Delivered", value: stats.delivered },
+    { label: "Rejected", value: stats.rejected },
   ];
   return (
     <div className="space-y-8">
@@ -487,6 +511,22 @@ function Overview({
             <div className="mt-2 font-serif text-2xl text-primary sm:mt-3 sm:text-4xl">{c.value}</div>
           </div>
         ))}
+      </div>
+      <div className="rounded-lg border border-border bg-card p-6">
+        <h2 className="font-serif text-2xl text-primary">Orders by status</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          A quick summary of every order tab in the Orders page.
+        </p>
+        <div className="mt-5 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-6">
+          {orderStatusCards.map((c) => (
+            <div key={c.label} className="rounded-lg border border-border bg-secondary/20 p-4">
+              <div className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+                {c.label}
+              </div>
+              <div className="mt-2 font-serif text-2xl text-primary">{c.value}</div>
+            </div>
+          ))}
+        </div>
       </div>
       <div className="rounded-lg border border-border bg-card p-6">
         <div className="flex items-baseline justify-between">
@@ -586,6 +626,16 @@ function PaymentBadge({ status }: { status: Order["paymentStatus"] }) {
   );
 }
 
+const ORDER_STATUS_TABS: { id: "all" | OrderStatus; label: string }[] = [
+  { id: "all", label: "All" },
+  { id: "order_placed", label: "Pending" },
+  { id: "order_confirmed", label: "Approved" },
+  { id: "baking", label: "Baking" },
+  { id: "out_for_delivery", label: "Out for Delivery" },
+  { id: "delivered", label: "Delivered" },
+  { id: "rejected", label: "Rejected" },
+];
+
 function Orders({
   orders,
   setStatus,
@@ -594,6 +644,38 @@ function Orders({
   setStatus: (id: string, status: OrderStatus) => void | Promise<void>;
 }) {
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [statusTab, setStatusTab] = useState<"all" | OrderStatus>("all");
+  const [search, setSearch] = useState("");
+  const [dateFilter, setDateFilter] = useState("");
+
+  const statusCounts = useMemo(() => {
+    const counts: Record<"all" | OrderStatus, number> = {
+      all: orders.length,
+      order_placed: 0,
+      order_confirmed: 0,
+      baking: 0,
+      out_for_delivery: 0,
+      delivered: 0,
+      rejected: 0,
+    };
+    for (const o of orders) counts[o.orderStatus] += 1;
+    return counts;
+  }, [orders]);
+
+  const filteredOrders = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return orders.filter((o) => {
+      if (statusTab !== "all" && o.orderStatus !== statusTab) return false;
+      if (dateFilter && o.deliveryDate !== dateFilter) return false;
+      if (q) {
+        const haystack = `${o.customerName} ${o.orderNumber} ${o.phone}`.toLowerCase();
+        if (!haystack.includes(q)) return false;
+      }
+      return true;
+    });
+  }, [orders, statusTab, search, dateFilter]);
+
+  const hasActiveFilters = !!search || !!dateFilter;
 
   const ActionButtons = ({ o }: { o: Order }) => (
     <div className="flex gap-1.5" onClick={(e) => e.stopPropagation()}>
@@ -662,6 +744,7 @@ function Orders({
         <p className="mt-2 text-sm text-primary/85">
           {o.address}
           <br />
+          <span className="font-medium text-primary">Delivery date &amp; time:</span>{" "}
           {o.deliveryDate} · {o.deliverySlot}
           {o.email && (
             <>
@@ -688,14 +771,74 @@ function Orders({
 
   return (
     <div className="space-y-4">
+      {/* Summary of orders by status */}
+      <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-7">
+        {ORDER_STATUS_TABS.map((t) => (
+          <div key={t.id} className="rounded-lg border border-border bg-card p-3">
+            <div className="text-[9px] uppercase tracking-[0.14em] text-muted-foreground">
+              {t.label}
+            </div>
+            <div className="mt-1.5 font-serif text-xl text-primary">{statusCounts[t.id]}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Search + date filter — shared across all status tabs */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search by customer name, order # or phone"
+          className="w-full flex-1 rounded-full border border-border bg-background px-4 py-2.5 text-sm text-primary outline-none focus:border-accent sm:max-w-xs"
+        />
+        <input
+          type="date"
+          value={dateFilter}
+          onChange={(e) => setDateFilter(e.target.value)}
+          title="Filter by delivery date"
+          className="w-full rounded-full border border-border bg-background px-4 py-2.5 text-sm text-primary outline-none focus:border-accent sm:w-auto"
+        />
+        {hasActiveFilters && (
+          <button
+            onClick={() => {
+              setSearch("");
+              setDateFilter("");
+            }}
+            className="text-xs uppercase tracking-[0.14em] text-muted-foreground hover:text-accent"
+          >
+            Clear filters
+          </button>
+        )}
+      </div>
+
+      {/* Status tabs */}
+      <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
+        {ORDER_STATUS_TABS.map((t) => (
+          <button
+            key={t.id}
+            onClick={() => setStatusTab(t.id)}
+            className={`shrink-0 rounded-full border px-4 py-2 text-xs uppercase tracking-[0.14em] transition ${
+              statusTab === t.id
+                ? "border-primary bg-primary text-primary-foreground"
+                : "border-border text-primary/80 hover:border-accent hover:text-accent"
+            }`}
+          >
+            {t.label} ({statusCounts[t.id]})
+          </button>
+        ))}
+      </div>
+
       {/* MOBILE: card list */}
       <div className="space-y-3 md:hidden">
-        {orders.length === 0 && (
+        {filteredOrders.length === 0 && (
           <div className="rounded-lg border border-border bg-card px-5 py-10 text-center text-sm text-muted-foreground">
-            No orders yet — orders placed at checkout will show up here in real time.
+            {orders.length === 0
+              ? "No orders yet — orders placed at checkout will show up here in real time."
+              : "No orders match your search or filters."}
           </div>
         )}
-        {orders.map((o) => (
+        {filteredOrders.map((o) => (
           <div key={o.id} className="overflow-hidden rounded-lg border border-border bg-card">
             <button
               className="flex w-full flex-col gap-3 px-4 py-4 text-left"
@@ -712,6 +855,9 @@ function Orders({
                 </div>
               </div>
               <div className="truncate text-xs text-muted-foreground">{itemsSummary(o)}</div>
+              <div className="text-xs text-muted-foreground">
+                Delivery: {o.deliveryDate} · {o.deliverySlot}
+              </div>
               <div className="flex flex-wrap items-center gap-2">
                 <PaymentBadge status={o.paymentStatus} />
                 <StatusBadge order={o} />
@@ -742,6 +888,7 @@ function Orders({
               <th className="px-6 py-4 text-left">Customer</th>
               <th className="px-6 py-4 text-left">Items</th>
               <th className="px-6 py-4 text-left">Placed</th>
+              <th className="px-6 py-4 text-left">Delivery date &amp; time</th>
               <th className="px-6 py-4 text-right">Total</th>
               <th className="px-6 py-4 text-left">Payment</th>
               <th className="px-6 py-4 text-left">Status</th>
@@ -749,14 +896,16 @@ function Orders({
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {orders.length === 0 && (
+            {filteredOrders.length === 0 && (
               <tr>
-                <td colSpan={8} className="px-6 py-10 text-center text-sm text-muted-foreground">
-                  No orders yet — orders placed at checkout will show up here in real time.
+                <td colSpan={9} className="px-6 py-10 text-center text-sm text-muted-foreground">
+                  {orders.length === 0
+                    ? "No orders yet — orders placed at checkout will show up here in real time."
+                    : "No orders match your search or filters."}
                 </td>
               </tr>
             )}
-            {orders.map((o) => (
+            {filteredOrders.map((o) => (
               <React.Fragment key={o.id}>
                 <tr
                   className="cursor-pointer hover:bg-secondary/30"
@@ -771,6 +920,9 @@ function Orders({
                     {itemsSummary(o)}
                   </td>
                   <td className="px-6 py-4 text-muted-foreground">{formatPlacedAt(o.createdAt)}</td>
+                  <td className="px-6 py-4 text-muted-foreground">
+                    {o.deliveryDate} · {o.deliverySlot}
+                  </td>
                   <td className="px-6 py-4 text-right font-serif text-base text-primary">
                     ₹{o.total}
                   </td>
@@ -786,7 +938,7 @@ function Orders({
                 </tr>
                 {expanded === o.id && (
                   <tr className="bg-secondary/20">
-                    <td colSpan={8} className="px-6 py-5">
+                    <td colSpan={9} className="px-6 py-5">
                       <OrderDetails o={o} />
                     </td>
                   </tr>
