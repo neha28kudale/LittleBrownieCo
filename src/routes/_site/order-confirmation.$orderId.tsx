@@ -413,7 +413,7 @@ function OrderConfirmation() {
         <div className="flex items-start justify-between gap-4 border-b border-dashed border-border pb-5">
           <div>
             <div className="font-serif text-2xl text-primary">Little Brownie Co.</div>
-            <div className="text-xs text-muted-foreground">Bengaluru · Premium Mini Brownies</div>
+            <div className="text-xs text-muted-foreground">Bengaluru · Handcrafted Bakery</div>
           </div>
           <div className="text-right">
             <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
