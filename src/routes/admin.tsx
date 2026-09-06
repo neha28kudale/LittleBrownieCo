@@ -8,6 +8,7 @@ import {
   deleteProductRow,
   uploadProductImage,
   deleteProductImage,
+  reorderProducts,
   type Product,
   type Variant,
   IMG,
@@ -70,6 +71,8 @@ import {
   Truck,
   ChevronLeft,
   ChevronRight,
+  ArrowUp,
+  ArrowDown,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "sonner";
@@ -1418,6 +1421,30 @@ function ProductsAdmin({
     refresh();
   };
 
+  // Reordering is optimistic (moves instantly in the local `products` list
+  // this component was handed) and then persisted as new sort_order values
+  // for every product — the public site reads that same column, so the
+  // change reflects on the live menu immediately.
+  const [reordering, setReordering] = useState(false);
+
+  const move = async (index: number, direction: "up" | "down") => {
+    const targetIndex = direction === "up" ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= products.length) return;
+
+    const reordered = [...products];
+    [reordered[index], reordered[targetIndex]] = [reordered[targetIndex], reordered[index]];
+
+    setReordering(true);
+    const result = await reorderProducts(reordered.map((p) => p.id));
+    setReordering(false);
+
+    if (!result.ok) {
+      toast.error(result.error);
+      return;
+    }
+    refresh();
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-end">
@@ -1435,8 +1462,28 @@ function ProductsAdmin({
             No products yet — add your first one above.
           </div>
         )}
-        {products.map((p) => (
+        {products.map((p, i) => (
           <div key={p.id} className="flex items-center gap-3 rounded-lg border border-border bg-card p-4">
+            <div className="flex shrink-0 flex-col gap-1">
+              <button
+                onClick={() => move(i, "up")}
+                disabled={i === 0 || reordering}
+                className="rounded-full border border-border p-1.5 hover:border-accent hover:text-accent disabled:opacity-30"
+                aria-label="Move up"
+                title="Move up"
+              >
+                <ArrowUp className="h-3.5 w-3.5" />
+              </button>
+              <button
+                onClick={() => move(i, "down")}
+                disabled={i === products.length - 1 || reordering}
+                className="rounded-full border border-border p-1.5 hover:border-accent hover:text-accent disabled:opacity-30"
+                aria-label="Move down"
+                title="Move down"
+              >
+                <ArrowDown className="h-3.5 w-3.5" />
+              </button>
+            </div>
             <img
               src={p.image}
               alt=""
@@ -1477,6 +1524,7 @@ function ProductsAdmin({
           <table className="min-w-full text-sm">
             <thead className="bg-secondary/60 text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
               <tr>
+                <th className="px-6 py-4 text-left">Order</th>
                 <th className="px-6 py-4 text-left">Product</th>
                 <th className="px-6 py-4 text-left">Category</th>
                 <th className="px-6 py-4 text-right">Price</th>
@@ -1484,8 +1532,30 @@ function ProductsAdmin({
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {products.map((p) => (
+              {products.map((p, i) => (
                 <tr key={p.id}>
+                  <td className="px-6 py-4">
+                    <div className="flex gap-1">
+                      <button
+                        onClick={() => move(i, "up")}
+                        disabled={i === 0 || reordering}
+                        className="rounded-full border border-border p-1.5 hover:border-accent hover:text-accent disabled:opacity-30"
+                        aria-label="Move up"
+                        title="Move up"
+                      >
+                        <ArrowUp className="h-3.5 w-3.5" />
+                      </button>
+                      <button
+                        onClick={() => move(i, "down")}
+                        disabled={i === products.length - 1 || reordering}
+                        className="rounded-full border border-border p-1.5 hover:border-accent hover:text-accent disabled:opacity-30"
+                        aria-label="Move down"
+                        title="Move down"
+                      >
+                        <ArrowDown className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
                       <img src={p.image} alt="" className="h-12 w-12 rounded-sm object-cover" />
