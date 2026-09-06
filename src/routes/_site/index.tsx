@@ -29,20 +29,20 @@ export const Route = createFileRoute("/_site/")({
   loader: async () => ({ products: await getProducts() }),
   head: () => ({
     meta: [
-      { title: "Little Brownie Co. | Handcrafted Brownies in Bengaluru" },
+      { title: "Little Brownie Co. | Premium Mini Brownies in Bengaluru" },
       {
         name: "description",
         content:
-          "Handcrafted, small-batch brownies from Bengaluru. Order online — Belgian chocolate, cultured butter, baked fresh to order.",
+          "Where every bite earns you brownie points. Premium mini brownies, freshly baked in Bengaluru. Order your favourites online from Little Brownie Co.",
       },
       {
         property: "og:title",
-        content: "Little Brownie Co. | Handcrafted Brownies in Bengaluru",
+        content: "Little Brownie Co. | Premium Mini Brownies in Bengaluru",
       },
       {
         property: "og:description",
         content:
-          "Where every bite earns you brownie points. Order online from Bengaluru.",
+          "Where every bite earns you brownie points. Premium mini brownies, freshly baked in Bengaluru. Order your favourites online from Little Brownie Co.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
