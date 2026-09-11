@@ -61,6 +61,7 @@ LittleBrownieCo/
 - [Node.js](https://nodejs.org/) (v18 or higher recommended)
 - npm (comes with Node.js)
 - A [Supabase](https://supabase.com/) project (for backend/database features)
+- 
 
 ### Installation
 
