@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import { useCart, RIBBON_FEE } from "@/lib/cart";
 import { createOrder } from "@/lib/orders";
+import { applyCoupon, redeemCoupon, type AppliedCoupon } from "@/lib/coupons";
 import {
   DELIVERY_TIME_SLOTS,
   earliestDeliveryDate,
@@ -73,7 +74,50 @@ function Checkout() {
   const [allergenAgreed, setAllergenAgreed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  const payableTotal = subtotal + (deliveryFee ?? 0) + ribbonFee;
+  const [couponInput, setCouponInput] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null);
+  const [couponError, setCouponError] = useState("");
+  const [applyingCoupon, setApplyingCoupon] = useState(false);
+
+  const discountAmount = appliedCoupon?.discountAmount ?? 0;
+
+  const handleApplyCoupon = async () => {
+    const cleanPhone = phone.replace(/\D/g, "");
+    if (!/^[6-9]\d{9}$/.test(cleanPhone)) {
+      setCouponError("Enter your WhatsApp number above first, then apply the code.");
+      return;
+    }
+    if (!couponInput.trim()) {
+      setCouponError("Please enter a coupon code.");
+      return;
+    }
+
+    setApplyingCoupon(true);
+    setCouponError("");
+
+    const result = await applyCoupon(couponInput, cleanPhone);
+    if (!result.ok) {
+      setCouponError(result.error);
+      setApplyingCoupon(false);
+      return;
+    }
+
+    setAppliedCoupon(result.coupon);
+    setCouponError("");
+    setApplyingCoupon(false);
+    toast.success(`Coupon ${result.coupon.code} applied — ₹${result.coupon.discountAmount} off!`);
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponInput("");
+    setCouponError("");
+  };
+
+  const payableTotal = Math.max(
+    0,
+    subtotal + (deliveryFee ?? 0) + ribbonFee - discountAmount,
+  );
 
   // Debounced address + pincode + landmark -> delivery fee lookup.
   useEffect(() => {
@@ -292,6 +336,8 @@ function Checkout() {
       isGift,
       giftMessage: isGift ? giftMessage.trim() || undefined : undefined,
       ribbonFee,
+      couponCode: appliedCoupon?.code,
+      discountAmount: appliedCoupon?.discountAmount ?? 0,
       items: detailed,
     });
 
@@ -302,6 +348,20 @@ function Checkout() {
     }
 
     const order = result.order;
+
+    // Actually consume the coupon now that the order (with the discounted
+    // total) exists. If someone beat this customer to it a moment ago
+    // (e.g. the same number in another tab), we stop here rather than let
+    // them pay the discounted price for a coupon they didn't get.
+    if (appliedCoupon) {
+      const redemption = await redeemCoupon(appliedCoupon.code, cleanPhone, order.id);
+      if (!redemption.ok) {
+        setSubmitting(false);
+        toast.error(redemption.error);
+        setAppliedCoupon(null);
+        return;
+      }
+    }
 
     try {
       const { data, error } = await supabase.functions.invoke(
@@ -713,6 +773,54 @@ function Checkout() {
             ))}
           </ul>
 
+          {/* COUPON CODE */}
+          <div className="mt-5 border-t border-border pt-4">
+            {appliedCoupon ? (
+              <div className="flex items-center justify-between rounded-lg border border-accent/40 bg-accent/10 px-3.5 py-2.5">
+                <span className="text-xs text-primary">
+                  Coupon <span className="font-medium">{appliedCoupon.code}</span> applied
+                </span>
+                <button
+                  type="button"
+                  onClick={handleRemoveCoupon}
+                  className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground underline hover:text-accent"
+                >
+                  Remove
+                </button>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <input
+                  value={couponInput}
+                  onChange={(e) => {
+                    setCouponInput(e.target.value.toUpperCase());
+                    if (couponError) setCouponError("");
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleApplyCoupon();
+                    }
+                  }}
+                  placeholder="Coupon code"
+                  className="min-w-0 flex-1 rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm uppercase tracking-wide text-primary outline-none focus:border-accent"
+                />
+                <button
+                  type="button"
+                  onClick={handleApplyCoupon}
+                  disabled={applyingCoupon}
+                  className="shrink-0 rounded-lg border border-primary px-4 py-2.5 text-xs uppercase tracking-[0.12em] text-primary transition-colors hover:bg-primary hover:text-primary-foreground disabled:opacity-50"
+                >
+                  {applyingCoupon ? "Checking…" : "Apply"}
+                </button>
+              </div>
+            )}
+
+            {couponError && (
+              <p className="mt-2 text-[11px] text-destructive">{couponError}</p>
+            )}
+          </div>
+
           <dl className="mt-5 space-y-3 border-t border-border pt-4 text-sm">
             {/* SUBTOTAL */}
             <div className="flex justify-between">
@@ -742,6 +850,14 @@ function Checkout() {
               <div className="flex animate-in fade-in slide-in-from-top-1 justify-between duration-300">
                 <dt className="text-muted-foreground">Gift ribbon</dt>
                 <dd>₹{RIBBON_FEE}</dd>
+              </div>
+            )}
+
+            {/* COUPON DISCOUNT */}
+            {appliedCoupon && (
+              <div className="flex animate-in fade-in slide-in-from-top-1 justify-between text-accent duration-300">
+                <dt>Coupon ({appliedCoupon.code})</dt>
+                <dd>−₹{appliedCoupon.discountAmount}</dd>
               </div>
             )}
 
