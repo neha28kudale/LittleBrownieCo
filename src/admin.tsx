@@ -40,6 +40,13 @@ import {
   subscribeReviews,
   type Review,
 } from "@/lib/reviews";
+import {
+  getAllCoupons,
+  createCoupon,
+  setCouponActive,
+  deleteCoupon,
+  type Coupon,
+} from "@/lib/coupons";
 import { exportAdminDataToExcel } from "@/lib/export";
 import {
   LayoutDashboard,
@@ -64,6 +71,7 @@ import {
   MapPin,
   Download,
   Truck,
+  Tag,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "sonner";
@@ -186,16 +194,25 @@ function AdminDashboard({
   onLogout: () => void;
 }) {
   const [tab, setTab] = useState<
-    "overview" | "orders" | "products" | "customers" | "reviews" | "analytics" | "delivery"
+    | "overview"
+    | "orders"
+    | "products"
+    | "customers"
+    | "reviews"
+    | "analytics"
+    | "delivery"
+    | "coupons"
   >("overview");
   const [orders, setOrders] = useState<Order[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [deliverySlabs, setDeliverySlabs] = useState<DeliverySlab[]>([]);
+  const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [exporting, setExporting] = useState(false);
 
   const refreshProducts = () => getAllProductsAdmin().then(setProducts);
   const refreshDeliverySlabs = () => getDeliverySlabs().then(setDeliverySlabs);
+  const refreshCoupons = () => getAllCoupons().then(setCoupons);
 
   useEffect(() => {
     refreshProducts();
@@ -203,6 +220,10 @@ function AdminDashboard({
 
   useEffect(() => {
     refreshDeliverySlabs();
+  }, []);
+
+  useEffect(() => {
+    refreshCoupons();
   }, []);
 
   useEffect(() => {
@@ -313,6 +334,7 @@ function AdminDashboard({
     { id: "orders", label: "Orders", icon: ShoppingBag },
     { id: "products", label: "Products", icon: Package },
     { id: "delivery", label: "Delivery Fees", icon: Truck },
+    { id: "coupons", label: "Coupons", icon: Tag },
     { id: "customers", label: "Customers", icon: Users },
     { id: "reviews", label: "Reviews", icon: MessageSquare, badge: pendingReviewCount },
     { id: "analytics", label: "Analytics", icon: LayoutDashboard },
@@ -427,6 +449,9 @@ function AdminDashboard({
           {tab === "products" && <ProductsAdmin products={products} refresh={refreshProducts} />}
           {tab === "delivery" && (
             <DeliveryFeesAdmin slabs={deliverySlabs} refresh={refreshDeliverySlabs} />
+          )}
+          {tab === "coupons" && (
+            <CouponsAdmin coupons={coupons} refresh={refreshCoupons} />
           )}
           {tab === "customers" && <CustomersAdmin customers={customers} />}
           {tab === "reviews" && (
@@ -1030,6 +1055,197 @@ function DeliveryFeesAdmin({
           {slabs.length === 0 && (
             <p className="py-6 text-center text-sm text-muted-foreground">
               No delivery fee ranges found.
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CouponsAdmin({
+  coupons,
+  refresh,
+}: {
+  coupons: Coupon[];
+  refresh: () => void;
+}) {
+  const [showForm, setShowForm] = useState(false);
+  const [code, setCode] = useState("");
+  const [amount, setAmount] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+
+  const resetForm = () => {
+    setCode("");
+    setAmount("");
+    setShowForm(false);
+  };
+
+  const handleCreate = async () => {
+    setSaving(true);
+    const result = await createCoupon({ code, discountAmount: Number(amount) });
+    setSaving(false);
+    if (!result.ok) {
+      toast.error(result.error);
+      return;
+    }
+    toast.success(`Coupon ${code.trim().toUpperCase()} created`);
+    resetForm();
+    refresh();
+  };
+
+  const handleToggle = async (c: Coupon) => {
+    setBusyId(c.id);
+    const ok = await setCouponActive(c.id, !c.active);
+    setBusyId(null);
+    if (ok) {
+      toast.success(c.active ? `${c.code} turned off` : `${c.code} turned on`);
+      refresh();
+    } else {
+      toast.error("Couldn't update — please try again.");
+    }
+  };
+
+  const handleDelete = async (c: Coupon) => {
+    setBusyId(c.id);
+    const ok = await deleteCoupon(c.id);
+    setBusyId(null);
+    setConfirmDeleteId(null);
+    if (ok) {
+      toast.success(`${c.code} deleted`);
+      refresh();
+    } else {
+      toast.error("Couldn't delete — please try again.");
+    }
+  };
+
+  return (
+    <div className="max-w-2xl">
+      <div className="rounded-lg border border-border bg-card p-5 sm:p-6">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <h2 className="font-serif text-2xl text-primary">Coupon Codes</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Each code can only be used once per customer's WhatsApp
+              number. Turn a code off to stop new uses without losing its
+              history, or delete it to remove it entirely.
+            </p>
+          </div>
+          {!showForm && (
+            <button
+              onClick={() => setShowForm(true)}
+              className="flex shrink-0 items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs uppercase tracking-[0.14em] text-primary-foreground transition-colors hover:bg-cocoa-dark"
+            >
+              <Plus className="h-3.5 w-3.5" /> Add
+            </button>
+          )}
+        </div>
+
+        {showForm && (
+          <div className="mt-5 rounded-lg border border-border bg-background p-4">
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <input
+                value={code}
+                onChange={(e) => setCode(e.target.value.toUpperCase())}
+                placeholder="Code, e.g. BROWNIE25"
+                className="min-w-0 flex-1 rounded-lg border border-border bg-card px-3.5 py-2.5 text-sm uppercase tracking-wide text-primary outline-none focus:border-accent"
+              />
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">₹</span>
+                <input
+                  type="number"
+                  min={1}
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  placeholder="Amount"
+                  className="w-28 rounded-lg border border-border bg-card px-3 py-2.5 text-sm text-primary outline-none focus:border-accent"
+                />
+              </div>
+            </div>
+            <div className="mt-3 flex justify-end gap-2">
+              <button
+                onClick={resetForm}
+                className="rounded-full px-4 py-1.5 text-xs uppercase tracking-[0.14em] text-muted-foreground hover:text-primary"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleCreate}
+                disabled={saving}
+                className="rounded-full bg-primary px-4 py-1.5 text-xs uppercase tracking-[0.14em] text-primary-foreground transition-colors hover:bg-cocoa-dark disabled:opacity-50"
+              >
+                {saving ? "Creating…" : "Create"}
+              </button>
+            </div>
+          </div>
+        )}
+
+        <div className="mt-5 divide-y divide-border">
+          {coupons.map((c) => (
+            <div key={c.id} className="flex items-center justify-between gap-4 py-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium tracking-wide text-primary">
+                    {c.code}
+                  </span>
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-[10px] uppercase tracking-[0.1em] ${
+                      c.active
+                        ? "bg-accent/15 text-accent"
+                        : "bg-muted text-muted-foreground"
+                    }`}
+                  >
+                    {c.active ? "Active" : "Off"}
+                  </span>
+                </div>
+                <div className="mt-0.5 text-xs text-muted-foreground">
+                  ₹{c.discountAmount} off
+                </div>
+              </div>
+
+              <div className="flex shrink-0 items-center gap-2">
+                <button
+                  onClick={() => handleToggle(c)}
+                  disabled={busyId === c.id}
+                  className="rounded-full border border-border px-3 py-1.5 text-[11px] uppercase tracking-[0.1em] text-primary transition-colors hover:bg-muted disabled:opacity-50"
+                >
+                  {c.active ? "Turn off" : "Turn on"}
+                </button>
+
+                {confirmDeleteId === c.id ? (
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={() => handleDelete(c)}
+                      disabled={busyId === c.id}
+                      className="rounded-full bg-destructive px-3 py-1.5 text-[11px] uppercase tracking-[0.1em] text-destructive-foreground disabled:opacity-50"
+                    >
+                      Confirm
+                    </button>
+                    <button
+                      onClick={() => setConfirmDeleteId(null)}
+                      className="rounded-full px-2 py-1.5 text-[11px] text-muted-foreground hover:text-primary"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setConfirmDeleteId(c.id)}
+                    className="rounded-full p-1.5 text-muted-foreground transition-colors hover:text-destructive"
+                    aria-label={`Delete ${c.code}`}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+
+          {coupons.length === 0 && (
+            <p className="py-6 text-center text-sm text-muted-foreground">
+              No coupon codes yet — add one above.
             </p>
           )}
         </div>
