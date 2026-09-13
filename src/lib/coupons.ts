@@ -18,6 +18,82 @@ export type AppliedCoupon = {
   discountAmount: number;
 };
 
+/** Admin-only shape — includes fields the checkout flow never needs. */
+export type Coupon = {
+  id: string;
+  code: string;
+  discountAmount: number;
+  active: boolean;
+  createdAt: string;
+};
+
+function couponFromRow(row: any): Coupon {
+  return {
+    id: row.id,
+    code: row.code,
+    discountAmount: Number(row.discount_amount),
+    active: row.is_active,
+    createdAt: row.created_at,
+  };
+}
+
+/** Admin-only: list every coupon (active or not). */
+export async function getAllCoupons(): Promise<Coupon[]> {
+  const { data, error } = await supabase
+    .from("coupons")
+    .select("*")
+    .order("created_at", { ascending: false });
+  if (error || !data) {
+    if (error) console.error("[coupons] getAllCoupons", error);
+    return [];
+  }
+  return data.map(couponFromRow);
+}
+
+/** Admin-only: create a new coupon code. */
+export async function createCoupon(input: {
+  code: string;
+  discountAmount: number;
+}): Promise<{ ok: true } | { ok: false; error: string }> {
+  const code = input.code.trim().toUpperCase();
+  if (!code) return { ok: false, error: "Enter a coupon code." };
+  if (!Number.isFinite(input.discountAmount) || input.discountAmount <= 0) {
+    return { ok: false, error: "Enter a discount amount greater than ₹0." };
+  }
+
+  const { error } = await supabase
+    .from("coupons")
+    .insert({ code, discount_amount: input.discountAmount });
+
+  if (error) {
+    console.error("[coupons] createCoupon", error);
+    if (error.code === "23505") {
+      return { ok: false, error: "That code already exists." };
+    }
+    return { ok: false, error: "Could not create the coupon." };
+  }
+  return { ok: true };
+}
+
+/** Admin-only: turn a coupon on/off without deleting it (keeps redemption
+ * history intact). Turning it off stops it working immediately. */
+export async function setCouponActive(id: string, active: boolean) {
+  const { error } = await supabase.from("coupons").update({ is_active: active }).eq("id", id);
+  if (error) console.error("[coupons] setCouponActive", error);
+  return !error;
+}
+
+/** Admin-only: permanently delete a coupon. Also removes its redemption
+ * history (via cascade), so past orders keep their discount_amount but
+ * the link to "who used this code" is lost. Prefer setCouponActive(false)
+ * if you just want to stop new uses. */
+export async function deleteCoupon(id: string) {
+  const { error } = await supabase.from("coupons").delete().eq("id", id);
+  if (error) console.error("[coupons] deleteCoupon", error);
+  return !error;
+}
+
+
 export async function applyCoupon(
   code: string,
   phone: string,
