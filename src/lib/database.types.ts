@@ -92,6 +92,8 @@ export type Database = {
           delivery_date: string;
           delivery_slot: string;
           notes: string | null;
+          coupon_code: string | null;
+          discount_amount: number;
           payment_status: "pending" | "paid" | "failed";
           order_status: "order_placed" | "order_confirmed" | "rejected";
           cashfree_order_id: string | null;
@@ -112,6 +114,8 @@ export type Database = {
           delivery_date: string;
           delivery_slot: string;
           notes?: string | null;
+          coupon_code?: string | null;
+          discount_amount?: number;
           payment_status?: "pending" | "paid" | "failed";
           order_status?: "order_placed" | "order_confirmed" | "rejected";
           cashfree_order_id?: string | null;
