@@ -39,6 +39,13 @@ import {
   type DeliverySlab,
 } from "@/lib/delivery";
 import {
+  getAllCoupons,
+  createCoupon,
+  setCouponActive,
+  deleteCoupon,
+  type Coupon,
+} from "@/lib/coupons";
+import {
   getAllReviews,
   setReviewStatus,
   setShowOnHomepage,
@@ -73,6 +80,7 @@ import {
   ChevronRight,
   ArrowUp,
   ArrowDown,
+  Tag,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "sonner";
@@ -195,16 +203,25 @@ function AdminDashboard({
   onLogout: () => void;
 }) {
   const [tab, setTab] = useState<
-    "overview" | "orders" | "products" | "customers" | "reviews" | "analytics" | "delivery"
+    | "overview"
+    | "orders"
+    | "products"
+    | "customers"
+    | "reviews"
+    | "analytics"
+    | "delivery"
+    | "coupons"
   >("overview");
   const [orders, setOrders] = useState<Order[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [deliverySlabs, setDeliverySlabs] = useState<DeliverySlab[]>([]);
+  const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [exporting, setExporting] = useState(false);
 
   const refreshProducts = () => getAllProductsAdmin().then(setProducts);
   const refreshDeliverySlabs = () => getDeliverySlabs().then(setDeliverySlabs);
+  const refreshCoupons = () => getAllCoupons().then(setCoupons);
 
   useEffect(() => {
     refreshProducts();
@@ -212,6 +229,10 @@ function AdminDashboard({
 
   useEffect(() => {
     refreshDeliverySlabs();
+  }, []);
+
+  useEffect(() => {
+    refreshCoupons();
   }, []);
 
   useEffect(() => {
@@ -322,6 +343,7 @@ function AdminDashboard({
     { id: "orders", label: "Orders", icon: ShoppingBag },
     { id: "products", label: "Products", icon: Package },
     { id: "delivery", label: "Delivery Fees", icon: Truck },
+    { id: "coupons", label: "Coupons", icon: Tag },
     { id: "customers", label: "Customers", icon: Users },
     { id: "reviews", label: "Reviews", icon: MessageSquare, badge: pendingReviewCount },
     { id: "analytics", label: "Analytics", icon: LayoutDashboard },
@@ -437,6 +459,7 @@ function AdminDashboard({
           {tab === "delivery" && (
             <DeliveryFeesAdmin slabs={deliverySlabs} refresh={refreshDeliverySlabs} />
           )}
+          {tab === "coupons" && <CouponsAdmin coupons={coupons} refresh={refreshCoupons} />}
           {tab === "customers" && <CustomersAdmin customers={customers} />}
           {tab === "reviews" && (
             <ReviewsAdmin reviews={reviews} setStatus={reviewStatus} setHomepage={reviewHomepage} />
@@ -447,7 +470,7 @@ function AdminDashboard({
 
       {/* Mobile bottom tab bar */}
       <nav
-        className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-7 border-t border-border bg-background/95 backdrop-blur md:hidden"
+        className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-8 border-t border-border bg-background/95 backdrop-blur md:hidden"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
         {navItems.map(({ id, label, icon: Icon, badge }) => (
@@ -1013,6 +1036,157 @@ function Orders({
    the km range and the fee), and remove ranges here. */
 
 type SlabDraft = { minKm: string; maxKm: string; fee: string };
+
+function CouponsAdmin({
+  coupons,
+  refresh,
+}: {
+  coupons: Coupon[];
+  refresh: () => void;
+}) {
+  const [newCode, setNewCode] = useState("");
+  const [newAmount, setNewAmount] = useState("");
+  const [adding, setAdding] = useState(false);
+  const [busyId, setBusyId] = useState<string | null>(null);
+
+  const addCoupon = async () => {
+    const amount = Number(newAmount);
+    setAdding(true);
+    const result = await createCoupon({ code: newCode, discountAmount: amount });
+    setAdding(false);
+    if (!result.ok) {
+      toast.error(result.error);
+      return;
+    }
+    toast.success(`Coupon ${newCode.trim().toUpperCase()} created`);
+    setNewCode("");
+    setNewAmount("");
+    refresh();
+  };
+
+  const toggleActive = async (c: Coupon) => {
+    setBusyId(c.id);
+    const ok = await setCouponActive(c.id, !c.active);
+    setBusyId(null);
+    if (ok) {
+      toast.success(c.active ? "Coupon turned off" : "Coupon turned on");
+      refresh();
+    } else {
+      toast.error("Couldn't update — please try again.");
+    }
+  };
+
+  const remove = async (c: Coupon) => {
+    if (
+      !window.confirm(
+        `Permanently delete ${c.code}? This also removes its usage history. If you just want to stop it working, turn it off instead.`,
+      )
+    )
+      return;
+    setBusyId(c.id);
+    const ok = await deleteCoupon(c.id);
+    setBusyId(null);
+    if (ok) {
+      toast.success("Coupon deleted");
+      refresh();
+    } else {
+      toast.error("Couldn't delete — please try again.");
+    }
+  };
+
+  return (
+    <div className="max-w-2xl">
+      <div className="rounded-lg border border-border bg-card p-5 sm:p-6">
+        <h2 className="font-serif text-2xl text-primary">Coupon Codes</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Create a code for any amount, whenever you like. Each code can be
+          used once per customer (tracked by their WhatsApp number at
+          checkout) — this is enforced automatically, not something you need
+          to manage here.
+        </p>
+
+        {/* ADD NEW */}
+        <div className="mt-5 flex flex-wrap items-end gap-2 border-b border-border pb-5">
+          <label className="block">
+            <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+              Code
+            </span>
+            <input
+              value={newCode}
+              onChange={(e) => setNewCode(e.target.value.toUpperCase())}
+              placeholder="e.g. DIWALI100"
+              className="mt-1.5 w-40 rounded-lg border border-border bg-background px-3 py-2 text-sm uppercase text-primary outline-none focus:border-accent"
+            />
+          </label>
+          <label className="block">
+            <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+              Discount (₹)
+            </span>
+            <input
+              type="number"
+              min={1}
+              value={newAmount}
+              onChange={(e) => setNewAmount(e.target.value)}
+              placeholder="e.g. 100"
+              className="mt-1.5 w-28 rounded-lg border border-border bg-background px-3 py-2 text-sm text-primary outline-none focus:border-accent"
+            />
+          </label>
+          <button
+            onClick={addCoupon}
+            disabled={adding || !newCode.trim() || !newAmount}
+            className="rounded-full bg-primary px-5 py-2.5 text-xs uppercase tracking-[0.14em] text-primary-foreground transition-colors hover:bg-cocoa-dark disabled:opacity-50"
+          >
+            {adding ? "Adding…" : "Add coupon"}
+          </button>
+        </div>
+
+        {/* LIST */}
+        <div className="mt-2 divide-y divide-border">
+          {coupons.length === 0 && (
+            <p className="py-6 text-center text-sm text-muted-foreground">
+              No coupons yet — add one above.
+            </p>
+          )}
+          {coupons.map((c) => (
+            <div key={c.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
+              <div>
+                <span className="text-sm font-medium text-primary">{c.code}</span>
+                <span className="ml-2 text-sm text-muted-foreground">₹{c.discountAmount} off</span>
+                <span
+                  className={`ml-3 rounded-full px-2 py-0.5 text-[10px] uppercase tracking-[0.1em] ${
+                    c.active
+                      ? "bg-accent/15 text-accent"
+                      : "bg-muted text-muted-foreground"
+                  }`}
+                >
+                  {c.active ? "Active" : "Off"}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => toggleActive(c)}
+                  disabled={busyId === c.id}
+                  className="rounded-full border border-border px-4 py-1.5 text-xs uppercase tracking-[0.14em] text-primary transition-colors hover:bg-muted disabled:opacity-50"
+                >
+                  {c.active ? "Turn off" : "Turn on"}
+                </button>
+                <button
+                  onClick={() => remove(c)}
+                  disabled={busyId === c.id}
+                  className="rounded-full border border-destructive/40 px-3 py-1.5 text-destructive transition-colors hover:bg-destructive/10 disabled:opacity-50"
+                  aria-label={`Delete ${c.code}`}
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function DeliveryFeesAdmin({
   slabs,
